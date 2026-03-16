@@ -22,13 +22,13 @@ export const C = {
 // feat: false → standard styling
 export const SHOWS = [
   {
-    mo:   'MAR',
-    d:    '08',
-    v:    'Ypsi Ale House',
-    loc:  'Ypsilanti, MI',
-    t:    'w/ Cult Therapy & Shindig Machine',
-    feat: true,
-    ticketUrl: '#',   // ← replace with real ticket link
+    mo:   'TBA',
+    d:    '??',
+    v:    'More Shows Coming Soon',
+    loc:  'Detroit, MI',
+    t:    'Stay tuned',
+    feat: false,
+    ticketUrl: '#',
   },
   // Add more shows like this:
   // {
