@@ -1,8 +1,3 @@
-// ─────────────────────────────────────
-//  Shows.jsx
-//  Upcoming shows list.
-//  Edit shows in src/data/constants.js
-// ─────────────────────────────────────
 import SectionTitle from './SectionTitle';
 import { C, SHOWS } from '../data/constants';
 
@@ -25,79 +20,43 @@ export default function Shows() {
               key={i}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '76px 1fr auto',
+                gridTemplateColumns: '76px 1fr',
                 alignItems: 'center',
                 gap: '1.25rem',
-                padding: '1.1rem 1.4rem',
+                padding: '1.4rem 1.8rem',
                 border: `3px solid ${s.feat ? C.gold : 'rgba(212,160,23,0.22)'}`,
                 background: s.feat ? 'rgba(212,160,23,0.07)' : 'rgba(0,0,0,0.25)',
                 transition: 'transform 0.08s, box-shadow 0.08s',
                 cursor: 'default',
               }}
-              onMouseEnter={(e) => {
+              onMouseEnter={e => {
                 e.currentTarget.style.transform = 'translate(-2px,-2px)';
                 e.currentTarget.style.boxShadow = `5px 5px 0 ${C.goldD}`;
               }}
-              onMouseLeave={(e) => {
+              onMouseLeave={e => {
                 e.currentTarget.style.transform = '';
                 e.currentTarget.style.boxShadow = '';
               }}
             >
               {/* Date */}
               <div style={{ textAlign: 'center' }}>
-                <span
-                  style={{
-                    fontFamily: '"Press Start 2P"',
-                    fontSize: '0.45rem',
-                    color: '#e74c3c',
-                    display: 'block',
-                    marginBottom: '0.25rem',
-                  }}
-                >
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.55rem', color: '#e74c3c', display: 'block', marginBottom: '0.25rem' }}>
                   {s.mo}
                 </span>
-                <span
-                  style={{
-                    fontFamily: '"Press Start 2P"',
-                    fontSize: '1.1rem',
-                    color: C.gold,
-                    display: 'block',
-                  }}
-                >
+                <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1.2rem', color: C.gold, display: 'block' }}>
                   {s.d}
                 </span>
               </div>
 
               {/* Venue info */}
               <div>
-                <span
-                  style={{ fontFamily: '"VT323"', fontSize: '1.7rem', color: C.cream, display: 'block' }}
-                >
+                <span style={{ fontFamily: '"VT323"', fontSize: '2.2rem', color: C.cream, display: 'block', lineHeight: 1.1 }}>
                   {s.v}
                 </span>
-                <span
-                  style={{ fontFamily: '"Press Start 2P"', fontSize: '0.35rem', color: C.goldL }}
-                >
+                <span style={{ fontFamily: '"VT323"', fontSize: '1.5rem', color: C.goldL, display: 'block', marginTop: '0.2rem' }}>
                   📍 {s.loc} — {s.t}
                 </span>
               </div>
-
-              {/* Ticket button */}
-              <a
-                href={s.ticketUrl}
-                style={{
-                  fontFamily: '"Press Start 2P"',
-                  fontSize: '0.36rem',
-                  color: C.green,
-                  background: s.feat ? C.gold : C.goldL,
-                  padding: '0.55rem 0.7rem',
-                  textDecoration: 'none',
-                  boxShadow: '3px 3px 0 #000',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                TICKETS →
-              </a>
             </div>
           ))}
         </div>
