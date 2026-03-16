@@ -739,34 +739,57 @@ export default function PizzaGame() {
       </div>
 
       {/* Mobile controls */}
+      {/* noSelectStyle kills iOS text-selection callout on long-press */}
+      <style>{`
+        .tc-btn {
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+          -webkit-touch-callout: none;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: none;
+        }
+        .tc-btn:active { opacity: 0.85; }
+      `}</style>
+
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
         {/* ◀ ▶ movement */}
         <div style={{ display: 'flex', gap: '0.6rem' }}>
           {[['◀', 'ArrowLeft', true], ['▶', 'ArrowRight', true]].map(([lbl, key, hold]) => (
             <button
               key={key}
-              style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', background: C.gold, color: C.green, border: 'none', width: 76, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000', userSelect: 'none', touchAction: 'none' }}
+              className="tc-btn"
+              style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', background: C.gold, color: C.green, border: 'none', width: 76, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000' }}
               onTouchStart={e => { e.preventDefault(); mb(key, true); }}
               onTouchEnd={e => { e.preventDefault(); hold && mb(key, false); }}
+              onTouchCancel={e => { e.preventDefault(); hold && mb(key, false); }}
+              onContextMenu={e => e.preventDefault()}
               onMouseDown={() => mb(key, true)}
               onMouseUp={() => hold && mb(key, false)}
+              onMouseLeave={() => hold && mb(key, false)}
             >{lbl}</button>
           ))}
         </div>
 
         {/* JUMP */}
         <button
-          style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', background: '#e74c3c', color: '#fff', border: 'none', width: 86, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000', userSelect: 'none', touchAction: 'none' }}
+          className="tc-btn"
+          style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', background: '#e74c3c', color: '#fff', border: 'none', width: 86, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000' }}
           onTouchStart={e => { e.preventDefault(); mb('jump', true); }}
           onTouchEnd={e => e.preventDefault()}
+          onTouchCancel={e => e.preventDefault()}
+          onContextMenu={e => e.preventDefault()}
           onMouseDown={() => mb('jump', true)}
         >▲ JUMP</button>
 
         {/* START */}
         <button
-          style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', background: C.greenL, color: C.cream, border: 'none', width: 86, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000', userSelect: 'none', touchAction: 'none' }}
+          className="tc-btn"
+          style={{ fontFamily: '"Press Start 2P"', fontSize: '0.7rem', background: C.greenL, color: C.cream, border: 'none', width: 86, height: 66, cursor: 'pointer', boxShadow: '3px 3px 0 #000' }}
           onTouchStart={e => { e.preventDefault(); mb('start', true); }}
           onTouchEnd={e => e.preventDefault()}
+          onTouchCancel={e => e.preventDefault()}
+          onContextMenu={e => e.preventDefault()}
           onMouseDown={() => mb('start', true)}
         >START</button>
       </div>
