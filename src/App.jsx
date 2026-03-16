@@ -10,7 +10,6 @@ import Shows       from './components/Shows';
 import Band        from './components/Band';
 import GameSection from './components/GameSection';
 import Footer      from './components/Footer';
-import MusicPlayer from './components/MusicPlayer';
 
 export default function App() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -24,7 +23,6 @@ export default function App() {
       <Band />
       <GameSection />
       <Footer />
-      <MusicPlayer />
     </div>
   );
 }
