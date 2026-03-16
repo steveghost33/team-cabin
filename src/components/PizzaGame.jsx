@@ -19,6 +19,7 @@ export default function PizzaGame() {
   const canvasRef = useRef(null);
   const gameRef = useRef({});
   const [uiState, setUiState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -480,6 +481,11 @@ export default function PizzaGame() {
     };
   },[]);
 
+  const enterFullscreen = () => {
+    if (window.innerWidth <= 768) setIsFullscreen(true);
+  };
+  const exitFullscreen = () => setIsFullscreen(false);
+
   const mb=(key,down)=>{
     const g=gameRef.current;if(!g)return;
     const st=g.getState?g.getState():uiState.state;
@@ -498,16 +504,13 @@ export default function PizzaGame() {
     } else{g.keys[key]=down;}
   };
 
-  return (
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'1rem'}}>
-      <div style={{border:`5px solid ${C.gold}`,boxShadow:`0 0 0 3px ${C.green},0 0 0 6px ${C.gold},8px 8px 0 6px #000`,background:'#000',width:'100%',maxWidth:780}}>
-        <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',display:'block',imageRendering:'pixelated'}}/>
-      </div>
+  const controlButtons = (
+    <>
       <style>{`
         .tc-btn{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:none;}
         .tc-btn:active{opacity:0.85;}
       `}</style>
-      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1.5rem',flexWrap:'wrap',marginTop:'0.75rem'}}>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1rem',flexWrap:'wrap',padding:'0.5rem'}}>
         <div style={{display:'flex',gap:'0.6rem'}}>
           {[['◀','ArrowLeft',true],['▶','ArrowRight',true]].map(([lbl,key,hold])=>(
             <button key={key} className="tc-btn"
@@ -538,7 +541,39 @@ export default function PizzaGame() {
           onContextMenu={e=>e.preventDefault()}
           onMouseDown={()=>mb('start',true)}
         >START</button>
+        {isFullscreen&&(
+          <button className="tc-btn"
+            style={{fontFamily:'"Press Start 2P"',fontSize:'0.55rem',background:'#333',color:C.cream,border:`2px solid ${C.goldD}`,width:66,height:66,cursor:'pointer',boxShadow:'3px 3px 0 #000'}}
+            onTouchStart={e=>{e.preventDefault();exitFullscreen();}}
+            onMouseDown={exitFullscreen}
+          >✕ EXIT</button>
+        )}
       </div>
+    </>
+  );
+
+  if (isFullscreen) {
+    return (
+      <div style={{position:'fixed',inset:0,zIndex:9999,background:'#000',display:'flex',flexDirection:'column'}}>
+        <div style={{flex:1,display:'flex',alignItems:'stretch',overflow:'hidden'}}>
+          <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',height:'100%',display:'block',imageRendering:'pixelated',objectFit:'contain'}}/>
+        </div>
+        <div style={{background:'#0a1506',borderTop:`3px solid ${C.gold}`,paddingBottom:'env(safe-area-inset-bottom,0px)'}}>
+          {controlButtons}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'1rem'}}>
+      <div onClick={enterFullscreen} style={{border:`5px solid ${C.gold}`,boxShadow:`0 0 0 3px ${C.green},0 0 0 6px ${C.gold},8px 8px 0 6px #000`,background:'#000',width:'100%',maxWidth:780,cursor:'pointer',position:'relative'}}>
+        <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',display:'block',imageRendering:'pixelated'}}/>
+        <div style={{position:'absolute',bottom:8,right:10,fontFamily:'"Press Start 2P"',fontSize:'0.4rem',color:'rgba(212,160,23,0.5)',pointerEvents:'none'}}>
+          📱 TAP TO FULLSCREEN
+        </div>
+      </div>
+      {controlButtons}
       <div style={{fontFamily:'"Press Start 2P"',fontSize:'0.4rem',color:'rgba(245,240,220,0.3)',textAlign:'center'}}>
         ← → MOVE &nbsp;|&nbsp; SPACE / ↑ JUMP &nbsp;|&nbsp; ENTER START
       </div>
