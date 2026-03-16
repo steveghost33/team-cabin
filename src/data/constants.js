@@ -72,7 +72,7 @@ export const MEMBERS = [
     charId: 0,
     name:  'STEVE',
     role:  'Bass & Vocals',
-    bio:   'The kind of guy who turns a three-minute song into a minor philosophy lecture — rough around the edges, but the kind of rough that makes you think. Holds the low end like a grudge.',
+    bio:   'The kind of guy who turns a 2-minute song into a minor philosophy lecture — rough around the edges, but the kind of rough that makes you think. Holds the low end like a grudge.',
     pizza: 'Deep dish, obviously',
   },
   {
