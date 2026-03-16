@@ -1,32 +1,23 @@
-// ─────────────────────────────────────
-//  PizzaGame.jsx
-//  Detroit Pizza Quest — full game with music.
-//
-//  MUSIC:
-//    Drop your MP3 in the public/ folder.
-//    Set SONG_FILE to match the filename.
-//    Set SONG_VOLUME between 0.0 and 1.0.
-// ─────────────────────────────────────
 import { useEffect, useRef, useState } from 'react';
 import { C } from '../data/constants';
 
-const W           = 780;
-const H           = 520;
-const GROUND      = H - 80;
-const PW          = 24;
-const PH          = 32;
-const WIN         = 16;
-const GRAVITY     = 0.65;
-const JUMP_POWER  = -13;
-const SPAWN_RATE  = 130;
-const PIZZA_RATE  = 85;
+const W = 780;
+const H = 520;
+const GROUND = H - 80;
+const PW = 24;
+const PH = 32;
+const WIN = 16;
+const GRAVITY = 0.65;
+const JUMP_POWER = -13;
+const SPAWN_RATE = 130;
+const PIZZA_RATE = 85;
 const ENEMY_SPEED = 2.5;
-const SONG_FILE   = '/song.mp3';  // ← filename in public/ folder
-const SONG_VOLUME = 0.5;          // ← 0.0 to 1.0
+const SONG_FILE = '/kylesong.mp3';
+const SONG_VOLUME = 0.5;
 
 export default function PizzaGame() {
   const canvasRef = useRef(null);
-  const gameRef   = useRef({});
+  const gameRef = useRef({});
   const [uiState, setUiState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0 });
 
   useEffect(() => {
@@ -35,7 +26,7 @@ export default function PizzaGame() {
     const ctx = canvas.getContext('2d');
 
     const music = new Audio(SONG_FILE);
-    music.loop   = true;
+    music.loop = true;
     music.volume = SONG_VOLUME;
 
     let gState = 'title', sc = 0, lv = 3, pc = 0, lvl = 1;
@@ -81,7 +72,7 @@ export default function PizzaGame() {
 
     function spawnObs() {
       const r = Math.random();
-      const type = r<0.28?'cone': r<0.55?'metermaid': r<0.78?'muscledude':'rat';
+      const type = r<0.28?'cone':r<0.55?'metermaid':r<0.78?'muscledude':'rat';
       const geo = { cone:{w:18,h:26,gy:GROUND-26}, metermaid:{w:22,h:38,gy:GROUND-38}, muscledude:{w:28,h:40,gy:GROUND-40}, rat:{w:20,h:16,gy:GROUND-16} }[type];
       obs.push({ type, x:W+scrollX+80, y:geo.gy, w:geo.w, h:geo.h, vx:-(ENEMY_SPEED+lvl*0.3), at:0, dead:false, deadTimer:0 });
     }
@@ -96,7 +87,7 @@ export default function PizzaGame() {
     }
 
     function drawBld(b, cx) {
-      const bx = b.x - cx;
+      const bx = b.x-cx;
       if (bx>W+200||bx+b.w<-200) return;
       ctx.fillStyle=b.color; ctx.fillRect(bx,GROUND-b.h,b.w,b.h);
       ctx.strokeStyle='#0a1506'; ctx.lineWidth=1; ctx.strokeRect(bx,GROUND-b.h,b.w,b.h);
@@ -293,7 +284,7 @@ export default function PizzaGame() {
       ctx.fillStyle='#e74c3c'; ctx.fillText('♥'.repeat(lv),12,44);
       ctx.fillStyle=C.cream; ctx.textAlign='center'; ctx.fillText('BEST:'+highSc,W/2,22);
       ctx.fillStyle=C.goldL; ctx.textAlign='right'; ctx.fillText('🍕 '+pc+'/'+WIN,W-12,22);
-      for (let i=0;i<WIN;i++) { ctx.fillStyle=i<pc?'#FF8C00':'#222'; ctx.fillRect(W-12-WIN*13+i*13,28,11,16); }
+      for (let i=0;i<WIN;i++){ctx.fillStyle=i<pc?'#FF8C00':'#222';ctx.fillRect(W-12-WIN*13+i*13,28,11,16);}
       ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
       ctx.fillText('STOMP ENEMIES FROM ABOVE | AVOID CONES',W/2,53);
     }
@@ -423,11 +414,9 @@ export default function PizzaGame() {
         blds=blds.filter(b=>b.x-scrollX>-300);
         if(sc>lvl*400)lvl++;
       }
-
       if(gState==='title'){drawTitle();raf=requestAnimationFrame(loop);return;}
       if(gState==='charselect'){drawCharSelect();raf=requestAnimationFrame(loop);return;}
       if(gState==='win'){drawWin();raf=requestAnimationFrame(loop);return;}
-
       const sg=ctx.createLinearGradient(0,0,0,GROUND);sg.addColorStop(0,'#050d03');sg.addColorStop(1,'#112009');
       ctx.fillStyle=sg;ctx.fillRect(0,0,W,GROUND);
       for(let i=0;i<40;i++){const sx=((i*137+scrollX*0.07)%(W+40)+W+40)%(W+40),sy=(i*73)%(GROUND*0.5);ctx.fillStyle=Math.sin(frame*0.03+i)>0.4?C.goldL:'rgba(212,160,23,0.2)';ctx.fillRect(sx,sy,2,2);}
