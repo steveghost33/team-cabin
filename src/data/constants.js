@@ -22,7 +22,7 @@ export const C = {
 // feat: false → standard styling
 export const SHOWS = [
   {
-    mo:   'MAR',
+    mo:   'MAY',
     d:    '08',
     v:    'Ypsi Ale House',
     loc:  'Ypsilanti, MI',
