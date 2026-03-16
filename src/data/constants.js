@@ -46,7 +46,7 @@ export const MUSIC_LINKS = [
   { name: 'YouTube Music',icon: '▶', color: '#ff0000', bg: 'rgba(255,0,0,0.1)',     url: 'https://music.youtube.com/channel/UCTjflMMBBqxCs2oUNMVLIuA?si=15mKpkFEZfdxr3v7' },
   { name: 'YouTube',      icon: '▶', color: '#ff4444', bg: 'rgba(255,68,68,0.1)',   url: 'https://youtube.com/@teamcabinmi?si=my2xg-r5hxGNAAsl' },
   { name: 'SoundCloud',   icon: '☁', color: '#ff5500', bg: 'rgba(255,85,0,0.1)',    url: 'https://soundcloud.com' },
-  { name: 'Amazon Music', icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.1)',   url: 'https://music.amazon.com' },
+  { name: 'Amazon Music', icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.1)',   url: 'https://music.amazon.com/artists/B071L2FBBB/team-cabin' },
 ];
 
 // ── Social / Footer Links ──
