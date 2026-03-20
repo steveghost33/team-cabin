@@ -31,7 +31,6 @@ export default function Nav({ scrollTo }) {
               color: C.cream,
               fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
               letterSpacing: '0.05em', padding: '0.5rem 0.7rem', cursor: 'pointer',
-              transition: 'color 0.1s',
             }}
               onMouseEnter={e => { e.target.style.color = C.gold; }}
               onMouseLeave={e => { e.target.style.color = C.cream; }}

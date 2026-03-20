@@ -4,7 +4,7 @@ import { C, SHOWS } from '../data/constants';
 export default function Shows() {
   return (
     <div id="shows" style={{
-      background: C.black,
+      background: '#152e0e',
       borderTop: `3px solid rgba(226,168,32,0.25)`,
       borderBottom: `3px solid rgba(226,168,32,0.25)`,
     }}>
@@ -24,7 +24,7 @@ export default function Shows() {
               onMouseEnter={e => { e.currentTarget.style.transform='translate(-3px,-3px)'; e.currentTarget.style.boxShadow='6px 6px 0 #000'; }}
               onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='4px 4px 0 #000'; }}
             >
-              {s.feat && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:5, background:C.gold, boxShadow:`0 0 8px ${C.gold}` }} />}
+              {s.feat && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:5, background:C.gold }} />}
               <div style={{ textAlign: 'center' }}>
                 <span style={{ fontFamily:'"Press Start 2P"', fontSize:'0.4rem', color:'#e74c3c', display:'block', marginBottom:'0.2rem' }}>{s.mo}</span>
                 <span style={{ fontFamily:'"Press Start 2P"', fontSize:'1rem', color:C.gold, display:'block' }}>{s.d}</span>
@@ -38,11 +38,7 @@ export default function Shows() {
                 color: C.green, background: s.feat ? C.gold : C.goldL,
                 padding:'0.5rem 0.65rem', textDecoration:'none',
                 boxShadow:'3px 3px 0 #000', whiteSpace:'nowrap',
-                transition: 'transform 0.08s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.transform='translate(-1px,-1px)'}
-                onMouseLeave={e => e.currentTarget.style.transform=''}
-              >TICKETS →</a>
+              }}>TICKETS →</a>
             </div>
           ))}
         </div>

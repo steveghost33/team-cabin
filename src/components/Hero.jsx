@@ -10,22 +10,10 @@ export default function Hero() {
       minHeight: '90vh',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: '4rem 2rem',
-      position: 'relative', overflow: 'hidden',
-      background: `linear-gradient(180deg, ${C.green} 0%, ${C.greenM} 60%, #3D5A2A 100%)`,
+      background: C.green,
     }}>
-      {/* pixel grid */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `
-          repeating-linear-gradient(0deg,transparent,transparent 15px,rgba(28,61,18,0.5) 15px,rgba(28,61,18,0.5) 16px),
-          repeating-linear-gradient(90deg,transparent,transparent 15px,rgba(28,61,18,0.5) 15px,rgba(28,61,18,0.5) 16px)
-        `,
-        backgroundSize: '16px 16px',
-        pointerEvents: 'none',
-      }} />
-
       {/* TC Logo */}
-      <div style={{ animation: 'float 4s ease-in-out infinite', marginBottom: '2rem', filter: `drop-shadow(0 0 24px ${C.gold})` }}>
+      <div style={{ animation: 'float 4s ease-in-out infinite', marginBottom: '2rem', filter: `drop-shadow(0 0 20px ${C.gold})` }}>
         <TCLogo size={160} />
       </div>
 
@@ -40,9 +28,8 @@ export default function Hero() {
       }}>TEAM CABIN</h1>
 
       <p style={{
-        fontFamily: '"Press Start 2P"', fontSize: 'clamp(0.38rem, 1.1vw, 0.6rem)',
-        color: C.goldL, letterSpacing: '0.1em', marginBottom: '3rem', textAlign: 'center',
-        textShadow: `2px 2px 0 ${C.green}`,
+        fontFamily: '"Press Start 2P"', fontSize: 'clamp(0.38rem, 1.1vw, 0.58rem)',
+        color: C.goldL, letterSpacing: '0.08em', marginBottom: '3rem', textAlign: 'center',
       }}>DETROIT'S FINEST THREE-PIECE 🍕</p>
 
       {/* Characters in pixel portrait boxes */}
@@ -57,12 +44,12 @@ export default function Hero() {
           const Char = CHARS[m.charId];
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-              {/* Portrait box */}
+              {/* Portrait box — gold border, darker green bg */}
               <div style={{
                 border: `3px solid ${C.gold}`,
                 boxShadow: `4px 4px 0 #000`,
-                background: C.green,
-                padding: 6,
+                background: '#152e0e',
+                padding: 8,
                 position: 'relative',
               }}>
                 {/* corner pixel accents */}
@@ -78,11 +65,10 @@ export default function Hero() {
                 fontFamily: '"Press Start 2P"', fontSize: '0.5rem',
                 padding: '3px 8px',
                 boxShadow: '2px 2px 0 #000',
-                letterSpacing: '0.05em',
               }}>{m.name}</div>
               <div style={{
                 fontFamily: '"Press Start 2P"', fontSize: '0.3rem',
-                color: C.goldL, letterSpacing: '0.04em',
+                color: C.goldL,
               }}>{m.role}</div>
             </div>
           );
@@ -92,7 +78,7 @@ export default function Hero() {
       <div style={{
         fontFamily: '"Press Start 2P"', fontSize: '0.45rem',
         color: C.gold, animation: 'blink 1s step-end infinite',
-        letterSpacing: '0.1em', textShadow: `2px 2px 0 #000`,
+        letterSpacing: '0.08em',
       }}>▼ SCROLL DOWN ▼</div>
     </section>
   );

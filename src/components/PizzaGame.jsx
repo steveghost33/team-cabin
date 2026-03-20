@@ -24,24 +24,21 @@ const GRN2 = '#2D4A1E';
 
 export default function PizzaGame() {
   const canvasRef = useRef(null);
-  const gameRef = useRef({});
+  const gameRef  = useRef({});
   const [uiState, setUiState] = useState({ state:'title', score:0, hp:MAX_HP, pizza:0, level:1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const check = () => setIsMobile('ontouchstart' in window || window.innerWidth <= 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
+  useEffect(()=>{
+    const check=()=>setIsMobile('ontouchstart' in window||window.innerWidth<=768);
+    check(); window.addEventListener('resize',check);
+    return()=>window.removeEventListener('resize',check);
+  },[]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const music = new Audio(SONG_FILE);
-    music.loop = true; music.volume = SONG_VOLUME;
+  useEffect(()=>{
+    const canvas=canvasRef.current; if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    const music=new Audio(SONG_FILE); music.loop=true; music.volume=SONG_VOLUME;
 
     let gState='title';
     let sc=0, pc=0, levelIdx=0;
@@ -49,55 +46,37 @@ export default function PizzaGame() {
     let obs=[], pizzas=[], weapons=[], parts=[], blds=[];
     let keys={}, charIdx=0, selectedChar=0;
     let boss=null, bossHp=BOSS_HP;
-    let transitionTimer=0;
-    let attackPressed=false;
-    let heldWeapon=null, weaponCooldown=0;
-    let punchLeg=0;
+    let transitionTimer=0, attackPressed=false;
+    let heldWeapon=null, weaponCooldown=0, punchLeg=0;
 
     const pl={x:80,y:GROUND-PH,vx:0,vy:0,og:true,face:1,inv:0,hp:MAX_HP,attacking:0,attackHit:[]};
     const sync=()=>setUiState({state:gState,score:sc,hp:pl.hp,pizza:pc,level:levelIdx+1});
     const cfg=()=>LEVELS[levelIdx];
 
-    function reset() {
+    function reset(){
       Object.assign(pl,{x:80,y:GROUND-PH,vx:0,vy:0,og:true,inv:0,hp:MAX_HP,attacking:0,attackHit:[]});
       obs=[];pizzas=[];weapons=[];parts=[];blds=[];
       boss=null;bossHp=BOSS_HP;heldWeapon=null;weaponCooldown=0;punchLeg=0;
       scrollX=0;spT=0;piT=0;wT=0;
       for(let i=0;i<26;i++) blds.push(mkBld(i*160+200));
     }
+    function start(){sc=0;pc=0;levelIdx=0;charIdx=selectedChar;reset();gState='playing';music.currentTime=0;music.play().catch(()=>{});sync();}
+    function respawn(){Object.assign(pl,{x:80,y:GROUND-PH,vx:0,vy:0,og:true,inv:180,hp:MAX_HP,attacking:0,attackHit:[]});heldWeapon=null;charIdx=selectedChar;gState='playing';music.play().catch(()=>{});sync();}
+    function jump(){if(pl.og){pl.vy=JUMP_POWER;pl.og=false;}}
 
-    function start() {
-      sc=0;pc=0;levelIdx=0;charIdx=selectedChar;
-      reset();gState='playing';
-      music.currentTime=0;music.play().catch(()=>{});sync();
-    }
-
-    function respawn() {
-      Object.assign(pl,{x:80,y:GROUND-PH,vx:0,vy:0,og:true,inv:180,hp:MAX_HP,attacking:0,attackHit:[]});
-      heldWeapon=null;charIdx=selectedChar;
-      gState='playing';music.play().catch(()=>{});sync();
-    }
-
-    function jump() { if(pl.og){pl.vy=JUMP_POWER;pl.og=false;} }
-
-    function attack() {
+    function attack(){
       if(pl.attacking>0) return;
-      pl.attacking=ATTACK_FRAMES;
-      pl.attackHit=[];
-      punchLeg=(punchLeg+1)%4;
-      if(heldWeapon&&weaponCooldown===0) fireWeapon();
-      else doAttack();
+      pl.attacking=ATTACK_FRAMES; pl.attackHit=[]; punchLeg=(punchLeg+1)%4;
+      if(heldWeapon&&weaponCooldown===0) fireWeapon(); else doAttack();
     }
-
-    function fireWeapon() {
+    function fireWeapon(){
       weaponCooldown=12;
-      if(heldWeapon.type==='gun') {
+      if(heldWeapon.type==='gun'){
         heldWeapon.ammo--;
         const by=pl.y+PH/2;
         addParts(pl.face===1?pl.x+PW:pl.x,by,'#ffe066',4);
         obs.forEach(o=>{
-          if(o.dead)return;
-          const ox=o.x-scrollX;
+          if(o.dead)return; const ox=o.x-scrollX;
           const inLine=pl.face===1?ox>pl.x:ox+o.w<pl.x+PW;
           if(inLine&&o.y<by+12&&o.y+o.h>by-12){
             o.hp=(o.hp||2)-2;o.hitFlash=10;
@@ -115,22 +94,16 @@ export default function PizzaGame() {
             sync();
           }
         }
-      } else {
-        heldWeapon.ammo--;
-        doAttack(1.8);
-      }
+      } else { heldWeapon.ammo--; doAttack(1.8); }
       if(heldWeapon&&heldWeapon.ammo<=0) heldWeapon=null;
     }
-
-    function doAttack(dmgMult=1) {
+    function doAttack(dmgMult=1){
       const ax=pl.face===1?pl.x+PW:pl.x-ATTACK_RANGE;
-      const ay=pl.y;
       obs.forEach(o=>{
         if(o.dead||pl.attackHit.includes(o.id))return;
         const ox=o.x-scrollX;
-        if(ox+o.w>ax&&ox<ax+ATTACK_RANGE&&o.y+o.h>ay&&o.y<ay+PH+10){
-          o.hp=(o.hp||2)-Math.round(1*dmgMult);o.hitFlash=10;
-          pl.attackHit.push(o.id);
+        if(ox+o.w>ax&&ox<ax+ATTACK_RANGE&&o.y+o.h>pl.y&&o.y<pl.y+PH+10){
+          o.hp=(o.hp||2)-Math.round(1*dmgMult);o.hitFlash=10;pl.attackHit.push(o.id);
           if(o.hp<=0){o.dead=true;o.deadTimer=30;sc+=200;addParts(ox+o.w/2,o.y,GLD,10);}
           else{o.vx=(pl.face===1?3:-3);addParts(ox+o.w/2,o.y+o.h/2,'#fff',4);}
           sync();
@@ -138,7 +111,7 @@ export default function PizzaGame() {
       });
       if(boss&&!boss.dead&&boss.inv===0){
         const bOx=boss.x-scrollX;
-        if(bOx+boss.w>ax&&bOx<ax+ATTACK_RANGE&&boss.y+boss.h>ay&&boss.y<ay+PH+10){
+        if(bOx+boss.w>ax&&bOx<ax+ATTACK_RANGE&&boss.y+boss.h>pl.y&&boss.y<pl.y+PH+10){
           bossHp=Math.max(0,bossHp-ATTACK_DMG*dmgMult);boss.inv=18;boss.hitFlash=10;
           sc+=100;addParts(bOx+boss.w/2,boss.y,GLD,10);
           if(bossHp<=0){boss.dead=true;boss.deadTimer=90;sc+=3000;addParts(bOx+boss.w/2,boss.y+boss.h/2,'#FFD700',50);}
@@ -148,9 +121,8 @@ export default function PizzaGame() {
     }
 
     let eid=0;
-    function mkBld(x) {
-      const c=cfg();
-      const awningCols=['#c0392b','#2980b9','#27ae60','#8e44ad','#e67e22'];
+    function mkBld(x){
+      const c=cfg(); const awningCols=['#c0392b','#2980b9','#27ae60','#8e44ad','#e67e22'];
       let specialType=null;
       if(levelIdx===0){const r=Math.random();if(r<0.1)specialType='grove';else if(r<0.2)specialType='hyperion';else if(r<0.32)specialType='ypsi';}
       else if(levelIdx===1){const r=Math.random();if(r<0.1)specialType='standrews';else if(r<0.18)specialType='checker';else if(r<0.26)specialType='rencen';}
@@ -160,146 +132,85 @@ export default function PizzaGame() {
         wc:Math.floor(Math.random()*4)+2,wr:Math.floor(Math.random()*3)+2,
         specialType,awningCol:awningCols[Math.floor(Math.random()*awningCols.length)]};
     }
-
-    function spawnEnemy() {
+    function spawnEnemy(){
       if(boss&&!boss.dead)return;
-      const c=cfg();
-      const r=Math.random();
+      const c=cfg(); const r=Math.random();
       const type=r<0.15?'cone':r<0.38?'metermaid':r<0.62?'muscledude':r<0.8?'biker':'rat';
       const isRat=type==='rat',isCone=type==='cone';
       const geos={cone:{w:18,h:26},metermaid:{w:24,h:32},muscledude:{w:24,h:32},biker:{w:24,h:32},rat:{w:12,h:10}};
-      const {w,h}=geos[type];
-      const fromLeft=Math.random()<0.3;
-      obs.push({
-        id:eid++,type,
+      const {w,h}=geos[type]; const fromLeft=Math.random()<0.3;
+      obs.push({id:eid++,type,
         x:isCone?(scrollX+W+40+Math.random()*200):(fromLeft?(scrollX-50):(scrollX+W+50)),
         y:GROUND-h,w,h,
         vx:isCone?0:(fromLeft?c.enemySpeed:-c.enemySpeed),
         at:0,dead:false,deadTimer:0,
-        hp:type==='muscledude'||type==='biker'?3:isRat?1:2,
-        hitFlash:0,
-      });
+        hp:type==='muscledude'||type==='biker'?3:isRat?1:2,hitFlash:0});
     }
-
-    function spawnCollectible() {
+    function spawnCollectible(){
       if(boss&&!boss.dead)return;
       const fly=Math.random()<0.35;
-      pizzas.push({
-        x:scrollX+W+80,
-        y:fly?GROUND-PH-55-Math.random()*55:GROUND-PH-2,
-        bob:Math.random()*Math.PI*2,collected:false,type:cfg().collectible,
-      });
+      pizzas.push({x:scrollX+W+80,y:fly?GROUND-PH-55-Math.random()*55:GROUND-PH-2,
+        bob:Math.random()*Math.PI*2,collected:false,type:cfg().collectible});
     }
-
-    function spawnWeapon() {
+    function spawnWeapon(){
       if(boss&&!boss.dead)return;
       const type=WEAPON_TYPES[Math.floor(Math.random()*WEAPON_TYPES.length)];
       weapons.push({x:scrollX+W+100,y:GROUND-18,type,bob:Math.random()*Math.PI*2,collected:false});
     }
-
-    function triggerBoss() {
+    function triggerBoss(){
       obs=[];pizzas=[];weapons=[];bossHp=BOSS_HP;
       const types=['landlord','ratking','recordexec'];
       boss={type:types[levelIdx],x:scrollX+W+100,y:GROUND-80,w:60,h:80,vx:-(1.8+levelIdx*0.4),at:0,inv:0,hitFlash:0,dead:false,deadTimer:0};
     }
+    function addParts(x,y,col,n){for(let i=0;i<n;i++) parts.push({x,y,vx:(Math.random()-0.5)*7,vy:(Math.random()-0.5)*7-2,life:50+Math.random()*20,ml:70,col,sz:3+Math.random()*4});}
 
-    function addParts(x,y,col,n) {
-      for(let i=0;i<n;i++) parts.push({x,y,vx:(Math.random()-0.5)*7,vy:(Math.random()-0.5)*7-2,life:50+Math.random()*20,ml:70,col,sz:3+Math.random()*4});
+    function drawWeaponPickup(wp){
+      const ox=wp.x-scrollX; if(ox>W+60||ox<-60)return;
+      const bob=Math.sin(frame*0.06+wp.bob)*4; const wy=wp.y+bob;
+      if(wp.type==='gun'){ctx.fillStyle='#555';ctx.fillRect(ox,wy+4,12,6);ctx.fillStyle='#444';ctx.fillRect(ox+8,wy+2,4,4);ctx.fillStyle='#666';ctx.fillRect(ox+2,wy+8,4,4);}
+      else{ctx.fillStyle='#aaa';ctx.fillRect(ox+2,wy+2,2,10);ctx.fillStyle='#8B4513';ctx.fillRect(ox,wy+10,5,4);}
+      ctx.font='8px serif';ctx.textAlign='center';ctx.fillText(wp.type==='gun'?'🔫':'🔪',ox+6,wy-2);
     }
 
-    // ── WEAPON PICKUP DRAW
-    function drawWeaponPickup(wp) {
-      const ox=wp.x-scrollX;
-      if(ox>W+60||ox<-60)return;
-      const bob=Math.sin(frame*0.06+wp.bob)*4;
-      const wy=wp.y+bob;
-      if(wp.type==='gun'){
-        ctx.fillStyle='#555';ctx.fillRect(ox,wy+4,12,6);
-        ctx.fillStyle='#444';ctx.fillRect(ox+8,wy+2,4,4);
-        ctx.fillStyle='#666';ctx.fillRect(ox+2,wy+8,4,4);
-        ctx.fillStyle='#888';ctx.fillRect(ox+1,wy+4,2,3);
-      } else {
-        ctx.fillStyle='#aaa';ctx.fillRect(ox+2,wy+2,2,10);
-        ctx.fillStyle='#ccc';ctx.fillRect(ox+3,wy+2,1,8);
-        ctx.fillStyle='#8B4513';ctx.fillRect(ox,wy+10,5,4);
-        ctx.fillStyle='#666';ctx.fillRect(ox-1,wy+9,7,2);
-      }
-      ctx.font='8px serif';ctx.textAlign='center';
-      ctx.fillText(wp.type==='gun'?'🔫':'🔪',ox+6,wy-2);
-    }
-
-    // ── PUNCH / KICK ATTACK EFFECT
-    function drawAttackEffect() {
+    function drawAttackEffect(){
       if(pl.attacking<=0) return;
       const prog=1-(pl.attacking/ATTACK_FRAMES);
       const swing=Math.sin(prog*Math.PI)*16;
       const isKick=punchLeg>=2;
-
-      if(heldWeapon) {
-        const wx=pl.face===1?pl.x+PW+2:pl.x-16;
-        const wy=pl.y+PH/2-4;
+      if(heldWeapon){
+        const wx=pl.face===1?pl.x+PW+2:pl.x-16; const wy=pl.y+PH/2-4;
         ctx.save();
         if(pl.face===-1){ctx.translate(wx+14,0);ctx.scale(-1,1);ctx.translate(-wx,0);}
         if(heldWeapon.type==='gun'){
-          ctx.fillStyle='#555';ctx.fillRect(wx,wy+2,14,7);
-          ctx.fillStyle='#444';ctx.fillRect(wx+10,wy,4,5);
-          ctx.fillStyle='#666';ctx.fillRect(wx+2,wy+7,5,4);
-          if(pl.attacking>ATTACK_FRAMES-4){
-            ctx.fillStyle='rgba(255,220,0,0.9)';ctx.beginPath();ctx.arc(wx+14,wy+5,5,0,Math.PI*2);ctx.fill();
-          }
-          ctx.fillStyle=GLD;ctx.font='6px "Press Start 2P"';ctx.textAlign='center';
-          ctx.fillText(heldWeapon.ammo,wx+7,wy-3);
+          ctx.fillStyle='#555';ctx.fillRect(wx,wy+2,14,7);ctx.fillStyle='#444';ctx.fillRect(wx+10,wy,4,5);
+          if(pl.attacking>ATTACK_FRAMES-4){ctx.fillStyle='rgba(255,220,0,0.9)';ctx.beginPath();ctx.arc(wx+14,wy+5,5,0,Math.PI*2);ctx.fill();}
+          ctx.fillStyle=GLD;ctx.font='6px "Press Start 2P"';ctx.textAlign='center';ctx.fillText(heldWeapon.ammo,wx+7,wy-3);
         } else {
-          ctx.fillStyle='#bbb';ctx.fillRect(wx,wy,3,12);
-          ctx.fillStyle='#ddd';ctx.fillRect(wx+1,wy,1,10);
-          ctx.fillStyle='#8B4513';ctx.fillRect(wx-1,wy+11,5,5);
-          ctx.fillStyle=GLD;ctx.font='6px "Press Start 2P"';ctx.textAlign='center';
-          ctx.fillText(heldWeapon.ammo,wx+3,wy-3);
+          ctx.fillStyle='#bbb';ctx.fillRect(wx,wy,3,12);ctx.fillStyle='#8B4513';ctx.fillRect(wx-1,wy+11,5,5);
+          ctx.fillStyle=GLD;ctx.font='6px "Press Start 2P"';ctx.textAlign='center';ctx.fillText(heldWeapon.ammo,wx+3,wy-3);
         }
-        ctx.restore();
-        return;
+        ctx.restore(); return;
       }
-
       ctx.save();
       if(pl.face===-1){ctx.translate(pl.x+PW,0);ctx.scale(-1,1);ctx.translate(-pl.x,0);}
       if(!isKick){
-        // PUNCH — arm extends forward, alternates left/right fist
-        const armY=pl.y+PH*0.3;
-        ctx.fillStyle=punchLeg===0?'#c49060':'#b48050';
-        ctx.fillRect(pl.x+PW,armY,swing*0.8,5);
-        ctx.fillStyle='#b48050';
-        ctx.fillRect(pl.x+PW+swing*0.8-1,armY-2,8,8);
-        if(prog>0.45&&prog<0.8){
-          ctx.fillStyle='rgba(255,255,100,0.8)';
-          ctx.beginPath();ctx.arc(pl.x+PW+swing*0.8+7,armY+2,7,0,Math.PI*2);ctx.fill();
-          ctx.fillStyle='rgba(255,200,0,0.4)';
-          ctx.beginPath();ctx.arc(pl.x+PW+swing*0.8+7,armY+2,13,0,Math.PI*2);ctx.fill();
-        }
+        ctx.fillStyle='#c49060';ctx.fillRect(pl.x+PW,pl.y+PH*0.3,swing*0.8,5);
+        ctx.fillStyle='#b48050';ctx.fillRect(pl.x+PW+swing*0.8-1,pl.y+PH*0.3-2,8,8);
+        if(prog>0.45&&prog<0.8){ctx.fillStyle='rgba(255,255,100,0.8)';ctx.beginPath();ctx.arc(pl.x+PW+swing*0.8+7,pl.y+PH*0.3+2,7,0,Math.PI*2);ctx.fill();}
       } else {
-        // KICK — leg extends forward
-        const legY=pl.y+PH*0.62;
-        ctx.fillStyle='#1c1c2c';
-        ctx.fillRect(pl.x+PW-2,legY,swing,6);
-        ctx.fillStyle='#111';
-        ctx.fillRect(pl.x+PW+swing-2,legY-3,12,9);
-        if(prog>0.45&&prog<0.8){
-          ctx.fillStyle='rgba(255,80,80,0.7)';
-          ctx.beginPath();ctx.arc(pl.x+PW+swing+10,legY+2,8,0,Math.PI*2);ctx.fill();
-          ctx.fillStyle='rgba(255,40,40,0.35)';
-          ctx.beginPath();ctx.arc(pl.x+PW+swing+10,legY+2,14,0,Math.PI*2);ctx.fill();
-        }
+        ctx.fillStyle='#1c1c2c';ctx.fillRect(pl.x+PW-2,pl.y+PH*0.62,swing,6);
+        ctx.fillStyle='#111';ctx.fillRect(pl.x+PW+swing-2,pl.y+PH*0.62-3,12,9);
+        if(prog>0.45&&prog<0.8){ctx.fillStyle='rgba(255,80,80,0.7)';ctx.beginPath();ctx.arc(pl.x+PW+swing+10,pl.y+PH*0.62+2,8,0,Math.PI*2);ctx.fill();}
       }
       ctx.restore();
     }
 
-    function drawBackground() {
+    function drawBackground(){
       const c=cfg();
       if(c.daytime){
-        const sg=ctx.createLinearGradient(0,0,0,GROUND);
-        sg.addColorStop(0,'#4a90d9');sg.addColorStop(1,'#87ceeb');
+        const sg=ctx.createLinearGradient(0,0,0,GROUND);sg.addColorStop(0,'#4a90d9');sg.addColorStop(1,'#87ceeb');
         ctx.fillStyle=sg;ctx.fillRect(0,0,W,GROUND);
         ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(W-90,55,26,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,215,0,0.22)';ctx.beginPath();ctx.arc(W-90,55,38,0,Math.PI*2);ctx.fill();
         ctx.fillStyle='rgba(255,255,255,0.9)';
         [[100,70,32],[280,50,24],[460,80,28],[640,60,22]].forEach(([cx,cy,r])=>{
           const cloudX=((cx-scrollX*0.03+W*3)%(W+100))-50;
@@ -307,14 +218,9 @@ export default function PizzaGame() {
           ctx.beginPath();ctx.arc(cloudX+r*0.6,cy+5,r*0.6,0,Math.PI*2);ctx.fill();
         });
       } else {
-        const sg=ctx.createLinearGradient(0,0,0,GROUND);
-        sg.addColorStop(0,c.skyTop);sg.addColorStop(1,c.skyBot);
+        const sg=ctx.createLinearGradient(0,0,0,GROUND);sg.addColorStop(0,c.skyTop);sg.addColorStop(1,c.skyBot);
         ctx.fillStyle=sg;ctx.fillRect(0,0,W,GROUND);
-        for(let i=0;i<40;i++){
-          const sx=((i*137+scrollX*0.07)%(W+40)+W+40)%(W+40),sy=(i*73)%(GROUND*0.5);
-          ctx.fillStyle=Math.sin(frame*0.03+i)>0.4?c.starColor:'rgba(226,168,32,0.08)';
-          ctx.fillRect(sx,sy,2,2);
-        }
+        for(let i=0;i<40;i++){const sx=((i*137+scrollX*0.07)%(W+40)+W+40)%(W+40),sy=(i*73)%(GROUND*0.5);ctx.fillStyle=Math.sin(frame*0.03+i)>0.4?c.starColor:'rgba(226,168,32,0.08)';ctx.fillRect(sx,sy,2,2);}
         ctx.fillStyle=c.moonColor;ctx.beginPath();ctx.arc(W-65,50,20,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=c.skyTop;ctx.beginPath();ctx.arc(W-56,44,17,0,Math.PI*2);ctx.fill();
       }
@@ -322,17 +228,11 @@ export default function PizzaGame() {
       for(let i=0;i<10;i++){const bx=((i*105-scrollX*0.1)%(W+200)+W+200)%(W+200)-100;ctx.fillRect(bx,GROUND-45-(i%4)*22,40+(i%3)*14,45+(i%4)*22);}
     }
 
-    function drawBuilding(b) {
-      const c=cfg();const bx=b.x-scrollX;
-      if(bx>W+200||bx+b.w<-200)return;
+    function drawBuilding(b){
+      const c=cfg(); const bx=b.x-scrollX; if(bx>W+200||bx+b.w<-200)return;
       if(b.specialType==='grove'){
         ctx.fillStyle='#2a2a2a';ctx.fillRect(bx,GROUND-130,90,130);
-        ctx.strokeStyle='#444';ctx.lineWidth=2;ctx.strokeRect(bx,GROUND-130,90,130);
         ctx.fillStyle='rgba(150,200,255,0.3)';ctx.fillRect(bx+8,GROUND-105,74,55);
-        ctx.strokeStyle='#555';ctx.strokeRect(bx+8,GROUND-105,74,55);
-        ctx.strokeStyle='#444';ctx.lineWidth=1;
-        ctx.beginPath();ctx.moveTo(bx+45,GROUND-105);ctx.lineTo(bx+45,GROUND-50);ctx.stroke();
-        ctx.beginPath();ctx.moveTo(bx+8,GROUND-78);ctx.lineTo(bx+82,GROUND-78);ctx.stroke();
         ctx.fillStyle='#cc0000';ctx.fillRect(bx+4,GROUND-128,82,20);
         ctx.fillStyle='#fff';ctx.font='bold 7px "Press Start 2P"';ctx.textAlign='center';
         ctx.fillText('GROVE',bx+45,GROUND-120);ctx.font='5px "Press Start 2P"';ctx.fillText('STUDIOS',bx+45,GROUND-112);
@@ -341,7 +241,6 @@ export default function PizzaGame() {
       }
       if(b.specialType==='hyperion'){
         ctx.fillStyle='#4a3020';ctx.fillRect(bx,GROUND-110,80,110);
-        ctx.strokeStyle='#2a1a10';ctx.lineWidth=2;ctx.strokeRect(bx,GROUND-110,80,110);
         ctx.fillStyle='rgba(255,200,100,0.4)';ctx.fillRect(bx+6,GROUND-85,68,50);
         ctx.fillStyle='#1a5a4a';ctx.fillRect(bx+4,GROUND-110,72,22);
         ctx.fillStyle='#fff';ctx.font='bold 7px "Press Start 2P"';ctx.textAlign='center';
@@ -350,15 +249,10 @@ export default function PizzaGame() {
       }
       if(b.specialType==='ypsi'){
         ctx.fillStyle=b.color;ctx.fillRect(bx,GROUND-120,b.w,120);
-        ctx.fillStyle='rgba(200,220,255,0.22)';ctx.fillRect(bx+4,GROUND-78,b.w-8,48);
-        ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.strokeRect(bx+4,GROUND-78,b.w-8,48);
         ctx.fillStyle=b.awningCol;ctx.fillRect(bx,GROUND-84,b.w,8);
+        ctx.fillStyle='rgba(200,220,255,0.22)';ctx.fillRect(bx+4,GROUND-78,b.w-8,48);
         ctx.fillStyle='#ffe066';
-        for(let i=0;i<6;i++){
-          const lx=bx+4+i*(b.w-8)/5,ly=GROUND-121+Math.sin(i*1.3)*3;
-          if(Math.sin(frame*0.04+i)>0){ctx.shadowBlur=4;ctx.shadowColor='#ffe066';}
-          ctx.beginPath();ctx.arc(lx,ly,2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-        }
+        for(let i=0;i<6;i++){const lx=bx+4+i*(b.w-8)/5,ly=GROUND-121+Math.sin(i*1.3)*3;if(Math.sin(frame*0.04+i)>0){ctx.shadowBlur=4;ctx.shadowColor='#ffe066';}ctx.beginPath();ctx.arc(lx,ly,2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
         return;
       }
       if(b.specialType==='standrews'){
@@ -366,14 +260,12 @@ export default function PizzaGame() {
         ctx.fillStyle='rgba(0,0,0,0.15)';for(let r=0;r<18;r++) for(let cc=0;cc<6;cc++){if((r+cc)%2===0)ctx.fillRect(bx+cc*16+(r%2)*8,GROUND-165+r*8,14,6);}
         ctx.fillStyle='#111';ctx.fillRect(bx+2,GROUND-118,96,24);
         ctx.fillStyle='#ffe066';for(let i=0;i<10;i++){if(Math.floor(frame/8+i)%2===0){ctx.beginPath();ctx.arc(bx+6+i*9,GROUND-107,3,0,Math.PI*2);ctx.fill();}}
-        ctx.fillStyle='#fff';ctx.font='bold 7px "Press Start 2P"';ctx.textAlign='center';
-        ctx.fillText('ST. ANDREWS',bx+50,GROUND-126);ctx.font='5px "Press Start 2P"';ctx.fillText('HALL',bx+50,GROUND-118);
+        ctx.fillStyle='#fff';ctx.font='bold 7px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('ST. ANDREWS',bx+50,GROUND-126);ctx.font='5px "Press Start 2P"';ctx.fillText('HALL',bx+50,GROUND-118);
         for(let i=0;i<4;i++){ctx.fillStyle=Math.sin(frame*0.02+i)>0?'#ffe066':'#111';ctx.fillRect(bx+8+i*22,GROUND-158,14,20);}
         return;
       }
       if(b.specialType==='checker'){
         ctx.fillStyle='#1a1a1a';ctx.fillRect(bx,GROUND-105,88,105);
-        ctx.strokeStyle='#333';ctx.lineWidth=2;ctx.strokeRect(bx,GROUND-105,88,105);
         const sq=8;for(let r=0;r<3;r++) for(let cc=0;cc<11;cc++){ctx.fillStyle=(r+cc)%2===0?'#fff':'#111';ctx.fillRect(bx+cc*sq,GROUND-105+r*sq,sq,sq);}
         ctx.fillStyle='#cc0000';ctx.shadowBlur=6;ctx.shadowColor='#ff0000';ctx.fillRect(bx+4,GROUND-76,80,18);ctx.shadowBlur=0;
         ctx.fillStyle='#fff';ctx.font='bold 6px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('CHECKER BAR',bx+44,GROUND-63);
@@ -403,10 +295,9 @@ export default function PizzaGame() {
         const wx=bx+8+cc*17,wy=GROUND-b.h+20+r*22;
         if(wx+10<bx+b.w-4){const lit=Math.sin(frame*0.013+r*1.8+cc*0.9+b.x*0.01)>0;ctx.fillStyle=lit?wc:'#050505';if(lit){ctx.shadowBlur=4;ctx.shadowColor=wc;}ctx.fillRect(wx,wy,10,10);ctx.shadowBlur=0;}
       }
-      ctx.fillStyle='#555';ctx.fillRect(bx+b.w/2-3,GROUND-b.h-12,6,12);
     }
 
-    function drawStreet() {
+    function drawStreet(){
       const c=cfg();
       ctx.fillStyle=c.streetColor;ctx.fillRect(0,GROUND,W,H-GROUND);
       ctx.fillStyle=c.groundColor;ctx.fillRect(0,GROUND+4,W,H-GROUND-4);
@@ -416,15 +307,15 @@ export default function PizzaGame() {
       for(let i=0;i<W;i+=56){const dx=((i-scrollX*0.5)%56+56)%56;ctx.fillRect(dx,lY,36,3);}
     }
 
-    function drawHUD() {
+    function drawHUD(){
       const c=cfg();
       ctx.fillStyle='rgba(0,0,0,0.82)';ctx.fillRect(0,0,W,54);
       ctx.fillStyle=GLD;ctx.font='11px "Press Start 2P"';ctx.textAlign='left';ctx.fillText('SCORE:'+sc,12,18);
       if(highSc>0){ctx.fillStyle='#c8b830';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST:'+highSc,12,34);}
       const hpW=160;
       ctx.fillStyle='#111';ctx.fillRect(W/2-hpW/2-2,8,hpW+4,16);
-      const hpCol=pl.hp>60?'#2ecc71':pl.hp>30?'#f39c12':'#e74c3c';
-      ctx.fillStyle=hpCol;ctx.fillRect(W/2-hpW/2,10,Math.max(0,hpW*(pl.hp/MAX_HP)),12);
+      ctx.fillStyle=pl.hp>60?'#2ecc71':pl.hp>30?'#f39c12':'#e74c3c';
+      ctx.fillRect(W/2-hpW/2,10,Math.max(0,hpW*(pl.hp/MAX_HP)),12);
       ctx.strokeStyle=GLD;ctx.lineWidth=1;ctx.strokeRect(W/2-hpW/2-2,8,hpW+4,16);
       ctx.fillStyle='#fff';ctx.font='7px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('HP',W/2,22);
       ctx.fillStyle='#F5F0DC';ctx.font='8px "Press Start 2P"';ctx.fillText('LVL '+(levelIdx+1)+' · '+c.name,W/2,38);
@@ -444,27 +335,25 @@ export default function PizzaGame() {
       }
     }
 
-    function drawTitle() {
+    function drawTitle(){
       ctx.fillStyle=GRN;ctx.fillRect(0,0,W,H);
       for(let i=0;i<50;i++){const sx=(i*131+frame*0.3)%W,sy=(i*71)%(H*0.55);ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(226,168,32,0.1)';ctx.fillRect(sx,sy,Math.sin(frame*0.06+i)>0.6?3:1,Math.sin(frame*0.06+i)>0.6?3:1);}
       ctx.fillStyle='rgba(0,0,0,0.88)';ctx.fillRect(W/2-290,H/2-200,580,400);
       ctx.strokeStyle=GLD;ctx.lineWidth=4;ctx.strokeRect(W/2-290,H/2-200,580,400);
-      ctx.strokeStyle='#c8b830';ctx.lineWidth=1.5;ctx.strokeRect(W/2-284,H/2-194,568,388);
       ctx.fillStyle=GLD;ctx.font='20px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('DETROIT PIZZA QUEST',W/2,H/2-155);
       ctx.fillStyle='#c8b830';ctx.font='11px "Press Start 2P"';ctx.fillText('— Team Cabin Edition —',W/2,H/2-123);
       ctx.fillStyle='#F5F0DC';ctx.font='9px "Press Start 2P"';
       ctx.fillText('3 LEVELS · 3 BOSSES · 1 CITY',W/2,H/2-91);
       ctx.fillText('← → MOVE   SPACE JUMP   Z ATTACK',W/2,H/2-69);
-      ctx.fillText('STOMP OR PUNCH OR KICK ENEMIES',W/2,H/2-47);
-      ctx.fillText('PICK UP 🔫 GUNS & 🔪 KNIVES',W/2,H/2-25);
-      ctx.fillText('COLLECT 16 SLICES → BOSS FIGHT',W/2,H/2-3);
+      ctx.fillText('STOMP ENEMIES · PICK UP WEAPONS',W/2,H/2-47);
+      ctx.fillText('COLLECT 16 SLICES → BOSS FIGHT',W/2,H/2-25);
       ctx.fillStyle='rgba(226,168,32,0.5)';ctx.font='7px "Press Start 2P"';
-      ctx.fillText('LVL1: YPSILANTI · LVL2: DETROIT · LVL3: MEXICANTOWN',W/2,H/2+24);
-      if(Math.floor(frame/25)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('[ PRESS ENTER TO CHOOSE PLAYER ]',W/2,H/2+72);}
-      if(highSc>0){ctx.fillStyle='#c8b830';ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc,W/2,H/2+106);}
+      ctx.fillText('LVL1: YPSILANTI · LVL2: DETROIT · LVL3: MEXICANTOWN',W/2,H/2+4);
+      if(Math.floor(frame/25)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('[ PRESS ENTER TO CHOOSE PLAYER ]',W/2,H/2+52);}
+      if(highSc>0){ctx.fillStyle='#c8b830';ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc,W/2,H/2+86);}
     }
 
-    function drawCharSelect() {
+    function drawCharSelect(){
       ctx.fillStyle=GRN;ctx.fillRect(0,0,W,H);
       for(let i=0;i<50;i++){const sx=(i*137)%W,sy=(i*71)%(H*0.6);ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(226,168,32,0.08)';ctx.fillRect(sx,sy,2,2);}
       ctx.fillStyle=GLD;ctx.font='20px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('CHOOSE YOUR PLAYER',W/2,52);
@@ -477,7 +366,7 @@ export default function PizzaGame() {
         if(isSel){ctx.shadowBlur=14;ctx.shadowColor=GLD;ctx.strokeRect(cx,cy,cardW,cardH);ctx.shadowBlur=0;}
         const scale=4,spriteX=cx+cardW/2-(32*scale)/2,spriteY=cy+40;
         ctx.save();ctx.translate(spriteX,spriteY);ctx.scale(scale,scale);
-        drawCharSprite(ctx,i,0,0,22,{gold:GLD,goldL:'#c8b830',greenL:'#4A7A30',cream:'#F5F0DC'});
+        drawCharSprite(ctx,i,0,0,22,{gold:GLD});
         ctx.restore();
         ctx.fillStyle=isSel?GLD:'#F5F0DC';ctx.font=`${isSel?'13':'12'}px "Press Start 2P"`;ctx.textAlign='center';ctx.fillText(ch.name,cx+cardW/2,cy+cardH-62);
         ctx.fillStyle='#c8b830';ctx.font='9px "Press Start 2P"';ctx.fillText(ch.role,cx+cardW/2,cy+cardH-40);
@@ -487,7 +376,7 @@ export default function PizzaGame() {
       ctx.fillStyle='#F5F0DC';ctx.font='11px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('← → TO SELECT     ENTER TO CONFIRM',W/2,H-18);
     }
 
-    function drawLevelTransition() {
+    function drawLevelTransition(){
       const c=cfg();
       if(c.daytime){const sg=ctx.createLinearGradient(0,0,0,H);sg.addColorStop(0,'#4a90d9');sg.addColorStop(1,'#87ceeb');ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);}
       else{const sg=ctx.createLinearGradient(0,0,0,H);sg.addColorStop(0,c.skyTop);sg.addColorStop(1,c.skyBot);ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);}
@@ -496,45 +385,37 @@ export default function PizzaGame() {
       ctx.fillStyle=GLD;ctx.font='14px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('LEVEL '+(levelIdx+1),W/2,H/2-88);
       ctx.fillStyle='#F5F0DC';ctx.font='22px "Press Start 2P"';ctx.fillText(c.name,W/2,H/2-52);
       ctx.fillStyle='#c8b830';ctx.font='10px "Press Start 2P"';ctx.fillText(c.subtitle,W/2,H/2-22);
-      ctx.fillStyle='rgba(245,240,220,0.7)';ctx.font='8px "Press Start 2P"';
-      ctx.fillText('COLLECT 16 '+(c.collectible==='taco'?'TACOS':'PIZZA SLICES')+' · THEN FIGHT THE BOSS',W/2,H/2+18);
+      ctx.fillStyle='rgba(245,240,220,0.7)';ctx.font='8px "Press Start 2P"';ctx.fillText('COLLECT 16 '+(c.collectible==='taco'?'TACOS':'PIZZA SLICES')+' · THEN FIGHT THE BOSS',W/2,H/2+18);
       if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+65);}
     }
 
-    function drawDead() {
+    function drawDead(){
       ctx.fillStyle='rgba(0,0,0,0.82)';ctx.fillRect(0,0,W,H);
       ctx.fillStyle='#e74c3c';ctx.font='26px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('WRECKED!',W/2,H/2-55);
       ctx.fillStyle='#F5F0DC';ctx.font='13px "Press Start 2P"';ctx.fillText('SCORE: '+sc,W/2,H/2-10);
       if(Math.floor(frame/28)%2===0){ctx.fillStyle='#c8b830';ctx.fillText('PRESS ENTER TO RETRY',W/2,H/2+50);}
     }
 
-    function drawWin() {
+    function drawWin(){
       ctx.fillStyle=GRN;ctx.fillRect(0,0,W,H);
       for(let i=0;i<30;i++){ctx.fillStyle=[GLD,'#e74c3c','#F5F0DC','#4A7A30'][i%4];ctx.fillRect((i*137+frame*2.5)%W,(i*89+frame*1.5)%(H-60),8,8);}
       ctx.fillStyle='rgba(0,0,0,0.85)';ctx.fillRect(W/2-260,H/2-140,520,280);
       ctx.strokeStyle=GLD;ctx.lineWidth=4;ctx.strokeRect(W/2-260,H/2-140,520,280);
       ctx.fillStyle=GLD;ctx.font='17px "Press Start 2P"';ctx.textAlign='center';ctx.fillText('🍕 DETROIT CONQUERED! 🍕',W/2,H/2-100);
       ctx.fillStyle='#F5F0DC';ctx.font='11px "Press Start 2P"';
-      ctx.fillText('THE BAND FEASTS TONIGHT',W/2,H/2-65);
-      ctx.fillText('ALL 3 LEVELS COMPLETE',W/2,H/2-38);
-      ctx.fillText('SCORE: '+sc,W/2,H/2-8);
+      ctx.fillText('THE BAND FEASTS TONIGHT',W/2,H/2-65);ctx.fillText('SCORE: '+sc,W/2,H/2-8);
       if(sc>=highSc&&sc>0){ctx.fillStyle='#c8b830';ctx.fillText('✨ NEW HIGH SCORE! ✨',W/2,H/2+28);}
       if(Math.floor(frame/28)%2===0){ctx.fillStyle='#c8b830';ctx.font='11px "Press Start 2P"';ctx.fillText('PRESS ENTER TO PLAY AGAIN',W/2,H/2+75);}
     }
 
     let raf;
-    function loop() {
+    function loop(){
       frame++;
       if(weaponCooldown>0) weaponCooldown--;
-
-      if(gState==='transition'){
-        transitionTimer--;drawLevelTransition();
-        if(transitionTimer<=0){gState='playing';sync();}
-        raf=requestAnimationFrame(loop);return;
-      }
+      if(gState==='transition'){transitionTimer--;drawLevelTransition();if(transitionTimer<=0){gState='playing';sync();}raf=requestAnimationFrame(loop);return;}
 
       if(gState==='playing'){
-        // LEFT / RIGHT only — pure side-scroller
+        // LEFT / RIGHT only — pure side-scroller, NO up/down
         if(keys['ArrowLeft']||keys['KeyA']){pl.vx=-4.5;pl.face=-1;}
         else if(keys['ArrowRight']||keys['KeyD']){pl.vx=4.5;pl.face=1;}
         else pl.vx*=0.6;
@@ -545,40 +426,32 @@ export default function PizzaGame() {
 
         pl.vy+=GRAVITY;pl.x+=pl.vx;pl.y+=pl.vy;
         if(pl.y+PH>=GROUND){pl.y=GROUND-PH;pl.vy=0;pl.og=true;}else pl.og=false;
-        if(pl.x<20)pl.x=20;if(pl.x>W-PW-20)pl.x=W-PW-20;
+        if(pl.x<20)pl.x=20; if(pl.x>W-PW-20)pl.x=W-PW-20;
         if(pl.inv>0)pl.inv--;
         if(pl.attacking>0){pl.attacking--;if(pl.attacking===ATTACK_FRAMES-3)doAttack();}
         if(pl.x>W*0.42){const s=pl.x-W*0.42;scrollX+=s;pl.x=W*0.42;}
 
         const c=cfg();
-        if(!boss||boss.dead){
-          spT++;if(spT>=c.spawnRate){spawnEnemy();spT=0;}
-          piT++;if(piT>=70){spawnCollectible();piT=0;}
-          wT++;if(wT>=200){spawnWeapon();wT=0;}
-        }
+        if(!boss||boss.dead){spT++;if(spT>=c.spawnRate){spawnEnemy();spT=0;}piT++;if(piT>=70){spawnCollectible();piT=0;}wT++;if(wT>=200){spawnWeapon();wT=0;}}
         if(pc>=c.collectTarget&&!boss) triggerBoss();
 
-        // weapon pickup
         weapons=weapons.filter(wp=>{
-          if(wp.collected)return false;
-          const ox=wp.x-scrollX;if(ox<-80)return false;
+          if(wp.collected)return false; const ox=wp.x-scrollX; if(ox<-80)return false;
           const bob=Math.sin(frame*0.06+wp.bob)*4;
           if(pl.x<ox+16&&pl.x+PW>ox&&pl.y<wp.y+bob+20&&pl.y+PH>wp.y+bob){
-            wp.collected=true;heldWeapon={type:wp.type,ammo:wp.type==='gun'?8:5};
-            addParts(ox+8,wp.y,'#3498db',10);return false;
+            wp.collected=true;heldWeapon={type:wp.type,ammo:wp.type==='gun'?8:5};addParts(ox+8,wp.y,'#3498db',10);return false;
           }
           return true;
         });
 
-        // boss — bounces left/right at ground level
+        // boss bounces left/right at ground level
         if(boss&&!boss.dead){
           boss.x+=boss.vx;
           if(boss.inv>0)boss.inv--;if(boss.hitFlash>0)boss.hitFlash--;
           const bOx=boss.x-scrollX;
           if(bOx<80)boss.vx=Math.abs(boss.vx);
           if(bOx>W-boss.w-60)boss.vx=-Math.abs(boss.vx);
-          const pb=pl.y+PH;
-          const bOverlapX=pl.x<bOx+boss.w&&pl.x+PW>bOx;
+          const pb=pl.y+PH; const bOverlapX=pl.x<bOx+boss.w&&pl.x+PW>bOx;
           const stomping=pl.vy>0&&pb>=boss.y&&pb<=boss.y+18&&bOverlapX;
           if(stomping&&boss.inv===0){
             bossHp=Math.max(0,bossHp-30);boss.inv=50;boss.hitFlash=15;pl.vy=-11;sc+=300;
@@ -591,60 +464,41 @@ export default function PizzaGame() {
             if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}sync();
           }
         }
+        if(boss&&boss.dead){boss.deadTimer--;if(boss.deadTimer<=0){if(levelIdx>=LEVELS.length-1){if(sc>highSc)highSc=sc;music.pause();gState='win';sync();}else{levelIdx++;pc=0;reset();transitionTimer=200;gState='transition';sync();}}}
 
-        if(boss&&boss.dead){
-          boss.deadTimer--;
-          if(boss.deadTimer<=0){
-            if(levelIdx>=LEVELS.length-1){if(sc>highSc)highSc=sc;music.pause();gState='win';sync();}
-            else{levelIdx++;pc=0;reset();transitionTimer=200;gState='transition';sync();}
-          }
-        }
-
-        // enemies — ground level, left/right only
+        // enemies walk on ground only — NO up/down movement
         obs=obs.filter(o=>{
           if(o.hitFlash>0)o.hitFlash--;
           if(o.type==='cone'){
             const ox=o.x-scrollX;if(ox<-120)return false;
             if(o.dead){o.deadTimer--;return o.deadTimer>0;}
-            if(pl.inv===0&&ox+o.w>pl.x&&ox<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){
-              pl.hp=Math.max(0,pl.hp-12);pl.inv=70;addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);
-              if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}sync();
-            }
+            if(pl.inv===0&&ox+o.w>pl.x&&ox<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){pl.hp=Math.max(0,pl.hp-12);pl.inv=70;addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}sync();}
             return true;
           }
-          o.x+=o.vx;
-          const ox=o.x-scrollX;
-          if(ox<-120)return false;
+          o.x+=o.vx; const ox=o.x-scrollX; if(ox<-120)return false;
           if(o.dead){o.deadTimer--;return o.deadTimer>0;}
           o.at++;
-          // stomp detection
+          // stomp
           if(!pl.og&&pl.vy>0){
             const pb=pl.y+PH;
             if(ox+o.w>pl.x&&ox<pl.x+PW&&pb>=o.y&&pb<=o.y+12){
-              o.hp=(o.hp||2)-2;o.hitFlash=15;pl.vy=-10;sc+=200;
-              addParts(ox+o.w/2,o.y,GLD,10);
+              o.hp=(o.hp||2)-2;o.hitFlash=15;pl.vy=-10;sc+=200;addParts(ox+o.w/2,o.y,GLD,10);
               if(o.hp<=0){o.dead=true;o.deadTimer=30;}sync();return true;
             }
           }
-          if(pl.inv===0&&ox+o.w>pl.x&&ox<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){
-            pl.hp=Math.max(0,pl.hp-10);pl.inv=70;addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);
-            if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}sync();
-          }
+          if(pl.inv===0&&ox+o.w>pl.x&&ox<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){pl.hp=Math.max(0,pl.hp-10);pl.inv=70;addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}sync();}
           return true;
         });
 
         pizzas=pizzas.filter(pz=>{
           if(pz.collected)return false;const ox=pz.x-scrollX;if(ox<-80)return false;
           const bob=Math.sin(frame*0.08+pz.bob)*6;
-          if(pl.x<ox+28&&pl.x+PW>ox&&pl.y<pz.y+bob+28&&pl.y+PH>pz.y+bob){
-            pz.collected=true;sc+=100;pc++;addParts(ox+14,pz.y+14,GLD,14);sync();return false;
-          }
+          if(pl.x<ox+28&&pl.x+PW>ox&&pl.y<pz.y+bob+28&&pl.y+PH>pz.y+bob){pz.collected=true;sc+=100;pc++;addParts(ox+14,pz.y+14,GLD,14);sync();return false;}
           return true;
         });
 
         parts=parts.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.2;p.life--;return p.life>0;});
-        if(!blds.length||blds[blds.length-1].x-scrollX<W+250)
-          blds.push(mkBld((blds[blds.length-1]?.x||200)+100+Math.random()*130));
+        if(!blds.length||blds[blds.length-1].x-scrollX<W+250)blds.push(mkBld((blds[blds.length-1]?.x||200)+100+Math.random()*130));
         blds=blds.filter(b=>b.x-scrollX>-300);
       }
 
@@ -652,48 +506,27 @@ export default function PizzaGame() {
       if(gState==='charselect'){drawCharSelect();raf=requestAnimationFrame(loop);return;}
       if(gState==='win'){drawWin();raf=requestAnimationFrame(loop);return;}
 
-      drawBackground();
-      blds.forEach(b=>drawBuilding(b));
-      drawStreet();
-
-      // draw weapons on ground
+      drawBackground();blds.forEach(b=>drawBuilding(b));drawStreet();
       weapons.forEach(wp=>{if(!wp.collected)drawWeaponPickup(wp);});
-
-      // enemies
       obs.forEach(o=>{
         const ox=o.x-scrollX;
         if(o.dead){ctx.globalAlpha=Math.max(0,o.deadTimer/30);ctx.font='18px serif';ctx.textAlign='center';ctx.fillText('💀',ox+o.w/2,o.y+o.h-2);ctx.globalAlpha=1;return;}
         if(o.hitFlash>0&&Math.floor(o.hitFlash/3)%2===0){ctx.globalAlpha=0.5;ctx.fillStyle='#fff';ctx.fillRect(ox,o.y,o.w,o.h);ctx.globalAlpha=1;}
-        drawEnemySprite(ctx,o,scrollX,{gold:GLD,goldL:'#c8b830',greenL:'#4A7A30',cream:'#F5F0DC'});
+        drawEnemySprite(ctx,o,scrollX,{gold:GLD});
       });
-
-      // collectibles
-      pizzas.forEach(pz=>{
-        const ox=pz.x-scrollX;const bob=Math.sin(frame*0.08+pz.bob)*6;
-        if(pz.type==='taco')drawTaco(ctx,ox,pz.y+bob,{gold:GLD});
-        else drawPizzaSlice(ctx,ox,pz.y+bob,{gold:GLD});
-      });
-
-      // boss
+      pizzas.forEach(pz=>{const ox=pz.x-scrollX;const bob=Math.sin(frame*0.08+pz.bob)*6;if(pz.type==='taco')drawTaco(ctx,ox,pz.y+bob,{gold:GLD});else drawPizzaSlice(ctx,ox,pz.y+bob,{gold:GLD});});
       if(boss&&(!boss.dead||boss.deadTimer>0)){
         const bOx=boss.x-scrollX;
         if(boss.hitFlash>0&&Math.floor(boss.hitFlash/3)%2===0){ctx.globalAlpha=0.4;ctx.fillStyle='#fff';ctx.fillRect(bOx,boss.y,boss.w,boss.h);ctx.globalAlpha=1;}
-        drawBossSprite(ctx,boss,scrollX,Math.round((1-bossHp/BOSS_HP)*10),10,{gold:GLD,goldL:'#c8b830'});
+        drawBossSprite(ctx,boss,scrollX,Math.round((1-bossHp/BOSS_HP)*10),10,{gold:GLD});
       }
-
-      // particles
       parts.forEach(p=>{ctx.globalAlpha=p.life/p.ml;ctx.fillStyle=p.col;ctx.fillRect(p.x-p.sz/2,p.y-p.sz/2,p.sz,p.sz);});
       ctx.globalAlpha=1;
-
-      // player
       if(!(pl.inv>0&&Math.floor(pl.inv/5)%2===0)){
-        ctx.save();
-        if(pl.face===-1){ctx.translate(pl.x+PW,0);ctx.scale(-1,1);ctx.translate(-pl.x,0);}
-        drawCharSprite(ctx,charIdx,pl.x,pl.y,PW,{gold:GLD,goldL:'#c8b830',greenL:'#4A7A30',cream:'#F5F0DC'});
-        ctx.restore();
-        drawAttackEffect();
+        ctx.save();if(pl.face===-1){ctx.translate(pl.x+PW,0);ctx.scale(-1,1);ctx.translate(-pl.x,0);}
+        drawCharSprite(ctx,charIdx,pl.x,pl.y,PW,{gold:GLD});
+        ctx.restore();drawAttackEffect();
       }
-
       drawHUD();
       if(gState==='dead')drawDead();
       raf=requestAnimationFrame(loop);
@@ -715,41 +548,16 @@ export default function PizzaGame() {
       }
     };
     const onUp=e=>{keys[e.code]=false;};
-    window.addEventListener('keydown',onDown);
-    window.addEventListener('keyup',onUp);
+    window.addEventListener('keydown',onDown); window.addEventListener('keyup',onUp);
     loop();
 
-    gameRef.current={
-      jump,start,attack,
-      tryAgain:respawn,
-      toCharSelect:()=>{gState='charselect';sync();},
-      setChar:(i)=>{selectedChar=i;sync();},
-      confirmChar:()=>{charIdx=selectedChar;start();},
-      keys,getState:()=>gState,getSelectedChar:()=>selectedChar,
-    };
-
-    return()=>{
-      cancelAnimationFrame(raf);
-      window.removeEventListener('keydown',onDown);
-      window.removeEventListener('keyup',onUp);
-      music.pause();music.currentTime=0;
-    };
+    gameRef.current={jump,start,attack,tryAgain:respawn,toCharSelect:()=>{gState='charselect';sync();},setChar:(i)=>{selectedChar=i;sync();},confirmChar:()=>{charIdx=selectedChar;start();},keys,getState:()=>gState,getSelectedChar:()=>selectedChar};
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener('keydown',onDown);window.removeEventListener('keyup',onUp);music.pause();music.currentTime=0;};
   },[]);
 
-  // Fullscreen — works on BOTH mobile and desktop
-  const enterFullscreen=()=>{
-    document.documentElement.requestFullscreen().catch(()=>{});
-    setIsFullscreen(true);
-  };
-  const exitFullscreen=()=>{
-    if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
-    setIsFullscreen(false);
-  };
-  useEffect(()=>{
-    const fn=()=>{if(!document.fullscreenElement)setIsFullscreen(false);};
-    document.addEventListener('fullscreenchange',fn);
-    return()=>document.removeEventListener('fullscreenchange',fn);
-  },[]);
+  const enterFullscreen=()=>{document.documentElement.requestFullscreen().catch(()=>{});setIsFullscreen(true);};
+  const exitFullscreen=()=>{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});setIsFullscreen(false);};
+  useEffect(()=>{const fn=()=>{if(!document.fullscreenElement)setIsFullscreen(false);};document.addEventListener('fullscreenchange',fn);return()=>document.removeEventListener('fullscreenchange',fn);},[]);
 
   const mb=(key,down)=>{
     const g=gameRef.current;if(!g)return;
@@ -770,89 +578,82 @@ export default function PizzaGame() {
     } else{g.keys[key]=down;}
   };
 
-  const btnS=(bg,fg,w,h)=>({
-    fontFamily:'"Press Start 2P"',fontSize:'0.6rem',
-    background:bg,color:fg||'#fff',border:'none',borderRadius:4,
-    cursor:'pointer',boxShadow:'0 4px 0 rgba(0,0,0,0.6)',
-    display:'flex',alignItems:'center',justifyContent:'center',
-    userSelect:'none',WebkitUserSelect:'none',
-    WebkitTouchCallout:'none',touchAction:'none',
-    width:w||72,height:h||72,
-  });
-
-  // directional button — hold support
-  const dpadBtn=(lbl,key,w,h)=>(
-    <button key={key} style={btnS(GLD,GRN,w||80,h||80)}
+  // NES-style button
+  const nesBtn=(label,key,bg,fg,w,h,hold=false)=>(
+    <button key={key}
+      style={{
+        fontFamily:'"Press Start 2P"',
+        fontSize: w>70?'0.7rem':'0.55rem',
+        background:bg, color:fg||'#fff',
+        border:'none',
+        borderRadius: key==='start'?4:50,
+        cursor:'pointer',
+        boxShadow:`0 5px 0 rgba(0,0,0,0.5), 0 6px 0 rgba(0,0,0,0.3)`,
+        userSelect:'none',WebkitUserSelect:'none',
+        WebkitTouchCallout:'none',touchAction:'none',
+        width:w||72, height:h||72,
+        display:'flex',alignItems:'center',justifyContent:'center',
+        flexShrink:0,
+      }}
       onTouchStart={e=>{e.preventDefault();mb(key,true);}}
-      onTouchEnd={e=>{e.preventDefault();mb(key,false);}}
-      onTouchCancel={e=>{e.preventDefault();mb(key,false);}}
+      onTouchEnd={e=>{e.preventDefault();if(hold)mb(key,false);}}
+      onTouchCancel={e=>{e.preventDefault();if(hold)mb(key,false);}}
       onContextMenu={e=>e.preventDefault()}
       onMouseDown={()=>mb(key,true)}
-      onMouseUp={()=>mb(key,false)}
-      onMouseLeave={()=>mb(key,false)}
-    >{lbl}</button>
+      onMouseUp={()=>{if(hold)mb(key,false);}}
+      onMouseLeave={()=>{if(hold)mb(key,false);}}
+    >{label}</button>
   );
 
+  // NES controller layout: ◀ ▶ on left, B(ATK) A(JUMP) on right, START in middle
   const controlBar=(
     <div style={{
       background:GRN,
       borderTop:`3px solid ${GLD}`,
-      padding:'10px 16px',
-      paddingBottom:'max(10px,env(safe-area-inset-bottom))',
-      display:'flex',flexDirection:'column',gap:8,
+      padding:'12px 16px',
+      paddingBottom:'max(12px,env(safe-area-inset-bottom))',
     }}>
-      {/* top row — fullscreen + joystick toggle (mobile only) */}
-      <div style={{display:'flex',justifyContent:'center',gap:8,flexWrap:'wrap'}}>
-        <button style={{...btnS(isFullscreen?'#e74c3c':GRN2,'#F5F0DC',160,28),fontSize:'0.4rem',borderRadius:4,border:`1px solid ${GLD}`}}
+      {/* fullscreen row */}
+      <div style={{display:'flex',justifyContent:'center',marginBottom:10}}>
+        <button style={{
+          fontFamily:'"Press Start 2P"',fontSize:'0.38rem',
+          background:isFullscreen?'#e74c3c':GRN2, color:'#F5F0DC',
+          border:`1px solid ${GLD}`, borderRadius:4, cursor:'pointer',
+          padding:'5px 12px', boxShadow:'2px 2px 0 #000',
+        }}
           onMouseDown={isFullscreen?exitFullscreen:enterFullscreen}
           onTouchStart={e=>{e.preventDefault();isFullscreen?exitFullscreen():enterFullscreen();}}>
           {isFullscreen?'✕ EXIT FULLSCREEN':'⛶ FULLSCREEN'}
         </button>
       </div>
 
-      {/* main control row: ◀  [START]  ▶  [ATK] [JUMP] */}
+      {/* main NES row */}
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
 
-        {/* LEFT */}
-        {dpadBtn('◀','ArrowLeft',80,80)}
-
-        {/* center: START */}
-        <div style={{display:'flex',flexDirection:'column',gap:6,alignItems:'center'}}>
-          <button style={btnS(GRN2,'#F5F0DC',80,38)}
-            onTouchStart={e=>{e.preventDefault();mb('start',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('start',true)}>
-            <span style={{fontSize:'0.42rem'}}>START</span>
-          </button>
-          {!isMobile&&(
-            <div style={{fontFamily:'"Press Start 2P"',fontSize:'0.26rem',color:`rgba(226,168,32,0.4)`,textAlign:'center',lineHeight:1.9}}>
-              ←→ MOVE<br/>SPACE JUMP<br/>Z ATTACK
-            </div>
-          )}
+        {/* D-PAD: just ◀ and ▶, nothing else */}
+        <div style={{display:'flex',gap:6,alignItems:'center'}}>
+          {nesBtn('◀','ArrowLeft',GLD,GRN,78,78,true)}
+          {nesBtn('▶','ArrowRight',GLD,GRN,78,78,true)}
         </div>
 
-        {/* RIGHT */}
-        {dpadBtn('▶','ArrowRight',80,80)}
-
-        {/* action buttons */}
-        <div style={{display:'flex',flexDirection:'column',gap:8}}>
-          <button style={btnS('#8e44ad','#fff',88,62)}
-            onTouchStart={e=>{e.preventDefault();mb('attack',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('attack',true)}>
-            <span style={{fontSize:'0.52rem'}}>⚔ ATK</span>
-          </button>
-          <button style={btnS('#e74c3c','#fff',88,62)}
-            onTouchStart={e=>{e.preventDefault();mb('jump',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('jump',true)}>
-            <span style={{fontSize:'0.52rem'}}>▲ JUMP</span>
-          </button>
+        {/* CENTER: SELECT + START (small oval NES buttons) */}
+        <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'center'}}>
+          {nesBtn('START','start','#555','#F5F0DC',72,30,false)}
+          {!isMobile&&<div style={{fontFamily:'"Press Start 2P"',fontSize:'0.24rem',color:'rgba(226,168,32,0.35)',textAlign:'center',lineHeight:1.9}}>←→ MOVE{'\n'}SPACE JUMP{'\n'}Z ATTACK</div>}
         </div>
 
+        {/* B + A action buttons — NES style round, right side */}
+        <div style={{display:'flex',gap:10,alignItems:'center'}}>
+          {nesBtn('B','attack','#8e44ad','#fff',72,72,false)}
+          {nesBtn('A','jump','#e74c3c','#fff',82,82,false)}
+        </div>
+
+      </div>
+
+      {/* button labels */}
+      <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:4,paddingRight:4}}>
+        <span style={{fontFamily:'"Press Start 2P"',fontSize:'0.28rem',color:'rgba(226,168,32,0.4)'}}>B=ATTACK</span>
+        <span style={{fontFamily:'"Press Start 2P"',fontSize:'0.28rem',color:'rgba(226,168,32,0.4)'}}>A=JUMP</span>
       </div>
     </div>
   );
@@ -861,8 +662,7 @@ export default function PizzaGame() {
     return(
       <div style={{position:'fixed',inset:0,zIndex:9999,background:'#000',display:'flex',flexDirection:'column'}}>
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',background:'#000'}}>
-          <canvas ref={canvasRef} width={780} height={520}
-            style={{maxWidth:'100%',maxHeight:'100%',imageRendering:'pixelated',display:'block'}}/>
+          <canvas ref={canvasRef} width={780} height={520} style={{maxWidth:'100%',maxHeight:'100%',imageRendering:'pixelated',display:'block'}}/>
         </div>
         {controlBar}
       </div>
@@ -871,17 +671,12 @@ export default function PizzaGame() {
 
   return(
     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.5rem'}}>
-      <div style={{
-        border:`4px solid ${GLD}`,
-        boxShadow:`4px 4px 0 #000`,
-        background:'#000',width:'100%',maxWidth:780,
-      }}>
-        <canvas ref={canvasRef} width={780} height={520}
-          style={{width:'100%',display:'block',imageRendering:'pixelated'}}/>
+      <div style={{border:`4px solid ${GLD}`,boxShadow:`4px 4px 0 #000`,background:'#000',width:'100%',maxWidth:780}}>
+        <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',display:'block',imageRendering:'pixelated'}}/>
       </div>
       {controlBar}
-      <div style={{fontFamily:'"Press Start 2P"',fontSize:'0.33rem',color:`rgba(226,168,32,0.3)`,textAlign:'center'}}>
-        ←→ MOVE &nbsp;|&nbsp; SPACE JUMP &nbsp;|&nbsp; Z ATTACK &nbsp;|&nbsp; ENTER START
+      <div style={{fontFamily:'"Press Start 2P"',fontSize:'0.33rem',color:'rgba(226,168,32,0.3)',textAlign:'center'}}>
+        ← → MOVE &nbsp;|&nbsp; SPACE JUMP &nbsp;|&nbsp; Z ATTACK &nbsp;|&nbsp; ENTER START
       </div>
     </div>
   );
