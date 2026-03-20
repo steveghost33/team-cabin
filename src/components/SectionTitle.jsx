@@ -1,7 +1,5 @@
-import { C } from '../data/constants';
-
 export default function SectionTitle({ children, color }) {
-  const c = color || C.gold;
+  const c = color || '#E2A820';
   return (
     <div style={{
       fontFamily: '"Press Start 2P"',

@@ -9,68 +9,41 @@
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
-        background: #0a0a0a;
+        background: #2D4A1E;
         color: #F5F0DC;
         font-family: 'Press Start 2P', monospace;
         overflow-x: hidden;
       }
-      /* scanlines */
       body::after {
         content: '';
         position: fixed; inset: 0;
-        background: repeating-linear-gradient(
-          0deg, transparent, transparent 2px,
-          rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 3px
-        );
+        background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 3px);
         pointer-events: none;
         z-index: 9000;
       }
       #root { min-height: 100vh; }
-
       @keyframes bob {
         0%,100% { transform: translateY(0); }
         50%      { transform: translateY(-8px); }
       }
       @keyframes glow {
-        0%,100% { text-shadow: 3px 3px 0 #000, 6px 6px 0 #000; }
-        50%      { text-shadow: 3px 3px 0 #000, 6px 6px 0 #000, 0 0 20px #D4A017, 0 0 40px #D4A017; }
+        0%,100% { text-shadow: 3px 3px 0 #1C3D12, 6px 6px 0 #000; }
+        50%      { text-shadow: 3px 3px 0 #1C3D12, 6px 6px 0 #000, 0 0 20px #E2A820, 0 0 40px #E2A820; }
       }
       @keyframes blink  { 50% { opacity: 0; } }
       @keyframes float  {
         0%,100% { transform: translateY(0) rotate(-1deg); }
         50%     { transform: translateY(-10px) rotate(1deg); }
       }
-      @keyframes explode {
-        0%   { transform: scale(1); opacity: 1; }
-        50%  { transform: scale(1.15); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-      @keyframes slide-in {
-        from { transform: translateX(-20px); opacity: 0; }
-        to   { transform: translateX(0); opacity: 1; }
-      }
       @keyframes marquee {
         0%   { transform: translateX(0); }
         100% { transform: translateX(-50%); }
       }
-
       .tc-btn {
         -webkit-user-select: none; user-select: none;
         -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
         touch-action: none;
-      }
-      .tc-btn:active { opacity: 0.8; transform: translate(2px,2px); }
-
-      /* BroForce pixel border */
-      .pixel-box {
-        border: 3px solid #D4A017;
-        box-shadow: 4px 4px 0 #000, inset 0 0 0 1px rgba(212,160,23,0.15);
-        image-rendering: pixelated;
-      }
-      .pixel-box:hover {
-        transform: translate(-3px,-3px);
-        box-shadow: 7px 7px 0 #000;
       }
     </style>
   </head>
