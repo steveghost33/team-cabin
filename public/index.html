@@ -9,7 +9,7 @@
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
-        background: #2D4A1E;
+        background: #1C3D12;
         color: #F5F0DC;
         font-family: 'Press Start 2P', monospace;
         overflow-x: hidden;
@@ -17,23 +17,27 @@
       body::after {
         content: '';
         position: fixed; inset: 0;
-        background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 3px);
+        background: repeating-linear-gradient(
+          0deg, transparent, transparent 2px,
+          rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 3px
+        );
         pointer-events: none;
         z-index: 9000;
       }
       #root { min-height: 100vh; }
+
       @keyframes bob {
         0%,100% { transform: translateY(0); }
         50%      { transform: translateY(-8px); }
       }
       @keyframes glow {
         0%,100% { text-shadow: 3px 3px 0 #1C3D12, 6px 6px 0 #000; }
-        50%      { text-shadow: 3px 3px 0 #1C3D12, 6px 6px 0 #000, 0 0 20px #E2A820, 0 0 40px #E2A820; }
+        50%      { text-shadow: 3px 3px 0 #1C3D12, 6px 6px 0 #000, 0 0 24px #E2A820, 0 0 48px #E2A820; }
       }
       @keyframes blink  { 50% { opacity: 0; } }
       @keyframes float  {
         0%,100% { transform: translateY(0) rotate(-1deg); }
-        50%     { transform: translateY(-10px) rotate(1deg); }
+        50%     { transform: translateY(-12px) rotate(1deg); }
       }
       @keyframes marquee {
         0%   { transform: translateX(0); }
@@ -45,6 +49,7 @@
         -webkit-tap-highlight-color: transparent;
         touch-action: none;
       }
+      .tc-btn:active { opacity: 0.8; }
     </style>
   </head>
   <body>

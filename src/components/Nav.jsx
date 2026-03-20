@@ -13,8 +13,8 @@ export default function Nav({ scrollTo }) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 500,
-      background: '#1C3D12',
-      borderBottom: `4px solid #E2A820`,
+      background: C.green,
+      borderBottom: `4px solid ${C.gold}`,
       boxShadow: `0 4px 0 #000`,
     }}>
       <div style={{
@@ -28,12 +28,13 @@ export default function Nav({ scrollTo }) {
           {navLinks.map((n) => (
             <button key={n.id} onClick={() => scrollTo(n.id)} style={{
               background: 'none', border: 'none',
-              color: '#F5F0DC',
+              color: C.cream,
               fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
-              letterSpacing: '0.05em', padding: '0.5rem 0.65rem', cursor: 'pointer',
+              letterSpacing: '0.05em', padding: '0.5rem 0.7rem', cursor: 'pointer',
+              transition: 'color 0.1s',
             }}
-              onMouseEnter={e => { e.target.style.color = '#E2A820'; }}
-              onMouseLeave={e => { e.target.style.color = '#F5F0DC'; }}
+              onMouseEnter={e => { e.target.style.color = C.gold; }}
+              onMouseLeave={e => { e.target.style.color = C.cream; }}
             >{n.l}</button>
           ))}
         </div>
