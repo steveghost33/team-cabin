@@ -69,7 +69,7 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
   );
 }
 
-// ── MIKE — grey hoodie, snapback cap, beard ──
+// ── MIKE — solid grey hoodie no logo, mustard yellow snapback, dark grey shoes, maroon pants ──
 export function CharMid({ size = 64, animate = true, delay = '0.25s' }) {
   return (
     <svg
@@ -82,28 +82,26 @@ export function CharMid({ size = 64, animate = true, delay = '0.25s' }) {
         animation: animate ? `bob 1.3s ease-in-out ${delay} infinite` : 'none',
       }}
     >
-      {/* shoes */}
-      <rect x="6"  y="43" width="8" height="3" fill="#111" />
-      <rect x="18" y="43" width="7" height="2" fill="#111" />
-      <rect x="18" y="44" width="7" height="2" fill="#ddd" opacity="0.6" />
+      {/* shoes — dark grey, different from Steve's pure black */}
+      <rect x="6"  y="43" width="8" height="3" fill="#2a2a2a" />
+      <rect x="18" y="43" width="8" height="3" fill="#2a2a2a" />
+      <rect x="5"  y="45" width="10" height="1" fill="#1a1a1a" />
+      <rect x="17" y="45" width="10" height="1" fill="#1a1a1a" />
       {/* maroon pants */}
       <rect x="7"  y="30" width="7" height="13" fill="#7B2D3A" />
       <rect x="18" y="30" width="7" height="13" fill="#7B2D3A" />
-      {/* grey hoodie */}
+      {/* solid grey hoodie body — NO graphic, NO logo */}
       <rect x="4"  y="15" width="24" height="16" fill="#9a9a9a" />
-      <rect x="9"  y="24" width="14" height="6"  fill="#888" />
-      {/* EDC logo area */}
-      <rect x="10" y="17" width="12" height="7" fill="#888" />
-      <rect x="11" y="18" width="2"  height="5" fill="#ccc" />
-      <rect x="13" y="19" width="2"  height="3" fill="#ccc" />
-      <rect x="15" y="18" width="2"  height="5" fill="#ccc" />
-      <rect x="17" y="19" width="2"  height="3" fill="#ccc" />
-      {/* drawstrings */}
-      <rect x="14" y="15" width="1" height="6" fill="#777" />
-      <rect x="17" y="15" width="1" height="6" fill="#777" />
+      {/* hoodie bottom ribbing */}
+      <rect x="8"  y="27" width="16" height="4"  fill="#888" />
+      {/* center seam only */}
+      <rect x="15" y="15" width="2"  height="16" fill="#888" />
       {/* arms */}
       <rect x="0"  y="15" width="5" height="13" fill="#9a9a9a" />
       <rect x="27" y="15" width="5" height="13" fill="#9a9a9a" />
+      {/* sleeve cuffs */}
+      <rect x="0"  y="26" width="5" height="2"  fill="#888" />
+      <rect x="27" y="26" width="5" height="2"  fill="#888" />
       {/* hands */}
       <rect x="0"  y="27" width="5" height="3" fill="#c49a6c" />
       <rect x="27" y="27" width="5" height="3" fill="#c49a6c" />
@@ -112,18 +110,28 @@ export function CharMid({ size = 64, animate = true, delay = '0.25s' }) {
       {/* head */}
       <rect x="8"  y="2"  width="16" height="13" fill="#c49a6c" />
       {/* beard */}
-      <rect x="8"  y="12" width="16" height="4"  fill="#2a1a0a" />
-      <rect x="9"  y="10" width="3"  height="3"  fill="#2a1a0a" />
-      <rect x="20" y="10" width="3"  height="3"  fill="#2a1a0a" />
+      <rect x="8"  y="12" width="16" height="4"  fill="#1a0f05" />
+      <rect x="9"  y="10" width="3"  height="3"  fill="#1a0f05" />
+      <rect x="20" y="10" width="3"  height="3"  fill="#1a0f05" />
       {/* eyes */}
       <rect x="11" y="7" width="3" height="3" fill="#111" />
       <rect x="18" y="7" width="3" height="3" fill="#111" />
-      {/* smile */}
-      <rect x="12" y="13" width="8" height="1" fill="#9a6040" />
-      {/* snapback */}
-      <rect x="6"  y="4" width="20" height="3" fill="#111" />
-      <rect x="8"  y="0" width="16" height="5" fill="#1f1f1f" />
-      <rect x="6"  y="3" width="20" height="1" fill="#333" />
+      <rect x="11" y="7" width="1" height="1" fill="#fff" opacity="0.5" />
+      <rect x="18" y="7" width="1" height="1" fill="#fff" opacity="0.5" />
+      {/* MUSTARD YELLOW SNAPBACK — wide flat brim */}
+      {/* crown */}
+      <rect x="7"  y="0"  width="18" height="7"  fill="#c8a020" />
+      {/* crown sides */}
+      <rect x="5"  y="1"  width="3"  height="5"  fill="#c8a020" />
+      <rect x="24" y="1"  width="3"  height="5"  fill="#c8a020" />
+      {/* button on top */}
+      <rect x="13" y="0"  width="6"  height="1"  fill="#b89018" />
+      {/* wide flat brim — extends past both sides */}
+      <rect x="2"  y="6"  width="28" height="3"  fill="#c8a020" />
+      {/* brim underside shadow */}
+      <rect x="2"  y="8"  width="28" height="1"  fill="#a07810" />
+      {/* snapback back strap */}
+      <rect x="12" y="6"  width="8"  height="2"  fill="#b89018" />
     </svg>
   );
 }
