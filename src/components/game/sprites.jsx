@@ -1,6 +1,6 @@
 export function drawCharSprite(ctx, idx, px, py, PW, C) {
   if (idx === 0) {
-    // STEVE — original plaid shirt
+    // STEVE — plaid shirt, beard, glasses
     ctx.fillStyle='#111';    ctx.fillRect(px,py+26,8,4); ctx.fillRect(px+13,py+26,8,4);
     ctx.fillStyle='#1c1c2c'; ctx.fillRect(px+1,py+16,7,11); ctx.fillRect(px+13,py+16,7,11);
     ctx.fillStyle='#848688'; ctx.fillRect(px-1,py+5,PW+2,12);
@@ -19,23 +19,31 @@ export function drawCharSprite(ctx, idx, px, py, PW, C) {
     ctx.fillStyle='#7a6535'; ctx.fillRect(px+10,py-5,2,1);
 
   } else if (idx === 1) {
-    // MIKE — original hoodie but NO HAT, black hair instead
-    ctx.fillStyle='#111';    ctx.fillRect(px,py+26,8,4);
-    ctx.fillStyle='rgba(220,220,220,0.6)'; ctx.fillRect(px+14,py+28,7,2);
+    // MIKE — plain solid grey hoodie, NO graphic, NO hat, black hair, matching dark shoes
+    // shoes (both same dark color)
+    ctx.fillStyle='#111'; ctx.fillRect(px,py+26,8,4); ctx.fillRect(px+13,py+26,8,4);
+    // pants (maroon)
     ctx.fillStyle='#7B2D3A'; ctx.fillRect(px+1,py+16,7,11); ctx.fillRect(px+13,py+16,7,11);
+    // hoodie body — plain solid grey, NO graphic at all
     ctx.fillStyle='#9a9a9a'; ctx.fillRect(px-1,py+5,PW+2,11);
-    ctx.fillStyle='#888';    ctx.fillRect(px+3,py+12,16,4);
+    // hoodie bottom band
+    ctx.fillStyle='#888'; ctx.fillRect(px+3,py+12,16,4);
+    // arms
     ctx.fillStyle='#9a9a9a'; ctx.fillRect(px-5,py+5,5,12); ctx.fillRect(px+PW,py+5,5,12);
+    // hands
     ctx.fillStyle='#c49a6c'; ctx.fillRect(px-5,py+16,5,3); ctx.fillRect(px+PW,py+16,5,3);
+    // neck
     ctx.fillStyle='#c49a6c'; ctx.fillRect(px+3,py-10,16,13);
+    // beard
     ctx.fillStyle='#2a1a0a'; ctx.fillRect(px+3,py+1,16,4); ctx.fillRect(px+4,py-1,3,3); ctx.fillRect(px+15,py-1,3,3);
-    ctx.fillStyle='#111';    ctx.fillRect(px+6,py-6,3,3); ctx.fillRect(px+13,py-6,3,3);
-    // BLACK HAIR instead of snapback hat
+    // eyes
+    ctx.fillStyle='#111'; ctx.fillRect(px+6,py-6,3,3); ctx.fillRect(px+13,py-6,3,3);
+    // BLACK hair (no hat — just hair on top of head)
     ctx.fillStyle='#0a0a0a'; ctx.fillRect(px+3,py-10,16,5);
-    ctx.fillRect(px+2,py-9,3,4); ctx.fillRect(px+18,py-9,3,4);
+    ctx.fillRect(px+2,py-9,3,4); ctx.fillRect(px+18,py-9,2,4);
 
   } else {
-    // KYLE — original green jacket
+    // KYLE — green jacket, glasses, brown hair
     ctx.fillStyle='#5D4037'; ctx.fillRect(px,py+26,8,4); ctx.fillRect(px+13,py+26,8,4);
     ctx.fillStyle='#283040'; ctx.fillRect(px+1,py+16,7,11); ctx.fillRect(px+13,py+16,7,11);
     ctx.fillStyle='#3D5A2A'; ctx.fillRect(px-1,py+5,PW+2,12);
@@ -218,7 +226,6 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     ctx.fillStyle='#2ecc71'; ctx.beginPath(); ctx.arc(bx+42,by-10,3,0,Math.PI*2); ctx.fill();
 
   } else {
-    // RECORD EXEC
     const bx=ox,by=oy+bob;
     ctx.fillStyle='#111'; ctx.fillRect(bx+4,by+72,14,6); ctx.fillRect(bx+34,by+72,14,6);
     ctx.fillRect(bx+2,by+74,5,3); ctx.fillRect(bx+46,by+74,5,3);
@@ -253,7 +260,6 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     ctx.fillStyle='#fff'; ctx.fillRect(bx+23,by+16,4,4); ctx.fillRect(bx+28,by+16,4,4); ctx.fillRect(bx+33,by+16,3,4);
   }
 
-  // HP bar
   ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(ox-5,oy-26,boss.w+10,10);
   ctx.fillStyle='#e74c3c'; ctx.fillRect(ox-4,oy-25,Math.max(0,(boss.w+8)*((bossMaxHits-bossHits)/bossMaxHits)),8);
   ctx.strokeStyle=C.gold; ctx.lineWidth=1; ctx.strokeRect(ox-5,oy-26,boss.w+10,10);

@@ -72,14 +72,18 @@ export default function PizzaGame() {
 
     function mkBld(x) {
       const c=cfg();
+      const awningCols=['#c0392b','#2980b9','#27ae60','#8e44ad','#e67e22'];
       return {
-        x, w:50+Math.random()*90, h:70+Math.random()*160,
+        x,
+        w:50+Math.random()*90,
+        h:70+Math.random()*160,
         color:c.buildingCols[Math.floor(Math.random()*c.buildingCols.length)],
         wc:Math.floor(Math.random()*4)+2,
         wr:Math.floor(Math.random()*3)+2,
-        isRenCen: levelIdx===1&&Math.random()<0.12,
-        isLovingTouch: levelIdx===0&&Math.random()<0.1,
-        isMexican: levelIdx===2&&Math.random()<0.2,
+        isRenCen:levelIdx===1&&Math.random()<0.12,
+        isYpsi:levelIdx===0&&Math.random()<0.15,
+        isMexican:levelIdx===2&&Math.random()<0.2,
+        awningCol:awningCols[Math.floor(Math.random()*awningCols.length)],
       };
     }
 
@@ -151,13 +155,26 @@ export default function PizzaGame() {
         return;
       }
 
-      if(b.isLovingTouch){
-        ctx.fillStyle='#1a0a2e';ctx.fillRect(bx,GROUND-110,80,110);
-        ctx.fillStyle='#c084fc';ctx.font='8px "Press Start 2P"';ctx.textAlign='center';
-        ctx.fillText('LOVING',bx+40,GROUND-80);ctx.fillText('TOUCH',bx+40,GROUND-65);
-        ctx.fillStyle='rgba(192,132,252,0.6)';ctx.fillRect(bx+5,GROUND-50,70,4);
-        ctx.shadowBlur=8;ctx.shadowColor='#c084fc';ctx.fillRect(bx+5,GROUND-50,70,4);ctx.shadowBlur=0;
-        for(let i=0;i<4;i++){ctx.fillStyle=['#e74c3c','#f39c12','#2ecc71','#3498db'][i];ctx.fillRect(bx+8+i*18,GROUND-44,12,6);}
+      if(b.isYpsi){
+        ctx.fillStyle=b.color;ctx.fillRect(bx,GROUND-120,b.w,120);
+        ctx.fillStyle='rgba(200,220,255,0.25)';ctx.fillRect(bx+4,GROUND-80,b.w-8,50);
+        ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.strokeRect(bx+4,GROUND-80,b.w-8,50);
+        ctx.strokeStyle='#333';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(bx+b.w/2,GROUND-80);ctx.lineTo(bx+b.w/2,GROUND-30);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(bx+4,GROUND-55);ctx.lineTo(bx+b.w-4,GROUND-55);ctx.stroke();
+        ctx.fillStyle=b.awningCol||'#c0392b';ctx.fillRect(bx,GROUND-86,b.w,8);
+        ctx.fillStyle='#ffe066';
+        for(let i=0;i<6;i++){
+          const lx=bx+4+i*(b.w-8)/5;
+          const ly=GROUND-120+8+Math.sin(i*1.2)*4;
+          ctx.beginPath();ctx.arc(lx,ly,2,0,Math.PI*2);ctx.fill();
+          if(Math.sin(frame*0.04+i)>0){ctx.shadowBlur=4;ctx.shadowColor='#ffe066';ctx.beginPath();ctx.arc(lx,ly,2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
+        }
+        for(let i=0;i<3;i++){
+          ctx.fillStyle=Math.sin(frame*0.02+i*2)>0?'#ffe066':'#222';
+          ctx.fillRect(bx+6+i*((b.w-12)/3),GROUND-112,b.w/4-4,16);
+        }
+        ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(bx,GROUND-92,b.w,8);
         return;
       }
 
@@ -168,9 +185,22 @@ export default function PizzaGame() {
         ctx.fillStyle='rgba(192,132,252,0.7)';ctx.fillRect(bx+5,GROUND-b.h+8,b.w-10,5);
         ctx.shadowBlur=6;ctx.shadowColor='#c084fc';ctx.fillRect(bx+5,GROUND-b.h+8,b.w-10,5);ctx.shadowBlur=0;
       }
+
       if(b.isMexican){
-        const cols=['#e74c3c','#f39c12','#2ecc71','#3498db','#9b59b6'];
-        for(let i=0;i<5;i++){ctx.fillStyle=cols[i%cols.length];ctx.fillRect(bx+4+i*10,GROUND-b.h+5,8,12);}
+        ctx.fillStyle='rgba(0,0,0,0.2)';
+        for(let r=0;r<Math.floor(b.h/8);r++){
+          for(let cc=0;cc<Math.floor(b.w/16);cc++){
+            if((r+cc)%2===0)ctx.fillRect(bx+cc*16+(r%2)*8,GROUND-b.h+r*8,14,6);
+          }
+        }
+        ctx.fillStyle=b.awningCol||'#2980b9';ctx.fillRect(bx,GROUND-b.h*0.4,b.w,10);
+        const flagCols=['#e74c3c','#f39c12','#2ecc71','#3498db','#9b59b6','#fff'];
+        for(let i=0;i<8;i++){
+          ctx.fillStyle=flagCols[i%flagCols.length];
+          const fx=bx+4+i*(b.w-8)/7;
+          const fy=GROUND-b.h+5+Math.sin(frame*0.03+i)*3;
+          ctx.fillRect(fx,fy,8,12);
+        }
       }
 
       for(let r=0;r<b.wr;r++) for(let cc=0;cc<b.wc;cc++){
@@ -237,7 +267,7 @@ export default function PizzaGame() {
       ctx.fillText('AVOID TRAFFIC CONES',W/2,H/2-22);
       ctx.fillText('COLLECT 16 SLICES TO FIGHT THE BOSS',W/2,H/2);
       ctx.fillStyle='rgba(212,160,23,0.55)';ctx.font='7px "Press Start 2P"';
-      ctx.fillText('LVL1: FERNDALE  ·  LVL2: DOWNTOWN DETROIT  ·  LVL3: MEXICANTOWN',W/2,H/2+28);
+      ctx.fillText('LVL1: YPSILANTI  ·  LVL2: DOWNTOWN DETROIT  ·  LVL3: MEXICANTOWN',W/2,H/2+28);
       ctx.fillText('BOSS1: LANDLORD  ·  BOSS2: RAT KING  ·  BOSS3: RECORD EXEC',W/2,H/2+50);
       if(Math.floor(frame/25)%2===0){ctx.fillStyle=C.greenL;ctx.font='11px "Press Start 2P"';ctx.fillText('[ PRESS ENTER TO CHOOSE PLAYER ]',W/2,H/2+90);}
       if(highSc>0){ctx.fillStyle=C.goldL;ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc,W/2,H/2+120);}
@@ -251,7 +281,7 @@ export default function PizzaGame() {
       ctx.fillText('CHOOSE YOUR PLAYER',W/2,52);
       const chars=[{name:'STEVE',role:'Bass & Vocals',desc:'Bearded groove machine'},{name:'MIKE',role:'Drums',desc:'Everybody loves Mike'},{name:'KYLE',role:'Guitar & Vocals',desc:'Tall guitar genius'}];
       const cardW=210,cardH=380,gap=18,startX=(W-(cardW*3+gap*2))/2;
-      const topOffsets=[12,10,13],spriteHeights=[42,40,44];
+      const topOffsets=[10,10,10],spriteHeights=[40,40,40];
       chars.forEach((ch,i)=>{
         const cx=startX+i*(cardW+gap),cy=72,isSel=selectedChar===i;
         ctx.fillStyle=isSel?'rgba(212,160,23,0.2)':'rgba(0,0,0,0.5)';ctx.fillRect(cx,cy,cardW,cardH);
@@ -340,29 +370,24 @@ export default function PizzaGame() {
         if(pl.x>W*0.42){const s=pl.x-W*0.42;scrollX+=s;pl.x=W*0.42;}
 
         const c=cfg();
-
         if(!boss||boss.dead){
           spT++;if(spT>=c.spawnRate){spawnEnemy();spT=0;}
           piT++;if(piT>=70){spawnCollectible();piT=0;}
         }
 
-        // trigger boss at 16 collected
         if(pc>=c.collectTarget&&!boss){
           triggerBoss();
         }
 
-        // boss update
         if(boss&&!boss.dead){
           boss.x+=boss.vx;
           if(boss.inv>0)boss.inv--;
           const bOx=boss.x-scrollX;
           if(bOx<80)boss.vx=Math.abs(boss.vx);
           if(bOx>W-boss.w-60)boss.vx=-Math.abs(boss.vx);
-
           const pb=pl.y+PH;
           const bOverlapX=pl.x<bOx+boss.w&&pl.x+PW>bOx;
           const stomping=pl.vy>0&&pb>=boss.y&&pb<=boss.y+18&&bOverlapX;
-
           if(stomping&&boss.inv===0){
             bossHits++;
             boss.inv=60;
@@ -381,7 +406,6 @@ export default function PizzaGame() {
           }
         }
 
-        // boss dead → advance level or win
         if(boss&&boss.dead){
           boss.deadTimer--;
           if(boss.deadTimer<=0){
@@ -399,7 +423,6 @@ export default function PizzaGame() {
           }
         }
 
-        // regular enemies
         obs=obs.filter(o=>{
           o.x+=o.vx;
           const ox=o.x-scrollX;
@@ -415,7 +438,6 @@ export default function PizzaGame() {
           return true;
         });
 
-        // collectibles
         pizzas=pizzas.filter(pz=>{
           if(pz.collected)return false;
           const ox=pz.x-scrollX;
