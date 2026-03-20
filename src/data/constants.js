@@ -1,55 +1,78 @@
 // ─────────────────────────────────────
 //  TEAM CABIN — Editable Site Data
+//  Change shows, music links, bios,
+//  social links, and colors all here.
 // ─────────────────────────────────────
 
-// Brand colors — matching TC logo exactly
+// ── Brand Colors ──
 export const C = {
-  gold:   '#E2A820',
-  goldL:  '#c8b830',
-  goldD:  '#a07810',
-  green:  '#1C3D12',
-  greenM: '#2D4A1E',
+  gold:   '#D4A017',
+  goldL:  '#E8B84B',
+  goldD:  '#A07810',
+  green:  '#2D4A1E',
+  greenM: '#3D6B2A',
   greenL: '#4A7A30',
   cream:  '#F5F0DC',
-  black:  '#050f03',
+  black:  '#0a0a0a',
 };
 
+// ── Upcoming Shows ──
+// Add or remove show objects here.
+// feat: true  → gold highlight + bigger ticket button
+// feat: false → standard styling
 export const SHOWS = [
   {
-    mo:   'MAR',
+    mo:   'MAY',
     d:    '08',
     v:    'Ypsi Ale House',
     loc:  'Ypsilanti, MI',
     t:    'w/ Cult Therapy & Shindig Machine',
     feat: true,
-    ticketUrl: '#',
+    ticketUrl: '#',   // ← replace with real ticket link
   },
+  // Add more shows like this:
+  // {
+  //   mo: 'APR', d: '15',
+  //   v: 'El Club', loc: 'Detroit, MI',
+  //   t: '9PM Doors', feat: false, ticketUrl: '#',
+  // },
 ];
 
+// ── Music Streaming Links ──
 export const MUSIC_LINKS = [
-  { name: 'Spotify',      icon: '♫', color: '#1db954', bg: 'rgba(29,185,84,0.08)',   url: 'https://open.spotify.com' },
-  { name: 'Apple Music',  icon: '♪', color: '#fc3c44', bg: 'rgba(252,60,68,0.08)',   url: 'https://music.apple.com' },
-  { name: 'Bandcamp',     icon: '◎', color: '#1da0c3', bg: 'rgba(29,160,195,0.08)',  url: 'https://bandcamp.com' },
-  { name: 'YouTube',      icon: '▶', color: '#ff0000', bg: 'rgba(255,0,0,0.08)',      url: 'https://youtube.com' },
-  { name: 'SoundCloud',   icon: '☁', color: '#ff5500', bg: 'rgba(255,85,0,0.08)',    url: 'https://soundcloud.com' },
-  { name: 'Amazon Music', icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.08)',   url: 'https://music.amazon.com' },
+  { name: 'Spotify',      icon: '♫', color: '#1db954', bg: 'rgba(29,185,84,0.1)',   url: 'https://open.spotify.com/artist/3Tf5gGxM19534XdbyqHsUO?si=ATZjxDE1SVqWGmuJSgscug' },
+  { name: 'Apple Music',  icon: '♪', color: '#fc3c44', bg: 'rgba(252,60,68,0.1)',   url: 'https://music.apple.com/us/artist/team-cabin/1232990862' },
+  { name: 'Bandcamp',     icon: '◎', color: '#1da0c3', bg: 'rgba(29,160,195,0.1)',  url: 'https://teamcabin.bandcamp.com/' },
+  { name: 'YouTube Music',icon: '▶', color: '#ff0000', bg: 'rgba(255,0,0,0.1)',     url: 'https://music.youtube.com/channel/UCTjflMMBBqxCs2oUNMVLIuA?si=15mKpkFEZfdxr3v7' },
+  { name: 'YouTube',      icon: '▶', color: '#ff4444', bg: 'rgba(255,68,68,0.1)',   url: 'https://youtube.com/@teamcabinmi?si=my2xg-r5hxGNAAsl' },
+  { name: 'SoundCloud',   icon: '☁', color: '#ff5500', bg: 'rgba(255,85,0,0.1)',    url: 'https://soundcloud.com' },
+  { name: 'Amazon Music', icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.1)',   url: 'https://music.amazon.com/artists/B071L2FBBB/team-cabin' },
 ];
 
+// ── Social / Footer Links ──
 export const SOCIAL_LINKS = [
-  { label: 'Instagram',    url: '#' },
-  { label: 'Facebook',     url: '#' },
-  { label: 'Twitter / X',  url: '#' },
-  { label: 'TikTok',       url: '#' },
-  { label: 'Press Kit',    url: '#' },
+  { label: 'Instagram', url: 'https://www.instagram.com/teamcabin' },
+  { label: 'Facebook',  url: 'https://www.facebook.com/TeamCabin/' },
+  { label: 'Threads',   url: 'https://www.threads.com/@teamcabin' },
+  { label: 'Twitter / X', url: 'https://x.com/weareteamcabin' },
+  { label: 'TikTok',    url: 'https://www.tiktok.com/@weareteamcabin' },
+  { label: 'YouTube',   url: 'https://youtube.com/@teamcabinmi?si=my2xg-r5hxGNAAsl' },
+  { label: 'Press Kit', url: '#' },
   { label: 'Mailing List', url: '#' },
 ];
 
+// ── Band Members ──
+// bio    = shown on the band section card
+// pizza  = fun pizza preference shown at bottom of card
+// charId = 0 (Steve/plaid), 1 (Mike/hoodie), 2 (Kyle/green jacket)
+//          Must match the character pixel art order — don't change unless
+//          you also update the character components.
 export const MEMBERS = [
   {
     charId: 0,
     name:  'STEVE',
     role:  'Bass & Vocals',
-    bio:   'The kind of guy who turns a three-minute song into a minor philosophy lecture — rough around the edges, but the kind of rough that makes you think. Holds the low end like a grudge.',
+    bio:   'The kind of guy who turns a 2-minute song into a minor philosophy lecture — rough around the edges, but the kind of rough that makes you think. Holds the low end like a grudge.',
     pizza: 'Deep dish, obviously',
   },
   {

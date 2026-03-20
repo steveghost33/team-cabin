@@ -1,3 +1,8 @@
+// ─────────────────────────────────────
+//  App.jsx
+//  Root component — assembles all sections.
+//  To add/remove sections, edit here.
+// ─────────────────────────────────────
 import Nav         from './components/Nav';
 import Hero        from './components/Hero';
 import Music       from './components/Music';
