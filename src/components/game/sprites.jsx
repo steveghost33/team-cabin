@@ -1,146 +1,82 @@
 export function drawCharSprite(ctx, idx, px, py, PW, C) {
+  const s = PW / 24; // scale factor
+  function r(x, y, w, h, fill) {
+    ctx.fillStyle = fill;
+    ctx.fillRect(px + x*s, py + y*s, w*s, h*s);
+  }
+
   if (idx === 0) {
-    // STEVE — plaid flannel, beard, glasses
-    ctx.fillStyle='#0a0a0a'; ctx.fillRect(px,py+56,18,8); ctx.fillRect(px+28,py+56,18,8);
-    ctx.fillStyle='#222'; ctx.fillRect(px+2,py+56,14,4); ctx.fillRect(px+30,py+56,14,4);
-    ctx.fillStyle='#1c1c3a'; ctx.fillRect(px+2,py+34,16,22); ctx.fillRect(px+28,py+34,16,22);
-    ctx.fillStyle='#2a2a4a'; ctx.fillRect(px+4,py+34,8,22); ctx.fillRect(px+30,py+34,8,22);
-    ctx.fillStyle='#111128'; ctx.fillRect(px+2,py+52,16,4); ctx.fillRect(px+28,py+52,16,4);
-    ctx.fillStyle='#3a2a10'; ctx.fillRect(px+2,py+32,44,4);
-    ctx.fillStyle='#c8a020'; ctx.fillRect(px+20,py+32,8,4);
-    ctx.fillStyle='#7a7c7e'; ctx.fillRect(px,py+10,48,24);
-    ctx.fillStyle='#9a9c9e'; ctx.fillRect(px+2,py+10,44,4);
-    ctx.fillStyle='#6a6c6e'; ctx.fillRect(px,py+30,48,4);
-    ctx.fillStyle='rgba(60,62,64,0.55)';
-    [px+6,px+14,px+22,px+30,px+38].forEach(x=>ctx.fillRect(x,py+10,3,24));
-    ctx.fillStyle='rgba(60,62,64,0.4)';
-    [py+14,py+19,py+24,py+29].forEach(y=>ctx.fillRect(px,y,48,2));
-    ctx.fillStyle='rgba(74,96,48,0.5)'; ctx.fillRect(px+16,py+10,6,24);
-    ctx.fillStyle='#9a9c9e'; ctx.fillRect(px+16,py+10,16,4);
-    ctx.fillStyle='#4a6030'; ctx.fillRect(px+18,py+10,12,6);
-    ctx.fillStyle='#7a7c7e'; ctx.fillRect(px-10,py+10,12,22); ctx.fillRect(px+46,py+10,12,22);
-    ctx.fillStyle='#8a8c8e'; ctx.fillRect(px-8,py+10,6,18); ctx.fillRect(px+50,py+10,6,18);
-    ctx.fillStyle='#5a5c5e'; ctx.fillRect(px-10,py+28,12,4); ctx.fillRect(px+46,py+28,12,4);
-    ctx.fillStyle='#d4a574'; ctx.fillRect(px-10,py+30,12,8); ctx.fillRect(px+46,py+30,12,8);
-    ctx.fillStyle='#c49060'; ctx.fillRect(px-10,py+35,12,3); ctx.fillRect(px+46,py+35,12,3);
-    ctx.fillStyle='#e4b584'; ctx.fillRect(px-8,py+30,6,4); ctx.fillRect(px+50,py+30,6,4);
-    ctx.fillStyle='#d4a574'; ctx.fillRect(px+18,py+2,12,10);
-    ctx.fillStyle='#c49060'; ctx.fillRect(px+22,py+2,4,10);
-    ctx.fillStyle='#d4a574'; ctx.fillRect(px+8,py-22,32,26);
-    ctx.fillStyle='#e4b584'; ctx.fillRect(px+10,py-22,28,8);
-    ctx.fillStyle='#c49060'; ctx.fillRect(px+8,py+2,32,2);
-    ctx.fillStyle='#b48050'; ctx.fillRect(px+8,py-2,32,4);
-    ctx.fillStyle='rgba(220,140,100,0.3)'; ctx.fillRect(px+8,py-8,6,4); ctx.fillRect(px+34,py-8,6,4);
-    ctx.fillStyle='#8a7040'; ctx.fillRect(px+8,py-4,32,8);
-    ctx.fillStyle='#9a8050'; ctx.fillRect(px+10,py-4,28,4);
-    ctx.fillStyle='#7a6030'; ctx.fillRect(px+8,py+2,32,2);
-    ctx.fillStyle='#8a7040'; ctx.fillRect(px+6,py-10,4,14); ctx.fillRect(px+38,py-10,4,14);
-    ctx.fillStyle='#7a6535'; ctx.fillRect(px+8,py-22,32,6);
-    ctx.fillStyle='#8a7545'; ctx.fillRect(px+10,py-22,28,3);
-    ctx.fillStyle='#5a4525'; ctx.fillRect(px+6,py-20,4,8); ctx.fillRect(px+38,py-20,4,8);
-    ctx.fillStyle='#1a1a1a'; ctx.fillRect(px+12,py-14,6,6); ctx.fillRect(px+30,py-14,6,6);
-    ctx.fillStyle='#4a3a20'; ctx.fillRect(px+13,py-13,4,4); ctx.fillRect(px+31,py-13,4,4);
-    ctx.fillStyle='#fff'; ctx.fillRect(px+12,py-14,2,2); ctx.fillRect(px+30,py-14,2,2);
-    ctx.strokeStyle='#7a6535'; ctx.lineWidth=2;
-    ctx.strokeRect(px+10,py-16,10,8); ctx.strokeRect(px+28,py-16,10,8);
-    ctx.fillStyle='#7a6535'; ctx.fillRect(px+20,py-13,8,2);
-    ctx.fillStyle='rgba(150,180,220,0.15)'; ctx.fillRect(px+11,py-15,8,6); ctx.fillRect(px+29,py-15,8,6);
+    // STEVE — matches SVG exactly, scaled
+    r(0,26,8,3,'#111'); r(13,26,8,3,'#111');
+    r(1,20,7,10,'#1c1c2c'); r(13,20,7,10,'#1c1c2c');
+    r(1,19,20,2,'#3a2a10'); r(8,19,6,2,'#c8a020');
+    r(-1,10,24,10,'#848688');
+    ctx.fillStyle='rgba(90,92,94,0.5)';
+    ctx.fillRect(px-s,py+12*s,24*s,s);ctx.fillRect(px-s,py+15*s,24*s,s);ctx.fillRect(px-s,py+18*s,24*s,s);
+    ctx.fillRect(px+3*s,py+10*s,2*s,10*s);ctx.fillRect(px+9*s,py+10*s,2*s,10*s);ctx.fillRect(px+15*s,py+10*s,2*s,10*s);
+    r(8,10,6,4,'#4a6030');
+    r(-5,10,5,8,'#848688'); r(PW,10,5,8,'#848688');
+    r(-5,17,5,3,'#e0c090'); r(PW,17,5,3,'#e0c090');
+    r(3,7,6,4,'#e0c090');
+    r(3,1,16,9,'#e0c090');
+    ctx.fillStyle='rgba(138,112,69,0.4)';ctx.fillRect(px+3*s,py+s,16*s,2*s);
+    r(3,8,16,3,'#8a7045'); r(4,7,3,2,'#8a7045'); r(15,7,3,2,'#8a7045');
+    r(6,4,3,3,'#1a1a1a'); r(13,4,3,3,'#1a1a1a');
+    ctx.strokeStyle='#7a6535'; ctx.lineWidth=s;
+    ctx.strokeRect(px+5*s,py+3*s,5*s,4*s);ctx.strokeRect(px+12*s,py+3*s,5*s,4*s);
+    r(10,5,2,s,'#7a6535');
 
   } else if (idx === 1) {
-    // MIKE — plain grey hoodie NO logo, mustard yellow fitted snapback, maroon pants, dark sneakers
-    ctx.fillStyle='#1a1a2a'; ctx.fillRect(px,py+56,18,8); ctx.fillRect(px+28,py+56,18,8);
-    ctx.fillStyle='#2a2a3a'; ctx.fillRect(px+2,py+56,14,4); ctx.fillRect(px+30,py+56,14,4);
-    ctx.fillStyle='#fff'; ctx.fillRect(px+1,py+62,16,2); ctx.fillRect(px+29,py+62,16,2);
-    ctx.fillStyle='#7B2D3A'; ctx.fillRect(px+2,py+34,16,22); ctx.fillRect(px+28,py+34,16,22);
-    ctx.fillStyle='#9a3a4a'; ctx.fillRect(px+4,py+34,8,10); ctx.fillRect(px+30,py+34,8,10);
-    ctx.fillStyle='#5a1a28'; ctx.fillRect(px+2,py+52,16,4); ctx.fillRect(px+28,py+52,16,4);
-    ctx.fillStyle='#2a2a2a'; ctx.fillRect(px+2,py+32,44,4);
-    ctx.fillStyle='#555'; ctx.fillRect(px+20,py+32,8,4);
-    // plain grey hoodie body
-    ctx.fillStyle='#9a9a9a'; ctx.fillRect(px,py+10,48,24);
-    ctx.fillStyle='#adadad'; ctx.fillRect(px+2,py+10,44,6);
-    ctx.fillStyle='#888'; ctx.fillRect(px,py+28,48,6);
-    ctx.fillStyle='#888'; ctx.fillRect(px+10,py+22,28,10);
-    ctx.fillStyle='#7a7a7a'; ctx.fillRect(px+10,py+22,28,2);
-    ctx.fillStyle='#878787'; ctx.fillRect(px+22,py+10,4,24);
-    ctx.fillStyle='#888'; ctx.fillRect(px+4,py+4,40,8);
-    ctx.fillStyle='#999'; ctx.fillRect(px+6,py+4,36,4);
-    ctx.fillStyle='#9a9a9a'; ctx.fillRect(px-10,py+10,12,22); ctx.fillRect(px+46,py+10,12,22);
-    ctx.fillStyle='#adadad'; ctx.fillRect(px-8,py+10,6,14); ctx.fillRect(px+50,py+10,6,14);
-    ctx.fillStyle='#888'; ctx.fillRect(px-10,py+28,12,4); ctx.fillRect(px+46,py+28,12,4);
-    ctx.fillStyle='#c49a6c'; ctx.fillRect(px-10,py+30,12,8); ctx.fillRect(px+46,py+30,12,8);
-    ctx.fillStyle='#b48a5c'; ctx.fillRect(px-10,py+35,12,3); ctx.fillRect(px+46,py+35,12,3);
-    ctx.fillStyle='#d4aa7c'; ctx.fillRect(px-8,py+30,6,4); ctx.fillRect(px+50,py+30,6,4);
-    ctx.fillStyle='#c49a6c'; ctx.fillRect(px+18,py+2,12,10);
-    ctx.fillStyle='#b48a5c'; ctx.fillRect(px+22,py+6,4,6);
-    ctx.fillStyle='#c49a6c'; ctx.fillRect(px+8,py-22,32,26);
-    ctx.fillStyle='#d4aa7c'; ctx.fillRect(px+10,py-22,28,8);
-    ctx.fillStyle='#b48a5c'; ctx.fillRect(px+8,py+2,32,2);
-    ctx.fillStyle='rgba(200,120,80,0.3)'; ctx.fillRect(px+8,py-8,6,4); ctx.fillRect(px+34,py-8,6,4);
-    ctx.fillStyle='#1a0f05'; ctx.fillRect(px+8,py-4,32,8);
-    ctx.fillStyle='#2a1a0a'; ctx.fillRect(px+10,py-4,28,4);
-    ctx.fillStyle='#0a0500'; ctx.fillRect(px+8,py+2,32,2);
-    ctx.fillStyle='#1a0f05'; ctx.fillRect(px+6,py-10,4,14); ctx.fillRect(px+38,py-10,4,14);
-    ctx.fillStyle='#111'; ctx.fillRect(px+12,py-14,6,6); ctx.fillRect(px+30,py-14,6,6);
-    ctx.fillStyle='#fff'; ctx.fillRect(px+12,py-14,2,2); ctx.fillRect(px+30,py-14,2,2);
-    // MUSTARD YELLOW FITTED SNAPBACK — tight to head, small neat brim
-    ctx.fillStyle='#c8a020'; ctx.fillRect(px+6,py-30,36,13);
-    ctx.fillStyle='#d8b030'; ctx.fillRect(px+8,py-30,32,6);
-    ctx.fillStyle='#a07810'; ctx.fillRect(px+6,py-19,36,2);
-    ctx.fillStyle='#c8a020'; ctx.fillRect(px+2,py-28,6,11); ctx.fillRect(px+40,py-28,6,11);
-    ctx.fillStyle='#a07810'; ctx.fillRect(px+2,py-19,6,2); ctx.fillRect(px+40,py-19,6,2);
-    ctx.fillStyle='#c8a020'; ctx.fillRect(px+4,py-19,40,5);
-    ctx.fillStyle='#d8b030'; ctx.fillRect(px+4,py-19,40,2);
-    ctx.fillStyle='#a07810'; ctx.fillRect(px+4,py-15,40,1);
-    ctx.fillStyle='#b89018'; ctx.fillRect(px+14,py-19,20,4);
-    ctx.fillStyle='#8a6010'; ctx.fillRect(px+18,py-18,12,2);
-    ctx.fillStyle='#b89018'; ctx.fillRect(px+20,py-31,8,2);
+    // MIKE — matches SVG exactly
+    r(0,26,8,3,'#2a2a2a'); r(13,26,8,3,'#2a2a2a');
+    ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fillRect(px,py+31*s,8*s,s);ctx.fillRect(px+13*s,py+31*s,8*s,s);
+    r(1,20,7,10,'#7B2D3A'); r(13,20,7,10,'#7B2D3A');
+    r(3,20,3,5,'#9a3a4a'); r(16,20,3,5,'#9a3a4a');
+    r(1,19,20,2,'#2a2a2a');
+    r(-1,10,24,10,'#9a9a9a');
+    r(-1,10,24,3,'#adadad'); r(-1,17,24,3,'#888');
+    r(4,15,14,4,'#888'); r(4,15,14,1,'#777');
+    r(10,10,2,10,'#878787');
+    r(-5,10,5,8,'#9a9a9a'); r(PW,10,5,8,'#9a9a9a');
+    r(-5,16,5,2,'#888'); r(PW,16,5,2,'#888');
+    r(-5,17,5,3,'#c49a6c'); r(PW,17,5,3,'#c49a6c');
+    r(3,7,6,4,'#c49a6c');
+    r(3,1,16,9,'#c49a6c'); r(5,1,12,4,'#d4aa7c');
+    r(3,7,16,4,'#1a0f05'); r(4,6,3,2,'#1a0f05'); r(15,6,3,2,'#1a0f05');
+    r(6,4,3,3,'#111'); r(13,4,3,3,'#111');
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fillRect(px+6*s,py+4*s,s,s);ctx.fillRect(px+13*s,py+4*s,s,s);
+    // mustard snapback
+    r(2,0,18,4,'#c8a020'); r(4,0,14,2,'#d8b030');
+    r(0,1,4,3,'#c8a020'); r(18,1,4,3,'#c8a020');
+    r(-1,3,24,2,'#c8a020'); r(-1,4,24,1,'#a07810');
+    r(9,0,4,1,'#b89018'); r(7,3,8,2,'#b89018');
 
   } else {
-    // KYLE — dark olive Patagonia zip fleece, dark pants, brown hiking boots, glasses
-    ctx.fillStyle='#4a3020'; ctx.fillRect(px,py+56,18,8); ctx.fillRect(px+28,py+56,18,8);
-    ctx.fillStyle='#6a5040'; ctx.fillRect(px+2,py+56,14,4); ctx.fillRect(px+30,py+56,14,4);
-    ctx.fillStyle='#2a1a10'; ctx.fillRect(px,py+60,18,4); ctx.fillRect(px+28,py+60,18,4);
-    ctx.fillStyle='#2a2a2a'; ctx.fillRect(px+2,py+34,16,22); ctx.fillRect(px+28,py+34,16,22);
-    ctx.fillStyle='#383838'; ctx.fillRect(px+4,py+34,8,10); ctx.fillRect(px+30,py+34,8,10);
-    ctx.fillStyle='#1a1a1a'; ctx.fillRect(px+2,py+52,16,4); ctx.fillRect(px+28,py+52,16,4);
-    ctx.fillStyle='#3a3020'; ctx.fillRect(px+2,py+32,44,4);
-    ctx.fillStyle='#2D4A1E'; ctx.fillRect(px,py+10,48,24);
-    ctx.fillStyle='#3D5A2A'; ctx.fillRect(px+2,py+10,44,8);
-    ctx.fillStyle='#1D3A10'; ctx.fillRect(px,py+28,48,6);
-    ctx.fillStyle='#1D3A10'; ctx.fillRect(px+21,py+10,6,24);
-    ctx.fillStyle='#aaa'; ctx.fillRect(px+23,py+14,2,18);
-    ctx.fillStyle='#3a6a28'; ctx.fillRect(px+4,py+14,14,8);
-    ctx.fillStyle='#D4A017'; ctx.fillRect(px+5,py+15,12,4);
-    ctx.fillStyle='#1D3A10'; ctx.fillRect(px+5,py+15,12,2);
-    ctx.fillStyle='#fff'; ctx.fillRect(px+6,py+16,10,2);
-    ctx.fillStyle='#1D3A10'; ctx.fillRect(px+14,py+8,20,6);
-    ctx.fillStyle='#2D4A1E'; ctx.fillRect(px+16,py+8,16,4);
-    ctx.fillStyle='#2D4A1E'; ctx.fillRect(px-10,py+10,12,22); ctx.fillRect(px+46,py+10,12,22);
-    ctx.fillStyle='#3D5A2A'; ctx.fillRect(px-8,py+10,6,14); ctx.fillRect(px+50,py+10,6,14);
-    ctx.fillStyle='#1D3A10'; ctx.fillRect(px-10,py+28,12,4); ctx.fillRect(px+46,py+28,12,4);
-    ctx.fillStyle='#d4b07a'; ctx.fillRect(px-10,py+30,12,8); ctx.fillRect(px+46,py+30,12,8);
-    ctx.fillStyle='#c4a06a'; ctx.fillRect(px-10,py+35,12,3); ctx.fillRect(px+46,py+35,12,3);
-    ctx.fillStyle='#e4c08a'; ctx.fillRect(px-8,py+30,6,4); ctx.fillRect(px+50,py+30,6,4);
-    ctx.fillStyle='#d4b07a'; ctx.fillRect(px+18,py+2,12,10);
-    ctx.fillStyle='#c4a06a'; ctx.fillRect(px+22,py+6,4,6);
-    ctx.fillStyle='#d4b07a'; ctx.fillRect(px+8,py-22,32,26);
-    ctx.fillStyle='#e4c08a'; ctx.fillRect(px+10,py-22,28,8);
-    ctx.fillStyle='#c4a06a'; ctx.fillRect(px+8,py+2,32,2);
-    ctx.fillStyle='rgba(210,150,100,0.3)'; ctx.fillRect(px+8,py-8,6,4); ctx.fillRect(px+34,py-8,6,4);
-    ctx.fillStyle='#6B4C2A'; ctx.fillRect(px+8,py-22,32,6);
-    ctx.fillStyle='#7B5C3A'; ctx.fillRect(px+10,py-22,28,3);
-    ctx.fillStyle='#5B3C1A'; ctx.fillRect(px+4,py-20,6,22); ctx.fillRect(px+38,py-20,6,22);
-    ctx.fillStyle='#6B4C2A'; ctx.fillRect(px+4,py-20,4,16); ctx.fillRect(px+40,py-20,4,16);
-    ctx.fillStyle='rgba(100,70,30,0.3)'; ctx.fillRect(px+8,py-2,32,4);
-    ctx.fillStyle='#1a1a1a'; ctx.fillRect(px+12,py-14,6,6); ctx.fillRect(px+30,py-14,6,6);
-    ctx.fillStyle='#3a3a5a'; ctx.fillRect(px+13,py-13,4,4); ctx.fillRect(px+31,py-13,4,4);
-    ctx.fillStyle='#fff'; ctx.fillRect(px+12,py-14,2,2); ctx.fillRect(px+30,py-14,2,2);
-    ctx.strokeStyle='#8B6C4A'; ctx.lineWidth=2;
-    ctx.strokeRect(px+10,py-16,10,8); ctx.strokeRect(px+28,py-16,10,8);
-    ctx.fillStyle='#8B6C4A'; ctx.fillRect(px+20,py-13,8,2);
-    ctx.fillStyle='rgba(150,180,220,0.12)'; ctx.fillRect(px+11,py-15,8,6); ctx.fillRect(px+29,py-15,8,6);
-    ctx.fillStyle='#c4906a'; ctx.fillRect(px+14,py-2,20,2);
+    // KYLE — matches SVG exactly
+    r(0,26,8,3,'#4a3020'); r(13,26,8,3,'#4a3020');
+    r(0,31,8,1,'#6a5040'); r(13,31,8,1,'#6a5040');
+    r(1,20,7,10,'#2a2a2a'); r(13,20,7,10,'#2a2a2a');
+    r(3,20,3,5,'#383838'); r(16,20,3,5,'#383838');
+    r(1,19,20,2,'#3a3020');
+    r(-1,10,24,10,'#2D4A1E');
+    r(-1,10,24,3,'#3D5A2A'); r(-1,17,24,3,'#1D3A10');
+    r(10,10,2,10,'#1D3A10'); r(10,12,2,6,'#aaa');
+    r(0,12,7,5,'#3a6a28'); r(1,13,5,2,'#D4A017'); r(1,13,5,1,'#1D3A10'); r(1,14,5,1,'#fff');
+    r(7,9,8,3,'#1D3A10');
+    r(-5,10,5,8,'#2D4A1E'); r(PW,10,5,8,'#2D4A1E');
+    r(-5,16,5,2,'#1D3A10'); r(PW,16,5,2,'#1D3A10');
+    r(-5,17,5,3,'#d4b07a'); r(PW,17,5,3,'#d4b07a');
+    r(3,7,6,4,'#d4b07a');
+    r(3,1,16,9,'#d4b07a'); r(5,1,12,4,'#e4c08a');
+    r(3,1,16,3,'#6B4C2A'); r(5,1,12,1,'#7B5C3A');
+    r(-2,2,4,9,'#6B4C2A'); r(18,2,4,9,'#6B4C2A');
+    ctx.fillStyle='rgba(138,96,48,0.3)';ctx.fillRect(px+4*s,py+8*s,14*s,2*s);
+    r(6,4,3,3,'#1a1a1a'); r(13,4,3,3,'#1a1a1a');
+    ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fillRect(px+6*s,py+4*s,s,s);ctx.fillRect(px+13*s,py+4*s,s,s);
+    ctx.strokeStyle='#8B6C4A'; ctx.lineWidth=s;
+    ctx.strokeRect(px+5*s,py+3*s,5*s,4*s);ctx.strokeRect(px+12*s,py+3*s,5*s,4*s);
+    r(10,5,2,s,'#8B6C4A');
+    ctx.fillStyle='rgba(196,144,106,0.6)';ctx.fillRect(px+7*s,py+9*s,8*s,s);
   }
 }
 

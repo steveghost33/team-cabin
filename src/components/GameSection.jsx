@@ -4,14 +4,40 @@ import { C } from '../data/constants';
 
 export default function GameSection() {
   return (
-    <div id="game" style={{ background: '#030a02', borderTop: `4px solid ${C.gold}` }}>
-      <div style={{ padding: '4rem 1rem', maxWidth: 820, margin: '0 auto' }}>
+    <div id="game" style={{
+      background: '#080808',
+      borderTop: `4px solid ${C.gold}`,
+      boxShadow: `inset 0 3px 0 ${C.goldD}`,
+    }}>
+      <div style={{ padding: '4rem 1rem', maxWidth: 840, margin: '0 auto' }}>
         <SectionTitle color={C.gold}>🍕 DETROIT PIZZA QUEST</SectionTitle>
-        <p style={{ fontFamily: '"VT323"', fontSize: '1.25rem', color: 'rgba(212,160,23,0.55)', textAlign: 'center', marginBottom: '2rem', lineHeight: 1.5 }}>
-          Guide the guys through Detroit streets hunting for the perfect slice.<br />
-          <strong style={{ color: C.gold }}>JUMP ON</strong> meter maids, muscle dudes &amp; rats to defeat them.<br />
-          <strong style={{ color: '#e74c3c' }}>AVOID</strong> the traffic cones — you can't stomp those!
+        <p style={{
+          fontFamily: '"Press Start 2P"', fontSize: '0.45rem',
+          color: 'rgba(212,160,23,0.5)', textAlign: 'center',
+          marginBottom: '0.8rem', lineHeight: 2,
+        }}>
+          3 LEVELS · 3 BOSSES · YPSILANTI / DETROIT / MEXICANTOWN
         </p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+          {[
+            { key: 'WASD / ↑↓←→', label: 'MOVE', color: C.gold },
+            { key: 'SPACE', label: 'JUMP', color: '#e74c3c' },
+            { key: 'Z / ATK', label: 'ATTACK', color: '#8e44ad' },
+            { key: '16 SLICES', label: '→ BOSS', color: C.greenL },
+          ].map(b => (
+            <div key={b.label} style={{
+              border: `2px solid ${b.color}`,
+              background: '#111',
+              boxShadow: '2px 2px 0 #000',
+              padding: '5px 10px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+              minWidth: 80,
+            }}>
+              <span style={{ fontFamily: '"VT323"', fontSize: '1.1rem', color: b.color }}>{b.key}</span>
+              <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: C.cream }}>{b.label}</span>
+            </div>
+          ))}
+        </div>
         <PizzaGame />
       </div>
     </div>
