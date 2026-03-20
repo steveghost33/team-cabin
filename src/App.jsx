@@ -1,10 +1,6 @@
-// ─────────────────────────────────────
-//  App.jsx
-//  Root component — assembles all sections.
-//  To add/remove sections, edit here.
-// ─────────────────────────────────────
 import Nav         from './components/Nav';
 import Hero        from './components/Hero';
+import Ticker      from './components/Ticker';
 import Music       from './components/Music';
 import Shows       from './components/Shows';
 import Band        from './components/Band';
@@ -13,11 +9,11 @@ import Footer      from './components/Footer';
 
 export default function App() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div>
       <Nav scrollTo={scrollTo} />
       <Hero />
+      <Ticker />
       <Music />
       <Shows />
       <Band />

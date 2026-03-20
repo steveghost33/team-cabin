@@ -1,67 +1,94 @@
-// ─────────────────────────────────────
-//  Music.jsx
-//  Streaming platform links grid.
-//  Edit links in src/data/constants.js
-// ─────────────────────────────────────
-import SectionTitle from './SectionTitle';
 import { C, MUSIC_LINKS } from '../data/constants';
 
 export default function Music() {
   return (
-    <section id="music" style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
-      <SectionTitle>FIND OUR MUSIC</SectionTitle>
+    <>
+      <style>{`
+        .music {
+          background: var(--off-black);
+          padding: clamp(4rem,8vw,8rem) 0;
+        }
+        .music-inner {
+          max-width: 1200px; margin: 0 auto;
+          padding: 0 clamp(1rem,4vw,3rem);
+        }
+        .section-header {
+          display: flex; align-items: baseline; gap: 1.5rem;
+          margin-bottom: clamp(2rem,4vw,3.5rem);
+        }
+        .section-title {
+          font-family: var(--font-display);
+          font-weight: 900; font-style: italic;
+          font-size: clamp(2.5rem,6vw,5rem);
+          text-transform: uppercase; line-height: 1;
+          color: var(--cream);
+        }
+        .section-title .accent { color: var(--gold); }
+        .section-rule {
+          flex: 1; height: 2px;
+          background: linear-gradient(90deg, rgba(226,168,32,0.5) 0%, transparent 100%);
+        }
+        .music-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1px;
+          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.06);
+        }
+        .music-link {
+          display: flex; align-items: center; gap: 1rem;
+          padding: 1.25rem 1.5rem;
+          background: var(--off-black);
+          text-decoration: none;
+          transition: background 0.15s, transform 0.1s;
+          position: relative; overflow: hidden;
+        }
+        .music-link::before {
+          content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+          width: 3px; background: var(--link-color);
+          transform: scaleY(0); transform-origin: bottom;
+          transition: transform 0.2s;
+        }
+        .music-link:hover { background: rgba(255,255,255,0.04); }
+        .music-link:hover::before { transform: scaleY(1); }
+        .music-icon {
+          font-size: 1.5rem; flex-shrink: 0;
+          filter: drop-shadow(0 0 6px var(--link-color));
+        }
+        .music-name {
+          font-family: var(--font-display);
+          font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.08em; font-size: 0.82rem;
+          color: var(--link-color);
+        }
+        .music-action {
+          font-family: var(--font-body);
+          font-size: 0.8rem; color: var(--cream-dim);
+          margin-top: 2px;
+        }
+      `}</style>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1.1rem',
-        }}
-      >
-        {MUSIC_LINKS.map((m) => (
-          <a
-            key={m.name}
-            href={m.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '1.2rem 1.4rem',
-              textDecoration: 'none',
-              border: `3px solid ${m.color}`,
-              background: m.bg,
-              transition: 'transform 0.08s, box-shadow 0.08s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translate(-3px,-3px)';
-              e.currentTarget.style.boxShadow = `6px 6px 0 ${m.color}`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = '';
-              e.currentTarget.style.boxShadow = '';
-            }}
-          >
-            <span style={{ fontSize: '1.7rem', flexShrink: 0 }}>{m.icon}</span>
-            <div>
-              <div
-                style={{
-                  fontFamily: '"Press Start 2P"',
-                  fontSize: '0.48rem',
-                  color: m.color,
-                  marginBottom: '0.3rem',
-                }}
-              >
-                {m.name}
-              </div>
-              <div style={{ fontFamily: '"VT323"', fontSize: '1.3rem', color: C.cream }}>
-                Listen Now →
-              </div>
-            </div>
-          </a>
-        ))}
-      </div>
-    </section>
+      <section id="music" className="music">
+        <div className="music-inner">
+          <div className="section-header">
+            <h2 className="section-title">Stream <span className="accent">Our</span> Music</h2>
+            <div className="section-rule" />
+          </div>
+          <div className="music-grid">
+            {MUSIC_LINKS.map(m => (
+              <a key={m.name} href={m.url} target="_blank" rel="noopener noreferrer"
+                className="music-link"
+                style={{ '--link-color': m.color }}>
+                <span className="music-icon">{m.icon}</span>
+                <div>
+                  <div className="music-name">{m.name}</div>
+                  <div className="music-action">Listen now →</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

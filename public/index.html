@@ -3,61 +3,149 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Team Cabin — Detroit rock three-piece. Bass, drums, guitar. Playing Detroit, Ypsilanti, and everywhere in between." />
     <title>Team Cabin</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bebas+Neue&family=VT323&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
     <style>
-      /* ── Reset ── */
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-
-      /* ── Base ── */
-      body {
-        background: #2D4A1E;
-        color: #F5F0DC;
-        font-family: 'Bebas Neue', sans-serif;
-        overflow-x: hidden;
+      /* ── Reset ─────────────────────────────── */
+      *, *::before, *::after {
+        margin: 0; padding: 0; box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-size: 16px;
       }
 
-      /* ── Scanline overlay ── */
-      body::after {
-        content: '';
-        position: fixed;
-        inset: 0;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 3px,
-          rgba(0,0,0,0.07) 3px,
-          rgba(0,0,0,0.07) 4px
-        );
-        pointer-events: none;
-        z-index: 9000;
+      /* ── Design tokens ─────────────────────── */
+      :root {
+        --gold:        #E2A820;
+        --gold-light:  #f0c040;
+        --gold-dark:   #a07810;
+        --green:       #1C3D12;
+        --green-mid:   #2D4A1E;
+        --green-light: #4A7A30;
+        --cream:       #F5F0DC;
+        --cream-dim:   #c8c0a0;
+        --black:       #080f06;
+        --off-black:   #111a0e;
+
+        --font-display: 'Barlow Condensed', sans-serif;
+        --font-body:    'Barlow', sans-serif;
+        --font-pixel:   'Press Start 2P', monospace;
+        --font-vt:      'VT323', monospace;
+
+        --radius:  4px;
+        --shadow:  0 4px 24px rgba(0,0,0,0.4);
+        --transition: 0.18s ease;
+      }
+
+      /* ── Base ──────────────────────────────── */
+      body {
+        background: var(--green);
+        color: var(--cream);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
       }
 
       #root { min-height: 100vh; }
 
-      /* ── Animations (referenced by inline styles via animation: name) ── */
+      img { display: block; max-width: 100%; }
+      a { color: inherit; text-decoration: none; }
+      button { cursor: pointer; font-family: inherit; }
+
+      /* ── Typography scale ──────────────────── */
+      .t-display {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-style: italic;
+        text-transform: uppercase;
+        letter-spacing: -0.01em;
+        line-height: 0.9;
+      }
+      .t-label {
+        font-family: var(--font-display);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.75rem;
+      }
+      .t-pixel {
+        font-family: var(--font-pixel);
+        line-height: 1.6;
+      }
+
+      /* ── Layout helpers ────────────────────── */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 clamp(1rem, 4vw, 3rem);
+      }
+      .section-pad {
+        padding: clamp(4rem, 8vw, 8rem) 0;
+      }
+
+      /* ── Scrollbar ─────────────────────────── */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: var(--black); }
+      ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+      /* ── Selection ─────────────────────────── */
+      ::selection { background: var(--gold); color: var(--green); }
+
+      /* ── Animations ────────────────────────── */
       @keyframes bob {
-        0%, 100% { transform: translateY(0); }
-        50%       { transform: translateY(-10px); }
+        0%,100% { transform: translateY(0); }
+        50%      { transform: translateY(-8px); }
       }
-      @keyframes glow {
-        0%, 100% { text-shadow: 4px 4px 0 #2D4A1E, 8px 8px 0 #000; }
-        50%       { text-shadow: 4px 4px 0 #2D4A1E, 8px 8px 0 #000, 0 0 30px #D4A017, 0 0 60px #ffcc00; }
+      @keyframes glow-pulse {
+        0%,100% { opacity: 1; }
+        50%      { opacity: 0.6; }
       }
-      @keyframes blink  { 50% { opacity: 0; } }
-      @keyframes float  {
-        0%, 100% { transform: translateY(0) rotate(-1deg); }
-        50%       { transform: translateY(-12px) rotate(1deg); }
+      @keyframes blink {
+        50% { opacity: 0; }
       }
-      @keyframes marquee {
+      @keyframes float-up {
+        from { opacity: 0; transform: translateY(32px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes slide-right {
+        from { opacity: 0; transform: translateX(-24px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes ticker {
         0%   { transform: translateX(0); }
         100% { transform: translateX(-50%); }
       }
-      @keyframes spin { 100% { transform: rotate(360deg); } }
+
+      /* ── Pixel game font ───────────────────── */
+      .pixel { font-family: var(--font-pixel); }
+      .vt    { font-family: var(--font-vt); }
+
+      /* ── Utility ───────────────────────────── */
+      .gold  { color: var(--gold); }
+      .cream { color: var(--cream); }
+      .sr-only {
+        position: absolute; width: 1px; height: 1px;
+        padding: 0; margin: -1px; overflow: hidden;
+        clip: rect(0,0,0,0); border: 0;
+      }
+
+      /* ── Focus visible ─────────────────────── */
+      :focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 3px;
+      }
+
+      /* ── Responsive images ─────────────────── */
+      .pixel-img {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
     </style>
   </head>
   <body>

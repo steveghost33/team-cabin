@@ -1,69 +1,55 @@
-// ─────────────────────────────────────
-//  Footer.jsx
-//  Site footer with logo and social links.
-//  Edit social links in src/data/constants.js
-// ─────────────────────────────────────
 import TCLogo from './TCLogo';
 import { C, SOCIAL_LINKS } from '../data/constants';
 
 export default function Footer() {
   return (
-    <footer
-      style={{
-        background: '#030a02',
-        borderTop: `3px solid rgba(212,160,23,0.25)`,
-        padding: '3rem 2rem',
-        textAlign: 'center',
-      }}
-    >
-      {/* Logo */}
-      <div style={{ marginBottom: '1.5rem', filter: `drop-shadow(0 0 12px ${C.goldD})` }}>
-        <TCLogo size={120} />
-      </div>
+    <>
+      <style>{`
+        .footer {
+          background: var(--black);
+          border-top: 1px solid rgba(255,255,255,0.06);
+          padding: 3rem 0;
+        }
+        .footer-inner {
+          max-width: 1200px; margin: 0 auto;
+          padding: 0 clamp(1rem,4vw,3rem);
+          display: flex; flex-direction: column; align-items: center;
+          gap: 2rem; text-align: center;
+        }
+        .footer-social {
+          display: flex; flex-wrap: wrap; gap: 0.25rem;
+          justify-content: center;
+        }
+        .footer-link {
+          font-family: var(--font-display); font-weight: 700;
+          font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+          color: var(--cream-dim); text-decoration: none;
+          padding: 0.4rem 0.8rem; border-radius: 2px;
+          transition: color 0.15s, background 0.15s;
+        }
+        .footer-link:hover { color: var(--gold); background: rgba(226,168,32,0.06); }
+        .footer-copy {
+          font-family: var(--font-body); font-size: 0.78rem;
+          color: rgba(200,192,160,0.35);
+        }
+        .footer-tagline {
+          font-family: var(--font-body); font-size: 0.8rem;
+          color: rgba(200,192,160,0.3); font-style: italic;
+        }
+      `}</style>
 
-      {/* Social links */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '2rem',
-          flexWrap: 'wrap',
-          marginBottom: '2rem',
-        }}
-      >
-        {SOCIAL_LINKS.map((l) => (
-          <a
-            key={l.label}
-            href={l.url}
-            style={{ fontFamily: '"VT323"', fontSize: '1.25rem', color: C.goldL, textDecoration: 'none' }}
-            onMouseEnter={(e) => (e.target.style.color = C.gold)}
-            onMouseLeave={(e) => (e.target.style.color = C.goldL)}
-          >
-            {l.label}
-          </a>
-        ))}
-      </div>
-
-      <p
-        style={{
-          fontFamily: '"Press Start 2P"',
-          fontSize: '0.35rem',
-          color: 'rgba(212,160,23,0.28)',
-          letterSpacing: '0.08em',
-        }}
-      >
-        © 2026 TEAM CABIN · DETROIT, MI · ALL RIGHTS RESERVED
-      </p>
-      <p
-        style={{
-          fontFamily: '"VT323"',
-          fontSize: '1rem',
-          color: 'rgba(212,160,23,0.28)',
-          marginTop: '0.4rem',
-        }}
-      >
-        No pizza was harmed in the making of this website 🍕
-      </p>
-    </footer>
+      <footer className="footer">
+        <div className="footer-inner">
+          <TCLogo size={64} />
+          <div className="footer-social">
+            {SOCIAL_LINKS.map(l => (
+              <a key={l.label} href={l.url} className="footer-link">{l.label}</a>
+            ))}
+          </div>
+          <p className="footer-copy">© 2026 Team Cabin · Detroit, MI · All rights reserved</p>
+          <p className="footer-tagline">No pizza was harmed in the making of this website.</p>
+        </div>
+      </footer>
+    </>
   );
 }
