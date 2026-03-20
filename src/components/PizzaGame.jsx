@@ -5,11 +5,11 @@ import { drawCharSprite, drawPizzaSlice, drawTaco, drawEnemySprite, drawBossSpri
 
 const W = 780;
 const H = 520;
-const GROUND_TOP = H - 200;  // top of walkable lane
-const GROUND_BOT = H - 80;   // bottom of walkable lane
+const GROUND_TOP = H - 200;
+const GROUND_BOT = H - 80;
 const LANE_H = GROUND_BOT - GROUND_TOP;
-const PW = 24;
-const PH = 40;
+const PW = 48;
+const PH = 64;
 const GRAVITY = 0.55;
 const JUMP_POWER = -12;
 const SONG_FILE = '/kylesong.mp3';
@@ -25,6 +25,8 @@ export default function PizzaGame() {
   const gameRef = useRef({});
   const [uiState, setUiState] = useState({ state:'title', score:0, hp:MAX_HP, pizza:0, level:1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [useJoystick, setUseJoystick] = useState(false);
+  const joystickRef = useRef({ active:false, startX:0, startY:0, dx:0, dy:0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -44,28 +46,22 @@ export default function PizzaGame() {
     let transitionTimer=0;
     let attackPressed=false;
 
-    // Player — now has y position in the lane
     const pl={
       x:120, y:GROUND_BOT-PH,
       vx:0, vy:0,
       airborne:false,
       face:1, inv:0,
       hp:MAX_HP,
-      attacking:0,   // frames left in attack animation
-      attackHit:[],  // enemy ids already hit this swing
+      attacking:0,
+      attackHit:[],
       combo:0, comboTimer:0,
     };
 
     const sync=()=>setUiState({state:gState,score:sc,hp:pl.hp,pizza:pc,level:levelIdx+1});
     const cfg=()=>LEVELS[levelIdx];
 
-    function groundY() {
-      // player "ground" is the bottom of lane but varies with lane depth
-      return GROUND_BOT - PH;
-    }
-
     function reset() {
-      Object.assign(pl,{x:120,y:groundY(),vx:0,vy:0,airborne:false,inv:0,hp:MAX_HP,attacking:0,attackHit:[],combo:0,comboTimer:0});
+      Object.assign(pl,{x:120,y:GROUND_BOT-PH,vx:0,vy:0,airborne:false,inv:0,hp:MAX_HP,attacking:0,attackHit:[],combo:0,comboTimer:0});
       obs=[];pizzas=[];parts=[];blds=[];
       boss=null;bossHp=BOSS_HP;
       scrollX=0;spT=0;piT=0;
@@ -83,7 +79,7 @@ export default function PizzaGame() {
     }
 
     function respawn() {
-      Object.assign(pl,{x:120,y:groundY(),vx:0,vy:0,airborne:false,inv:200,hp:MAX_HP,attacking:0,attackHit:[],combo:0,comboTimer:0});
+      Object.assign(pl,{x:120,y:GROUND_BOT-PH,vx:0,vy:0,airborne:false,inv:200,hp:MAX_HP,attacking:0,attackHit:[],combo:0,comboTimer:0});
       charIdx=selectedChar;
       gState='playing';
       music.play().catch(()=>{});
@@ -98,14 +94,12 @@ export default function PizzaGame() {
       if(pl.attacking>0) return;
       pl.attacking=ATTACK_FRAMES;
       pl.attackHit=[];
-      // check hits immediately
       doAttackHit();
     }
 
     function doAttackHit() {
-      const ax = pl.face===1 ? pl.x+PW : pl.x-ATTACK_RANGE;
-      const ay = pl.y;
-      // hit regular enemies
+      const ax=pl.face===1?pl.x+PW:pl.x-ATTACK_RANGE;
+      const ay=pl.y;
       obs.forEach(o=>{
         if(o.dead||pl.attackHit.includes(o.id)) return;
         const ox=o.x-scrollX;
@@ -119,27 +113,20 @@ export default function PizzaGame() {
             pl.combo++;pl.comboTimer=90;
             addParts(ox+o.w/2,o.y,C.gold,10);
           } else {
-            // knockback
             o.vx=(pl.face===1?4:-4);
             addParts(ox+o.w/2,o.y+o.h/2,'#fff',5);
           }
           sync();
         }
       });
-      // hit boss
       if(boss&&!boss.dead&&boss.inv===0){
         const bOx=boss.x-scrollX;
         if(bOx+boss.w>ax&&bOx<ax+ATTACK_RANGE&&boss.y+boss.h>ay&&boss.y<ay+PH+10){
           bossHp=Math.max(0,bossHp-ATTACK_DMG);
-          boss.inv=20;
-          boss.hitFlash=12;
+          boss.inv=20;boss.hitFlash=12;
           sc+=150;pl.combo++;pl.comboTimer=90;
           addParts(bOx+boss.w/2,boss.y,C.gold,15);
-          if(bossHp<=0){
-            boss.dead=true;boss.deadTimer=90;
-            sc+=3000;sync();
-            addParts(bOx+boss.w/2,boss.y+boss.h/2,'#FFD700',50);
-          }
+          if(bossHp<=0){boss.dead=true;boss.deadTimer=90;sc+=3000;sync();addParts(bOx+boss.w/2,boss.y+boss.h/2,'#FFD700',50);}
           sync();
         }
       }
@@ -175,22 +162,23 @@ export default function PizzaGame() {
       if(boss&&!boss.dead) return;
       const c=cfg();
       const r=Math.random();
-      const type=r<0.25?'cone':r<0.5?'metermaid':r<0.75?'muscledude':'rat';
+      // cones spawn but do NOT move — static hazard only
+      const type=r<0.2?'cone':r<0.45?'metermaid':r<0.72?'muscledude':'rat';
       const laneY=GROUND_TOP+20+Math.random()*(LANE_H-60);
       const fromLeft=Math.random()<0.3;
+      const speed=type==='cone'?0:c.enemySpeed; // CONES: zero speed
       obs.push({
         id:enemyId++,
         type,
-        x:fromLeft?(scrollX-60):(scrollX+W+60),
+        x:type==='cone'?(scrollX+W+40+Math.random()*200):(fromLeft?(scrollX-60):(scrollX+W+60)),
         y:laneY,
-        w:type==='muscledude'?28:22,
-        h:type==='muscledude'?40:32,
-        vx:fromLeft?c.enemySpeed:-c.enemySpeed,
+        w:type==='muscledude'?32:24,
+        h:type==='muscledude'?48:36,
+        vx:type==='cone'?0:(fromLeft?speed:-speed),
         vy:0,
         at:0,dead:false,deadTimer:0,
         hp:type==='muscledude'?3:2,
         hitFlash:0,
-        targetY:laneY,
       });
     }
 
@@ -226,13 +214,11 @@ export default function PizzaGame() {
       for(let i=0;i<n;i++) parts.push({x,y,vx:(Math.random()-0.5)*7,vy:(Math.random()-0.5)*6-2,life:40+Math.random()*20,ml:60,col,sz:3+Math.random()*4});
     }
 
-    // ── SHADOW under sprites (SOR2 style)
     function drawShadow(x,y,w) {
-      ctx.fillStyle='rgba(0,0,0,0.25)';
-      ctx.beginPath();ctx.ellipse(x+w/2,GROUND_BOT-2,w*0.6,6,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,0.22)';
+      ctx.beginPath();ctx.ellipse(x+w/2,GROUND_BOT-2,w*0.55,5,0,0,Math.PI*2);ctx.fill();
     }
 
-    // ── BACKGROUND
     function drawBackground() {
       const c=cfg();
       if(c.daytime){
@@ -260,60 +246,35 @@ export default function PizzaGame() {
         ctx.fillStyle=c.moonColor;ctx.beginPath();ctx.arc(W-65,45,18,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=c.skyTop;ctx.beginPath();ctx.arc(W-56,39,15,0,Math.PI*2);ctx.fill();
       }
+      const farCol=c.daytime?'rgba(80,120,60,0.5)':c.skyTop;
+      ctx.fillStyle=farCol;
+      for(let i=0;i<10;i++){const bx=((i*105-scrollX*0.1)%(W+200)+W+200)%(W+200)-100;ctx.fillRect(bx,GROUND_TOP-45-(i%4)*22,40+(i%3)*14,45+(i%4)*22);}
     }
 
-    // ── LANE / STREET (SOR2 style perspective floor)
     function drawLane() {
       const c=cfg();
-      // back wall
       ctx.fillStyle=c.daytime?'#c8b89a':c.groundColor;
       ctx.fillRect(0,GROUND_TOP,W,8);
-      // sidewalk / floor with perspective
       const floorGrad=ctx.createLinearGradient(0,GROUND_TOP,0,GROUND_BOT);
-      if(c.daytime){
-        floorGrad.addColorStop(0,'#d4c4a0');
-        floorGrad.addColorStop(0.5,'#b8a880');
-        floorGrad.addColorStop(1,'#a09060');
-      } else if(levelIdx===1){
-        floorGrad.addColorStop(0,'#1a2a1a');
-        floorGrad.addColorStop(0.5,'#111a11');
-        floorGrad.addColorStop(1,'#0a120a');
-      } else if(levelIdx===2){
-        floorGrad.addColorStop(0,'#3a1a08');
-        floorGrad.addColorStop(0.5,'#2a1206');
-        floorGrad.addColorStop(1,'#1a0a04');
-      } else {
-        floorGrad.addColorStop(0,'#1a1a2e');
-        floorGrad.addColorStop(1,'#0d0d1a');
-      }
+      if(c.daytime){floorGrad.addColorStop(0,'#d4c4a0');floorGrad.addColorStop(0.5,'#b8a880');floorGrad.addColorStop(1,'#a09060');}
+      else if(levelIdx===1){floorGrad.addColorStop(0,'#1a2a1a');floorGrad.addColorStop(0.5,'#111a11');floorGrad.addColorStop(1,'#0a120a');}
+      else if(levelIdx===2){floorGrad.addColorStop(0,'#3a1a08');floorGrad.addColorStop(0.5,'#2a1206');floorGrad.addColorStop(1,'#1a0a04');}
+      else{floorGrad.addColorStop(0,'#1a1a2e');floorGrad.addColorStop(1,'#0d0d1a');}
       ctx.fillStyle=floorGrad;ctx.fillRect(0,GROUND_TOP+8,W,LANE_H-8);
-      // floor lines (perspective stripes like SOR2)
-      ctx.strokeStyle=c.daytime?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.04)';
-      ctx.lineWidth=1;
-      for(let row=0;row<8;row++){
-        const y=GROUND_TOP+8+row*(LANE_H-8)/8;
-        ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
-      }
-      // vertical lane lines scrolling
-      ctx.strokeStyle=c.daytime?'rgba(0,0,0,0.06)':'rgba(255,255,255,0.03)';
-      for(let col=0;col<12;col++){
-        const x=((col*80-scrollX*0.4)%W+W)%W;
-        ctx.beginPath();ctx.moveTo(x,GROUND_TOP+8);ctx.lineTo(x-30,GROUND_BOT);ctx.stroke();
-      }
-      // curb line at bottom
+      ctx.strokeStyle=c.daytime?'rgba(0,0,0,0.07)':'rgba(255,255,255,0.03)';ctx.lineWidth=1;
+      for(let row=0;row<8;row++){const y=GROUND_TOP+8+row*(LANE_H-8)/8;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+      ctx.strokeStyle=c.daytime?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.02)';
+      for(let col=0;col<12;col++){const x=((col*80-scrollX*0.4)%W+W)%W;ctx.beginPath();ctx.moveTo(x,GROUND_TOP+8);ctx.lineTo(x-30,GROUND_BOT);ctx.stroke();}
       ctx.fillStyle=c.groundLine;ctx.fillRect(0,GROUND_BOT-4,W,6);
-      // gutter / road below
       ctx.fillStyle=c.streetColor||'#111';ctx.fillRect(0,GROUND_BOT+2,W,H-GROUND_BOT-2);
-      // road dashes
       ctx.fillStyle=c.laneColor;
       for(let i=0;i<W;i+=56){const dx=((i-scrollX*0.6)%56+56)%56;ctx.fillRect(dx,GROUND_BOT+12,36,3);}
     }
 
     function drawBuilding(b) {
       const c=cfg();
-      const bx=b.x-scrollX*0.85; // parallax
+      const bx=b.x-scrollX*0.85;
       if(bx>W+200||bx+b.w<-200) return;
-
       if(b.specialType==='grove'){
         ctx.fillStyle='#2a2a2a';ctx.fillRect(bx,GROUND_TOP-110,90,110);
         ctx.strokeStyle='#444';ctx.lineWidth=2;ctx.strokeRect(bx,GROUND_TOP-110,90,110);
@@ -401,12 +362,9 @@ export default function PizzaGame() {
         }
         return;
       }
-      // generic
       ctx.fillStyle=b.color;ctx.fillRect(bx,GROUND_TOP-b.h,b.w,b.h);
       ctx.strokeStyle='#000';ctx.lineWidth=1;ctx.strokeRect(bx,GROUND_TOP-b.h,b.w,b.h);
-      if(levelIdx===0&&b.w>58){
-        ctx.fillStyle=b.awningCol||'#c0392b';ctx.fillRect(bx,GROUND_TOP-b.h*0.35,b.w,7);
-      }
+      if(levelIdx===0&&b.w>58){ctx.fillStyle=b.awningCol||'#c0392b';ctx.fillRect(bx,GROUND_TOP-b.h*0.35,b.w,7);}
       const wc=cfg().windowColor;
       for(let r=0;r<b.wr;r++) for(let cc=0;cc<b.wc;cc++){
         const wx=bx+8+cc*17,wy=GROUND_TOP-b.h+18+r*22;
@@ -419,7 +377,6 @@ export default function PizzaGame() {
       }
     }
 
-    // ── ATTACK FLASH (fist arc)
     function drawAttackEffect() {
       if(pl.attacking<=0) return;
       const prog=1-(pl.attacking/ATTACK_FRAMES);
@@ -433,15 +390,12 @@ export default function PizzaGame() {
       ctx.globalAlpha=1;
     }
 
-    // ── HUD (SOR2 style)
     function drawHUD() {
       const c=cfg();
       ctx.fillStyle='rgba(0,0,0,0.8)';ctx.fillRect(0,0,W,52);
-      // score
       ctx.fillStyle=C.gold;ctx.font='11px "Press Start 2P"';ctx.textAlign='left';
       ctx.fillText('SCORE:'+sc,12,18);
       if(highSc>0){ctx.fillStyle=C.goldL;ctx.font='8px "Press Start 2P"';ctx.fillText('BEST:'+highSc,12,34);}
-      // HP bar
       const hpW=160;
       ctx.fillStyle='#111';ctx.fillRect(W/2-hpW/2-2,8,hpW+4,16);
       const hpCol=pl.hp>60?'#2ecc71':pl.hp>30?'#f39c12':'#e74c3c';
@@ -449,10 +403,8 @@ export default function PizzaGame() {
       ctx.strokeStyle=C.gold;ctx.lineWidth=1;ctx.strokeRect(W/2-hpW/2-2,8,hpW+4,16);
       ctx.fillStyle='#fff';ctx.font='7px "Press Start 2P"';ctx.textAlign='center';
       ctx.fillText('HP',W/2,22);
-      // level name
       ctx.fillStyle=C.cream;ctx.font='8px "Press Start 2P"';
       ctx.fillText('LVL '+(levelIdx+1)+' · '+c.name,W/2,38);
-      // collectibles
       if(!boss||boss.dead){
         const label=c.collectible==='taco'?'🌮':'🍕';
         ctx.fillStyle=C.goldL;ctx.textAlign='right';ctx.font='10px "Press Start 2P"';
@@ -462,7 +414,6 @@ export default function PizzaGame() {
           ctx.fillRect(W-12-c.collectTarget*11+i*11,26,9,12);
         }
       } else {
-        // boss HP bar
         const bhpW=200;
         ctx.fillStyle='#111';ctx.fillRect(W-bhpW-14,8,bhpW+4,16);
         ctx.fillStyle='#e74c3c';ctx.fillRect(W-bhpW-12,10,Math.max(0,bhpW*(bossHp/BOSS_HP)),12);
@@ -471,17 +422,11 @@ export default function PizzaGame() {
         ctx.fillStyle='#fff';ctx.font='7px "Press Start 2P"';ctx.textAlign='right';
         ctx.fillText(boss?bnames[boss.type]:'BOSS',W-14,38);
       }
-      // combo
       if(pl.combo>1&&pl.comboTimer>0){
         ctx.globalAlpha=Math.min(1,pl.comboTimer/20);
         ctx.fillStyle=C.gold;ctx.font='14px "Press Start 2P"';ctx.textAlign='left';
         ctx.fillText(pl.combo+'x COMBO!',14,H-30);
         ctx.globalAlpha=1;
-      }
-      // attack hint
-      if(frame<300&&gState==='playing'){
-        ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='7px "Press Start 2P"';ctx.textAlign='center';
-        ctx.fillText('[Z] OR [ATK BTN] TO ATTACK',W/2,H-10);
       }
     }
 
@@ -499,7 +444,7 @@ export default function PizzaGame() {
       ctx.fillText('3 LEVELS · 3 BOSSES · 1 CITY',W/2,H/2-84);
       ctx.fillText('MOVE IN ALL DIRECTIONS',W/2,H/2-62);
       ctx.fillText('[Z] ATTACK  ·  SPACE/↑ JUMP',W/2,H/2-40);
-      ctx.fillText('STOMP JUMPING OR ATTACK ENEMIES',W/2,H/2-18);
+      ctx.fillText('STOMP OR ATTACK ENEMIES',W/2,H/2-18);
       ctx.fillText('COLLECT 16 SLICES → TRIGGER BOSS',W/2,H/2+4);
       ctx.fillStyle='rgba(212,160,23,0.55)';ctx.font='7px "Press Start 2P"';
       ctx.fillText('LVL1: YPSILANTI  ·  LVL2: DOWNTOWN DETROIT  ·  LVL3: MEXICANTOWN',W/2,H/2+30);
@@ -521,7 +466,7 @@ export default function PizzaGame() {
         ctx.fillStyle=isSel?'rgba(212,160,23,0.2)':'rgba(0,0,0,0.5)';ctx.fillRect(cx,cy,cardW,cardH);
         ctx.strokeStyle=isSel?C.gold:'rgba(212,160,23,0.3)';ctx.lineWidth=isSel?4:2;ctx.strokeRect(cx,cy,cardW,cardH);
         if(isSel){ctx.shadowBlur=20;ctx.shadowColor=C.gold;ctx.strokeRect(cx,cy,cardW,cardH);ctx.shadowBlur=0;}
-        const scale=4;
+        const scale=3;
         const spriteX=cx+cardW/2-(32*scale)/2;
         const spriteY=cy+40;
         ctx.save();ctx.translate(spriteX,spriteY);ctx.scale(scale,scale);
@@ -588,46 +533,38 @@ export default function PizzaGame() {
       }
 
       if(gState==='playing'){
-        // ── PLAYER MOVEMENT (full 2D plane)
+        // get joystick input if active
+        const joy=joystickRef.current;
+        const joySpd=4.5;
+        let joyX=0,joyY=0;
+        if(joy.active){
+          const dist=Math.sqrt(joy.dx*joy.dx+joy.dy*joy.dy);
+          if(dist>8){joyX=joy.dx/Math.max(dist,40)*joySpd;joyY=joy.dy/Math.max(dist,40)*3;}
+        }
+
         const spd=4.5;
-        if(keys['ArrowLeft']||keys['KeyA']){pl.vx=-spd;pl.face=-1;}
-        else if(keys['ArrowRight']||keys['KeyD']){pl.vx=spd;pl.face=1;}
+        if(keys['ArrowLeft']||keys['KeyA']||joyX<-0.5){pl.vx=-spd;pl.face=-1;}
+        else if(keys['ArrowRight']||keys['KeyD']||joyX>0.5){pl.vx=spd;pl.face=1;}
         else pl.vx*=0.5;
 
-        // Up/Down movement in lane (no jumping — that's separate)
-        if(keys['ArrowUp']||keys['KeyW']){pl.y=Math.max(GROUND_TOP+4,pl.y-3);}
-        if(keys['ArrowDown']||keys['KeyS']){pl.y=Math.min(GROUND_BOT-PH,pl.y+3);}
+        if(keys['ArrowUp']||keys['KeyW']||(joyY<-0.5&&!pl.airborne)){pl.y=Math.max(GROUND_TOP+4,pl.y-3);}
+        if(keys['ArrowDown']||keys['KeyS']||joyY>0.5){pl.y=Math.min(GROUND_BOT-PH,pl.y+3);}
 
-        // Jump (space only)
-        if((keys['Space'])&&!pl.airborne) jump();
+        if(keys['Space']&&!pl.airborne) jump();
 
-        // Attack
-        if((keys['KeyZ']||keys['KeyJ'])&&!attackPressed){
-          attackPressed=true;
-          attack();
-        }
+        if((keys['KeyZ']||keys['KeyJ'])&&!attackPressed){attackPressed=true;attack();}
         if(!keys['KeyZ']&&!keys['KeyJ']) attackPressed=false;
 
-        // apply horizontal movement + scroll
         pl.x+=pl.vx;
         if(pl.airborne){pl.vy+=GRAVITY;pl.y+=pl.vy;}
-        // land — land at current lane depth
         const floorY=GROUND_BOT-PH;
         if(pl.airborne&&pl.y>=floorY){pl.y=floorY;pl.vy=0;pl.airborne=false;}
 
-        // clamp x
         if(pl.x<40)pl.x=40;
         if(pl.x>W-PW-40)pl.x=W-PW-40;
-
-        // scroll world when player moves right past midpoint
         if(pl.x>W*0.45){const s=pl.x-W*0.45;scrollX+=s;pl.x=W*0.45;}
-
         if(pl.inv>0)pl.inv--;
-        if(pl.attacking>0){
-          pl.attacking--;
-          // recheck hit each frame during attack window
-          if(pl.attacking===ATTACK_FRAMES-2) doAttackHit();
-        }
+        if(pl.attacking>0){pl.attacking--;if(pl.attacking===ATTACK_FRAMES-2)doAttackHit();}
         if(pl.comboTimer>0){pl.comboTimer--;if(pl.comboTimer===0)pl.combo=0;}
 
         const c=cfg();
@@ -637,31 +574,24 @@ export default function PizzaGame() {
         }
         if(pc>=c.collectTarget&&!boss) triggerBoss();
 
-        // boss AI
         if(boss&&!boss.dead){
           boss.at++;
           if(boss.inv>0)boss.inv--;
           if(boss.hitFlash>0)boss.hitFlash--;
-          // move toward player in both axes
           const bOx=boss.x-scrollX;
           const dx=pl.x-bOx;const dy=pl.y-boss.y;
           const dist=Math.sqrt(dx*dx+dy*dy);
           const spd2=1.4+levelIdx*0.3;
           if(dist>5){boss.x+=dx/dist*spd2;boss.y+=dy/dist*spd2;}
-          // bounce off walls
           if(bOx<60)boss.x=scrollX+60;
           if(bOx>W-boss.w-60)boss.x=scrollX+W-boss.w-60;
           boss.y=Math.max(GROUND_TOP+10,Math.min(GROUND_BOT-boss.h,boss.y));
-
-          // boss hits player
           if(pl.inv===0&&bOx+boss.w>pl.x&&bOx<pl.x+PW&&boss.y+boss.h>pl.y&&boss.y<pl.y+PH){
             pl.hp=Math.max(0,pl.hp-8);pl.inv=80;
             addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',10);
             if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}
             sync();
           }
-
-          // stomp boss (jump landing)
           if(pl.airborne&&pl.vy>0){
             if(bOx+boss.w>pl.x&&bOx<pl.x+PW&&boss.y+10>pl.y+PH&&boss.y<pl.y+PH+10&&boss.inv===0){
               bossHp=Math.max(0,bossHp-30);boss.inv=40;boss.hitFlash=15;
@@ -681,48 +611,54 @@ export default function PizzaGame() {
           }
         }
 
-        // regular enemies
         obs=obs.filter(o=>{
           if(o.hitFlash>0)o.hitFlash--;
+          // CONES: static — no movement, no Y tracking
+          if(o.type==='cone'){
+            const ox=o.x-scrollX;
+            if(ox<-120) return false;
+            if(o.dead){o.deadTimer--;return o.deadTimer>0;}
+            // just check if player walks into cone
+            if(pl.inv===0&&ox+o.w>pl.x&&ox<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){
+              pl.hp=Math.max(0,pl.hp-12);pl.inv=70;
+              addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);
+              if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}
+              sync();
+            }
+            return true;
+          }
+          // ALL OTHER ENEMIES: move and track player
           o.x+=o.vx;
-          // enemy moves toward player in Y too
           const oScreenX=o.x-scrollX;
-          if(oScreenX<-120||oScreenX>W+120)return false;
+          if(oScreenX<-120||oScreenX>W+120) return false;
           if(o.dead){o.deadTimer--;return o.deadTimer>0;}
-          // Y tracking
           const oDy=pl.y-o.y;
           if(Math.abs(oDy)>4)o.y+=oDy>0?1.2:-1.2;
           o.y=Math.max(GROUND_TOP+4,Math.min(GROUND_BOT-o.h,o.y));
-          // face player
           o.vx=oScreenX>pl.x?-Math.abs(o.vx):Math.abs(o.vx);
           o.at++;
-          // stomp
           if(pl.airborne&&pl.vy>0){
-            if(oScreenX+o.w>pl.x&&oScreenX<pl.x+PW&&o.y+8>pl.y+PH&&o.y<pl.y+PH+8&&o.type!=='cone'){
+            if(oScreenX+o.w>pl.x&&oScreenX<pl.x+PW&&o.y+8>pl.y+PH&&o.y<pl.y+PH+8){
               o.hp=(o.hp||2)-2;o.hitFlash=15;pl.vy=-9;sc+=200+pl.combo*50;pl.combo++;pl.comboTimer=90;
               addParts(oScreenX+o.w/2,o.y,C.gold,10);
               if(o.hp<=0){o.dead=true;o.deadTimer=30;}
-              sync();
-              return true;
+              sync();return true;
             }
           }
-          // hit player
           if(pl.inv===0&&oScreenX+o.w>pl.x&&oScreenX<pl.x+PW&&o.y+o.h>pl.y&&o.y<pl.y+PH){
-            if(o.type==='cone'){pl.hp=Math.max(0,pl.hp-15);}
-            else{pl.hp=Math.max(0,pl.hp-10);}
-            pl.inv=70;addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);
+            pl.hp=Math.max(0,pl.hp-10);pl.inv=70;
+            addParts(pl.x+PW/2,pl.y+PH/2,'#e74c3c',8);
             if(pl.hp<=0){if(sc>highSc)highSc=sc;music.pause();gState='dead';sync();}
             sync();
           }
           return true;
         });
 
-        // collectibles
         pizzas=pizzas.filter(pz=>{
           if(pz.collected)return false;
           const ox=pz.x-scrollX;
           if(ox<-80)return false;
-          if(pl.x<ox+26&&pl.x+PW>ox&&pl.y<pz.y+26&&pl.y+PH>pz.y){
+          if(pl.x<ox+30&&pl.x+PW>ox&&pl.y<pz.y+30&&pl.y+PH>pz.y){
             pz.collected=true;sc+=100;pc++;addParts(ox+14,pz.y+14,C.gold,14);sync();return false;
           }
           return true;
@@ -738,12 +674,10 @@ export default function PizzaGame() {
       if(gState==='charselect'){drawCharSelect();raf=requestAnimationFrame(loop);return;}
       if(gState==='win'){drawWin();raf=requestAnimationFrame(loop);return;}
 
-      // ── DRAW WORLD
       drawBackground();
       blds.forEach(b=>drawBuilding(b));
       drawLane();
 
-      // sort everything by Y for depth (SOR2 style)
       const drawables=[];
       obs.forEach(o=>{if(!o.dead||o.deadTimer>0)drawables.push({type:'enemy',o,y:o.y+o.h});});
       pizzas.forEach(pz=>{if(!pz.collected)drawables.push({type:'pizza',pz,y:pz.y+24});});
@@ -858,64 +792,128 @@ export default function PizzaGame() {
     } else{g.keys[key]=down;}
   };
 
+  // ── JOYSTICK handlers
+  const handleJoyStart=(e)=>{
+    e.preventDefault();
+    const t=e.touches[0];
+    joystickRef.current={active:true,startX:t.clientX,startY:t.clientY,dx:0,dy:0};
+  };
+  const handleJoyMove=(e)=>{
+    e.preventDefault();
+    const joy=joystickRef.current;
+    if(!joy.active)return;
+    const t=e.touches[0];
+    joy.dx=t.clientX-joy.startX;
+    joy.dy=t.clientY-joy.startY;
+  };
+  const handleJoyEnd=(e)=>{
+    e.preventDefault();
+    joystickRef.current={active:false,startX:0,startY:0,dx:0,dy:0};
+    const g=gameRef.current;
+    if(g){g.keys['ArrowLeft']=false;g.keys['ArrowRight']=false;}
+  };
+
+  const btnStyle=(bg,fg='#fff')=>({
+    fontFamily:'"Press Start 2P"',
+    fontSize:'0.65rem',
+    background:bg,
+    color:fg,
+    border:'none',
+    borderRadius:8,
+    cursor:'pointer',
+    boxShadow:'0 4px 0 rgba(0,0,0,0.5)',
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    userSelect:'none',
+    WebkitUserSelect:'none',
+    WebkitTouchCallout:'none',
+    touchAction:'none',
+  });
+
+  const dpadBtn=(lbl,key,hold,w=64,h=64)=>(
+    <button key={key}
+      style={{...btnStyle(C.gold,C.green),width:w,height:h}}
+      onTouchStart={e=>{e.preventDefault();mb(key,true);}}
+      onTouchEnd={e=>{e.preventDefault();hold&&mb(key,false);}}
+      onTouchCancel={e=>{e.preventDefault();hold&&mb(key,false);}}
+      onContextMenu={e=>e.preventDefault()}
+      onMouseDown={()=>mb(key,true)}
+      onMouseUp={()=>hold&&mb(key,false)}
+      onMouseLeave={()=>hold&&mb(key,false)}
+    >{lbl}</button>
+  );
+
+  const actionBtn=(lbl,key,bg)=>(
+    <button key={key}
+      style={{...btnStyle(bg),width:80,height:80,fontSize:'0.6rem',flexDirection:'column',gap:4}}
+      onTouchStart={e=>{e.preventDefault();mb(key,true);}}
+      onTouchEnd={e=>e.preventDefault()}
+      onTouchCancel={e=>e.preventDefault()}
+      onContextMenu={e=>e.preventDefault()}
+      onMouseDown={()=>mb(key,true)}
+    >{lbl}</button>
+  );
+
+  const dpadControls=(
+    <div style={{display:'grid',gridTemplateColumns:'64px 64px 64px',gridTemplateRows:'64px 64px 64px',gap:4}}>
+      <div/>{dpadBtn('▲','ArrowUp',true,64,64)}<div/>
+      {dpadBtn('◀','ArrowLeft',true,64,64)}
+      <div style={{width:64,height:64,background:'rgba(0,0,0,0.3)',borderRadius:8}}/>
+      {dpadBtn('▶','ArrowRight',true,64,64)}
+      <div/>{dpadBtn('▼','ArrowDown',true,64,64)}<div/>
+    </div>
+  );
+
+  const joystickControl=(
+    <div
+      style={{width:140,height:140,background:'rgba(255,255,255,0.08)',borderRadius:'50%',border:`3px solid ${C.gold}`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative',touchAction:'none'}}
+      onTouchStart={handleJoyStart}
+      onTouchMove={handleJoyMove}
+      onTouchEnd={handleJoyEnd}
+    >
+      <div style={{width:56,height:56,background:C.gold,borderRadius:'50%',boxShadow:'0 4px 0 rgba(0,0,0,0.5)',pointerEvents:'none'}}/>
+      <div style={{position:'absolute',top:6,fontFamily:'"Press Start 2P"',fontSize:'0.4rem',color:'rgba(255,255,255,0.5)'}}>MOVE</div>
+    </div>
+  );
+
   const controlButtons=(
-    <>
-      <style>{`
-        .tc-btn{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:none;}
-        .tc-btn:active{opacity:0.85;}
-      `}</style>
-      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'0.6rem',flexWrap:'wrap',padding:'0.5rem'}}>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(3,60px)',gridTemplateRows:'repeat(2,56px)',gap:'4px'}}>
-          {[['↑','ArrowUp',true,0,1],['◀','ArrowLeft',true,1,0],['◉','_none',false,1,1],['▶','ArrowRight',true,1,2],['↓','ArrowDown',true,2,1]].map(([lbl,key,hold,row,col])=>(
-            <button key={key} className="tc-btn"
-              style={{fontFamily:'"Press Start 2P"',fontSize:'0.8rem',background:key==='_none'?'#222':C.gold,color:C.green,border:'none',width:60,height:56,cursor:'pointer',boxShadow:'2px 2px 0 #000',gridRow:row+1,gridColumn:col+1,opacity:key==='_none'?0.2:1}}
-              onTouchStart={e=>{e.preventDefault();if(key!=='_none')mb(key,true);}}
-              onTouchEnd={e=>{e.preventDefault();if(hold&&key!=='_none')mb(key,false);}}
-              onTouchCancel={e=>{e.preventDefault();if(hold&&key!=='_none')mb(key,false);}}
-              onContextMenu={e=>e.preventDefault()}
-              onMouseDown={()=>key!=='_none'&&mb(key,true)}
-              onMouseUp={()=>hold&&key!=='_none'&&mb(key,false)}
-              onMouseLeave={()=>hold&&key!=='_none'&&mb(key,false)}
-            >{lbl}</button>
-          ))}
+    <div style={{background:'rgba(0,0,0,0.85)',borderTop:`3px solid ${C.gold}`,padding:'10px 12px',paddingBottom:'max(10px, env(safe-area-inset-bottom))'}}>
+      {/* Toggle row */}
+      <div style={{display:'flex',justifyContent:'center',marginBottom:8,gap:8}}>
+        <button
+          style={{...btnStyle(useJoystick?C.goldD:'#333','#fff'),padding:'4px 10px',fontSize:'0.5rem',height:28,borderRadius:6,border:`1px solid ${C.gold}`}}
+          onMouseDown={()=>setUseJoystick(false)}
+          onTouchStart={e=>{e.preventDefault();setUseJoystick(false);}}
+        >D-PAD</button>
+        <button
+          style={{...btnStyle(useJoystick?C.gold:'#333','#fff'),padding:'4px 10px',fontSize:'0.5rem',height:28,borderRadius:6,border:`1px solid ${C.gold}`}}
+          onMouseDown={()=>setUseJoystick(true)}
+          onTouchStart={e=>{e.preventDefault();setUseJoystick(true);}}
+        >JOYSTICK</button>
+        {isFullscreen&&(
+          <button
+            style={{...btnStyle('#333','#fff'),padding:'4px 10px',fontSize:'0.5rem',height:28,borderRadius:6,border:`1px solid ${C.goldD}`}}
+            onMouseDown={exitFullscreen}
+            onTouchStart={e=>{e.preventDefault();exitFullscreen();}}
+          >✕ EXIT</button>
+        )}
+      </div>
+      {/* Main controls row */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
+        {/* Left: movement */}
+        {useJoystick?joystickControl:dpadControls}
+        {/* Center: start */}
+        <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'center'}}>
+          {actionBtn('START','start',C.greenL)}
         </div>
-        <div style={{display:'flex',flexDirection:'column',gap:'4px'}}>
-          <button className="tc-btn"
-            style={{fontFamily:'"Press Start 2P"',fontSize:'0.6rem',background:'#e74c3c',color:'#fff',border:'none',width:86,height:56,cursor:'pointer',boxShadow:'2px 2px 0 #000'}}
-            onTouchStart={e=>{e.preventDefault();mb('jump',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onTouchCancel={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('jump',true)}
-          >▲ JUMP</button>
-          <button className="tc-btn"
-            style={{fontFamily:'"Press Start 2P"',fontSize:'0.6rem',background:'#8e44ad',color:'#fff',border:'none',width:86,height:56,cursor:'pointer',boxShadow:'2px 2px 0 #000'}}
-            onTouchStart={e=>{e.preventDefault();mb('attack',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onTouchCancel={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('attack',true)}
-          >⚔ ATK</button>
-        </div>
-        <div style={{display:'flex',flexDirection:'column',gap:'4px'}}>
-          <button className="tc-btn"
-            style={{fontFamily:'"Press Start 2P"',fontSize:'0.6rem',background:C.greenL,color:C.cream,border:'none',width:76,height:56,cursor:'pointer',boxShadow:'2px 2px 0 #000'}}
-            onTouchStart={e=>{e.preventDefault();mb('start',true);}}
-            onTouchEnd={e=>e.preventDefault()}
-            onTouchCancel={e=>e.preventDefault()}
-            onContextMenu={e=>e.preventDefault()}
-            onMouseDown={()=>mb('start',true)}
-          >START</button>
-          {isFullscreen&&(
-            <button className="tc-btn"
-              style={{fontFamily:'"Press Start 2P"',fontSize:'0.5rem',background:'#333',color:C.cream,border:`2px solid ${C.goldD}`,width:76,height:56,cursor:'pointer',boxShadow:'2px 2px 0 #000'}}
-              onTouchStart={e=>{e.preventDefault();exitFullscreen();}}
-              onMouseDown={exitFullscreen}
-            >✕ EXIT</button>
-          )}
+        {/* Right: action buttons */}
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          {actionBtn('⚔ ATK','attack','#8e44ad')}
+          {actionBtn('▲ JUMP','jump','#e74c3c')}
         </div>
       </div>
-    </>
+    </div>
   );
 
   if(isFullscreen){
@@ -924,15 +922,13 @@ export default function PizzaGame() {
         <div style={{flex:1,display:'flex',alignItems:'stretch',overflow:'hidden'}}>
           <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',height:'100%',display:'block',imageRendering:'pixelated',objectFit:'contain'}}/>
         </div>
-        <div style={{background:'#0a1506',borderTop:`3px solid ${C.gold}`,paddingBottom:'env(safe-area-inset-bottom,0px)'}}>
-          {controlButtons}
-        </div>
+        {controlButtons}
       </div>
     );
   }
 
   return(
-    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'1rem'}}>
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'0.5rem'}}>
       <div onClick={enterFullscreen} style={{border:`5px solid ${C.gold}`,boxShadow:`0 0 0 3px ${C.green},0 0 0 6px ${C.gold},8px 8px 0 6px #000`,background:'#000',width:'100%',maxWidth:780,cursor:'pointer',position:'relative'}}>
         <canvas ref={canvasRef} width={780} height={520} style={{width:'100%',display:'block',imageRendering:'pixelated'}}/>
         <div style={{position:'absolute',bottom:8,right:10,fontFamily:'"Press Start 2P"',fontSize:'0.4rem',color:'rgba(212,160,23,0.5)',pointerEvents:'none'}}>
