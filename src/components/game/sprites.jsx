@@ -16,25 +16,20 @@ export function drawCharSprite(ctx, idx, px, py, PW, C) {
     r(-5,17,5,3,'#e0c090'); r(PW+1,17,5,3,'#e0c090');
     r(3,7,6,4,'#e0c090');
     r(3,1,16,9,'#e0c090');
-    // sandy short hair on top
     r(3,1,16,3,'#9a7a45');
-    // beard
     r(3,8,16,3,'#9a7a45'); r(4,7,3,2,'#9a7a45'); r(15,7,3,2,'#9a7a45');
-    // eyes
     r(6,4,3,3,'#1a1a1a'); r(13,4,3,3,'#1a1a1a');
     ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fillRect(px+6*s,py+4*s,s,s); ctx.fillRect(px+13*s,py+4*s,s,s);
-    // glasses
     ctx.strokeStyle='#7a6535'; ctx.lineWidth=s;
     ctx.strokeRect(px+5*s,py+3*s,5*s,4*s); ctx.strokeRect(px+12*s,py+3*s,5*s,4*s);
     r(10,5,2,1,'#7a6535');
 
   } else if (idx === 1) {
-    // MIKE — plain grey hoodie NO logo, MUSTARD YELLOW fitted cap, maroon pants
+    // MIKE — plain grey hoodie NO logo, mustard yellow fitted cap, maroon pants
     r(0,26,8,3,'#1a1a1a'); r(13,26,8,3,'#1a1a1a');
     r(1,20,7,10,'#7B2D3A'); r(13,20,7,10,'#7B2D3A');
     r(3,20,3,5,'#9a3a4a'); r(16,20,3,5,'#9a3a4a');
     r(1,19,20,2,'#222');
-    // plain grey hoodie
     r(-1,10,24,10,'#9a9a9a');
     r(-1,10,24,3,'#b0b0b0'); r(-1,17,24,3,'#888');
     r(4,15,14,4,'#888'); r(4,15,14,1,'#777');
@@ -44,18 +39,15 @@ export function drawCharSprite(ctx, idx, px, py, PW, C) {
     r(-5,17,5,3,'#c49a6c'); r(PW+1,17,5,3,'#c49a6c');
     r(3,7,6,4,'#c49a6c');
     r(3,1,16,9,'#c49a6c'); r(5,1,12,4,'#d4aa7c');
-    // dark beard
     r(3,7,16,4,'#1a0f05'); r(4,6,3,2,'#1a0f05'); r(15,6,3,2,'#1a0f05');
-    // eyes
     r(6,4,3,3,'#111'); r(13,4,3,3,'#111');
     ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fillRect(px+6*s,py+4*s,s,s); ctx.fillRect(px+13*s,py+4*s,s,s);
-    // MUSTARD YELLOW fitted cap
+    // mustard fitted cap
     r(2,-1,18,5,'#c8a020'); r(4,-1,14,3,'#d8b030');
     r(0,0,4,4,'#c8a020'); r(18,0,4,4,'#c8a020');
     r(0,3,22,1,'#a07810');
     r(-1,3,24,2,'#c8a020'); r(-1,4,24,1,'#a07810');
-    r(9,-1,4,1,'#b89018');
-    r(6,3,10,1,'#b89018');
+    r(9,-1,4,1,'#b89018'); r(6,3,10,1,'#b89018');
 
   } else {
     // KYLE — dark olive zip fleece, SHORT brown hair, glasses, dark pants, brown boots
@@ -64,30 +56,21 @@ export function drawCharSprite(ctx, idx, px, py, PW, C) {
     r(1,20,7,10,'#2a2a3a'); r(13,20,7,10,'#2a2a3a');
     r(3,20,3,5,'#383848'); r(16,20,3,5,'#383848');
     r(1,19,20,2,'#3a3020');
-    // olive fleece
     r(-1,10,24,10,'#3a5a28');
     r(-1,10,24,3,'#4a6a38'); r(-1,17,24,3,'#2a4a18');
-    // zip
     r(10,10,2,10,'#2a4a18'); r(10,11,2,8,'#888');
-    // chest patch
     r(0,12,7,5,'#4a7a30'); r(1,13,5,2,'#E2A820'); r(1,14,5,1,'#fff');
-    // collar
     r(7,9,8,3,'#2a4a18');
-    // arms
     r(-5,10,5,8,'#3a5a28'); r(PW+1,10,5,8,'#3a5a28');
     r(-5,16,5,2,'#2a4a18'); r(PW+1,16,5,2,'#2a4a18');
     r(-5,17,5,3,'#d4a870'); r(PW+1,17,5,3,'#d4a870');
     r(3,7,6,4,'#d4a870');
     r(3,1,16,10,'#d4a870'); r(5,2,12,4,'#e4b880');
-    // SHORT brown hair — thin strip top only + tiny 2px sideburns
     r(3,1,16,3,'#6B4020'); r(5,1,12,1,'#7B5030');
     r(3,3,2,2,'#6B4020'); r(17,3,2,2,'#6B4020');
-    // stubble
     ctx.fillStyle='rgba(138,96,48,0.2)'; ctx.fillRect(px+5*s,py+8*s,14*s,2*s);
-    // eyes
     r(6,4,3,3,'#1a1a1a'); r(13,4,3,3,'#1a1a1a');
     ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillRect(px+6*s,py+4*s,s,s); ctx.fillRect(px+13*s,py+4*s,s,s);
-    // glasses
     ctx.strokeStyle='#8B6040'; ctx.lineWidth=s;
     ctx.strokeRect(px+5*s,py+3*s,5*s,4*s); ctx.strokeRect(px+12*s,py+3*s,5*s,4*s);
     r(10,5,2,1,'#8B6040');
@@ -110,7 +93,7 @@ export function drawPizzaSlice(ctx, ox, py, C) {
   ctx.strokeStyle='rgba(255,140,0,0.3)';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(tipX,tipY);ctx.lineTo(leftX,leftY);ctx.lineTo(rightX,rightY);ctx.closePath();ctx.stroke();
   ctx.shadowBlur=0;
-  ctx.fillStyle=C.gold||'#E2A820';ctx.font='11px "Press Start 2P"';ctx.textAlign='center';
+  ctx.fillStyle=C.gold||'#E2A820';ctx.font='9px "Press Start 2P"';ctx.textAlign='center';
   ctx.fillText('+100',ox+14,py-6);
 }
 
@@ -126,8 +109,23 @@ export function drawTaco(ctx, ox, py, C) {
   ctx.fillStyle='#FFD700';ctx.fillRect(ox+6,py+11,16,3);
   ctx.fillStyle='#e74c3c';
   [ox+7,ox+13,ox+18].forEach(x=>{ctx.beginPath();ctx.arc(x,py+13,2,0,Math.PI*2);ctx.fill();});
-  ctx.fillStyle=C.gold||'#E2A820';ctx.font='11px "Press Start 2P"';ctx.textAlign='center';
+  ctx.fillStyle=C.gold||'#E2A820';ctx.font='9px "Press Start 2P"';ctx.textAlign='center';
   ctx.fillText('+100',ox+14,py-6);
+}
+
+// Health item — glowing heart / food
+export function drawHealthItem(ctx, ox, py) {
+  ctx.shadowBlur=10;ctx.shadowColor='#e74c3c';
+  ctx.fillStyle='#e74c3c';
+  // pixel heart
+  ctx.fillRect(ox+2,py+2,4,4);ctx.fillRect(ox+8,py+2,4,4);
+  ctx.fillRect(ox,py+4,14,4);ctx.fillRect(ox+2,py+8,10,4);
+  ctx.fillRect(ox+4,py+12,6,4);ctx.fillRect(ox+6,py+14,2,2);
+  ctx.fillStyle='#ff6b6b';
+  ctx.fillRect(ox+3,py+3,2,2);ctx.fillRect(ox+9,py+3,2,2);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#fff';ctx.font='7px "Press Start 2P"';ctx.textAlign='center';
+  ctx.fillText('+HP',ox+7,py-3);
 }
 
 export function drawEnemySprite(ctx, o, scrollX, C) {
@@ -143,6 +141,7 @@ export function drawEnemySprite(ctx, o, scrollX, C) {
   const walk=Math.sin(o.at*0.2)*3;
 
   if(o.type==='cone'){
+    // traffic cone — static hazard
     ctx.fillStyle='#333';ctx.fillRect(ox-3,oy+22,24,5);
     ctx.fillStyle='#FF6600';
     ctx.beginPath();ctx.moveTo(ox+9,oy);ctx.lineTo(ox-2,oy+24);ctx.lineTo(ox+20,oy+24);ctx.closePath();ctx.fill();
@@ -152,7 +151,7 @@ export function drawEnemySprite(ctx, o, scrollX, C) {
     ctx.fillStyle='rgba(255,220,0,0.35)';ctx.fillRect(ox-4,oy+20,26,4);
 
   } else if(o.type==='rat'){
-    // small realistic rat ~12x10
+    // small realistic rat
     ctx.strokeStyle='#a07050';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(ox,oy+6);ctx.quadraticCurveTo(ox-6,oy+10,ox-9,oy+6);ctx.stroke();
     ctx.fillStyle='#6a6060';ctx.beginPath();ctx.ellipse(ox+6,oy+6,6,5,0,0,Math.PI*2);ctx.fill();
@@ -164,7 +163,6 @@ export function drawEnemySprite(ctx, o, scrollX, C) {
     ctx.fillStyle='#cc0000';ctx.beginPath();ctx.arc(ox+12,oy+3,1.5,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#000';ctx.beginPath();ctx.arc(ox+12,oy+3,0.8,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#ff8888';ctx.beginPath();ctx.ellipse(ox+14,oy+5,2,1.5,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ff4444';ctx.beginPath();ctx.arc(ox+15,oy+5,1,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#555';ctx.fillRect(ox+3,oy+9+walk,3,3);ctx.fillRect(ox+8,oy+9-walk,3,3);
 
   } else if(o.type==='metermaid'){
@@ -221,7 +219,7 @@ export function drawEnemySprite(ctx, o, scrollX, C) {
   }
 }
 
-export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
+export function drawBossSprite(ctx, boss, scrollX, bossHp, bossMaxHp, C) {
   if(!boss) return;
   const ox=boss.x-scrollX, oy=boss.y;
   if(ox>920||ox+boss.w<-120) return;
@@ -233,7 +231,7 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
   }
   boss.at++;
   const bob=Math.sin(boss.at*0.05)*4;
-  const angry=boss.inv>0;
+  const angry=boss.hitFlash>0;
   const GLD=C.gold||'#E2A820';
 
   if(boss.type==='landlord'){
@@ -256,17 +254,12 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     ctx.fillStyle='#1a1a1a';ctx.fillRect(bx+17,by+0,8,6);ctx.fillRect(bx+35,by+0,8,6);
     ctx.fillStyle='#fff';ctx.fillRect(bx+18,by+1,3,3);ctx.fillRect(bx+36,by+1,3,3);
     ctx.strokeStyle='#5c3d1a';ctx.lineWidth=3;
-    if(angry){
-      ctx.beginPath();ctx.moveTo(bx+16,by-3);ctx.lineTo(bx+26,by+1);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(bx+44,by-3);ctx.lineTo(bx+34,by+1);ctx.stroke();
-    } else {
-      ctx.fillStyle='#5c3d1a';ctx.fillRect(bx+16,by-2,10,3);ctx.fillRect(bx+34,by-2,10,3);
-    }
+    if(angry){ctx.beginPath();ctx.moveTo(bx+16,by-3);ctx.lineTo(bx+26,by+1);ctx.stroke();ctx.beginPath();ctx.moveTo(bx+44,by-3);ctx.lineTo(bx+34,by+1);ctx.stroke();}
+    else{ctx.fillStyle='#5c3d1a';ctx.fillRect(bx+16,by-2,10,3);ctx.fillRect(bx+34,by-2,10,3);}
     ctx.fillStyle='#8B2000';ctx.fillRect(bx+20,by+14,20,4);
 
   } else if(boss.type==='ratking'){
     const bx=ox, by=oy+bob;
-    // tail
     ctx.strokeStyle='#2a8a2a';ctx.lineWidth=6;
     ctx.beginPath();ctx.moveTo(bx+5,by+80);ctx.quadraticCurveTo(bx-35,by+100,bx-55,by+70);ctx.stroke();
     ctx.strokeStyle='#3aaa3a';ctx.lineWidth=3;
@@ -284,14 +277,13 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     ctx.fillStyle='#ee1111';ctx.beginPath();ctx.ellipse(bx+30,by+46,8,8,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#FFD700';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.fillText('RF',bx+30,by+52);
     ctx.fillStyle='#2a8a2a';ctx.fillRect(bx-12,by+32,16,22);ctx.fillRect(bx+boss.w-4,by+32,16,22);
-    // pizza held up
     ctx.fillStyle='#1a6a1a';ctx.fillRect(bx+boss.w+8,by+48,12,10);
     ctx.fillStyle='#C8860A';ctx.beginPath();ctx.moveTo(bx+boss.w+20,by+18);ctx.lineTo(bx+boss.w+6,by+52);ctx.lineTo(bx+boss.w+34,by+52);ctx.closePath();ctx.fill();
     ctx.fillStyle='#FFD966';ctx.beginPath();ctx.moveTo(bx+boss.w+20,by+23);ctx.lineTo(bx+boss.w+9,by+50);ctx.lineTo(bx+boss.w+31,by+50);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#C0392B';ctx.beginPath();ctx.moveTo(bx+boss.w+20,by+27);ctx.lineTo(bx+boss.w+12,by+48);ctx.lineTo(bx+boss.w+28,by+48);ctx.closePath();ctx.fill();
     ctx.fillStyle='#2a8a2a';ctx.fillRect(bx+20,by+22,20,10);
     ctx.fillStyle='#2a8a2a';ctx.beginPath();ctx.ellipse(bx+30,by+10,24,20,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#3aaa3a';ctx.beginPath();ctx.ellipse(bx+30,by+5,16,12,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1a7a1a';ctx.beginPath();ctx.ellipse(bx+30,by+18,18,10,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#2a8a2a';
     ctx.beginPath();ctx.ellipse(bx+10,by+2,9,12,-.3,0,Math.PI*2);ctx.fill();
     ctx.beginPath();ctx.ellipse(bx+50,by+2,9,12,.3,0,Math.PI*2);ctx.fill();
@@ -316,27 +308,20 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     [[bx+12,by,bx+16,by+5],[bx+24,by,bx+20,by+5],[bx+36,by,bx+40,by+5],[bx+48,by,bx+44,by+5]]
       .forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
     ctx.fillStyle='#1a6a1a';ctx.beginPath();ctx.ellipse(bx+30,by+20,12,8,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#2a8a2a';ctx.beginPath();ctx.ellipse(bx+30,by+18,8,5,0,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#ff9999';ctx.fillRect(bx+24,by+18,6,4);ctx.fillRect(bx+32,by+18,6,4);
     ctx.fillStyle='#fff';
     ctx.fillRect(bx+20,by+23,6,10);ctx.fillRect(bx+27,by+23,6,10);ctx.fillRect(bx+34,by+23,6,10);
     ctx.strokeStyle='#bbb';ctx.lineWidth=1;
     ctx.strokeRect(bx+20,by+23,6,10);ctx.strokeRect(bx+27,by+23,6,10);ctx.strokeRect(bx+34,by+23,6,10);
-    // crown
     ctx.fillStyle='#FFD700';ctx.fillRect(bx+12,by-18,36,12);
     ctx.fillStyle='#ffe040';ctx.fillRect(bx+14,by-18,32,6);
-    ctx.fillStyle='#c8a010';ctx.fillRect(bx+12,by-8,36,3);
     [[bx+12,by-30],[bx+21,by-26],[bx+30,by-34],[bx+39,by-26],[bx+46,by-30]].forEach(([cx,cy])=>{
       ctx.fillStyle='#FFD700';ctx.beginPath();ctx.moveTo(cx,by-18);ctx.lineTo(cx+5,cy);ctx.lineTo(cx+10,by-18);ctx.closePath();ctx.fill();
     });
     ctx.fillStyle='#e74c3c';ctx.beginPath();ctx.arc(bx+17,by-12,4,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#3498db';ctx.beginPath();ctx.arc(bx+30,by-12,4,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#2ecc71';ctx.beginPath();ctx.arc(bx+43,by-12,4,0,Math.PI*2);ctx.fill();
-    if(angry){
-      ctx.strokeStyle='#000';ctx.lineWidth=4;
-      ctx.beginPath();ctx.moveTo(bx+8,by-6);ctx.lineTo(bx+22,by+2);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(bx+52,by-6);ctx.lineTo(bx+38,by+2);ctx.stroke();
-    }
+    if(angry){ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(bx+8,by-6);ctx.lineTo(bx+22,by+2);ctx.stroke();ctx.beginPath();ctx.moveTo(bx+52,by-6);ctx.lineTo(bx+38,by+2);ctx.stroke();}
 
   } else {
     // RECORD EXEC
@@ -368,9 +353,11 @@ export function drawBossSprite(ctx, boss, scrollX, bossHits, bossMaxHits, C) {
     ctx.fillStyle='#fff';ctx.fillRect(bx+23,by+16,4,5);ctx.fillRect(bx+28,by+16,4,5);ctx.fillRect(bx+33,by+16,3,5);
   }
 
-  // HP bar
+  // HP bar above boss
+  const pct=bossHp/bossMaxHp;
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(ox-8,oy-32,boss.w+16,14);
-  ctx.fillStyle='#e74c3c';ctx.fillRect(ox-6,oy-30,Math.max(0,(boss.w+12)*((bossMaxHits-bossHits)/bossMaxHits)),10);
+  ctx.fillStyle=pct>0.5?'#2ecc71':pct>0.25?'#f39c12':'#e74c3c';
+  ctx.fillRect(ox-6,oy-30,Math.max(0,(boss.w+12)*pct),10);
   ctx.strokeStyle=GLD;ctx.lineWidth=2;ctx.strokeRect(ox-8,oy-32,boss.w+16,14);
   const names={landlord:'LANDLORD',ratking:'RAT KING',recordexec:'RECORD EXEC'};
   ctx.fillStyle=GLD;ctx.font='8px "Press Start 2P"';ctx.textAlign='center';
