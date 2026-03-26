@@ -260,7 +260,7 @@ function drawCharSelect(ctx, frame, selChar) {
     ctx.fillStyle=sel?'rgba(226,168,32,0.12)':'rgba(0,0,0,0.5)'; ctx.fillRect(cx,cy,cW,cH);
     ctx.strokeStyle=sel?GLD:'rgba(226,168,32,0.2)'; ctx.lineWidth=sel?4:2; ctx.strokeRect(cx,cy,cW,cH);
     if(sel){ctx.shadowBlur=14;ctx.shadowColor=GLD;ctx.strokeRect(cx,cy,cW,cH);ctx.shadowBlur=0;}
-    drawCharPreview(ctx, i, cx+cW/2, cy+cH*0.48, 5);
+    drawCharPreview(ctx, i, cx+cW/2, cy+cH*0.50, 3);
     ctx.fillStyle=sel?GLD:CREAM; ctx.font=`${sel?'13':'11'}px "Press Start 2P"`; ctx.textAlign='center';
     ctx.fillText(ch.name, cx+cW/2, cy+cH-55);
     ctx.fillStyle='rgba(226,168,32,0.6)'; ctx.font='8px "Press Start 2P"';
