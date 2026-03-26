@@ -15,12 +15,16 @@ export default function PizzaGame() {
   const rafRef     = useRef(null);
   const frameRef   = useRef(0);
   const musicRef   = useRef(null);
+  const pausedRef  = useRef(false);   // ref so game loop closure reads live value
+  const mutedRef   = useRef(false);
 
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile]   = useState(false);
+  const [isPaused, setIsPaused]   = useState(false);
+  const [isMuted,  setIsMuted]    = useState(false);
 
-  // detect mobile
+  // ── DETECT MOBILE ────────────────────────────
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
     check();
@@ -28,71 +32,122 @@ export default function PizzaGame() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // fullscreen change listener
+  // ── FULLSCREEN LISTENER ──────────────────────
   useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handler);
     return () => document.removeEventListener('fullscreenchange', handler);
   }, []);
 
-  // main game loop
+  // ── MAIN GAME LOOP ───────────────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // init engine
     const engine = new GameEngine((state) => setGameState(s => ({ ...s, ...state })));
     engineRef.current = engine;
 
-    // audio
     const music = new Audio('/kylesong.mp3');
     music.loop = true;
     music.volume = 0.5;
     musicRef.current = music;
 
+    // wrap startGame to reset pause + play music
     const origStart = engine.startGame.bind(engine);
     engine.startGame = () => {
       origStart();
-      music.currentTime = 0;
-      music.play().catch(() => {});
+      pausedRef.current = false;
+      setIsPaused(false);
+      if (!mutedRef.current) { music.currentTime = 0; music.play().catch(() => {}); }
     };
+
+    // wrap respawn to resume music
     const origRespawn = engine.respawn.bind(engine);
     engine.respawn = () => {
       origRespawn();
-      music.play().catch(() => {});
+      if (!mutedRef.current && !pausedRef.current) music.play().catch(() => {});
     };
 
-    // keyboard
+    // keyboard handler
     const onDown = (e) => {
       if (['Space','ArrowLeft','ArrowRight','ArrowUp'].includes(e.code)) e.preventDefault();
-      engine.handleKey(e.code, true);
+
+      // pause: P or Escape
+      if (e.code === 'Escape' || e.code === 'KeyP') {
+        if (engine.gState === 'playing') {
+          const next = !pausedRef.current;
+          pausedRef.current = next;
+          setIsPaused(next);
+          if (next) music.pause();
+          else if (!mutedRef.current) music.play().catch(() => {});
+        }
+        return;
+      }
+      // mute: M
+      if (e.code === 'KeyM') {
+        const next = !mutedRef.current;
+        mutedRef.current = next;
+        setIsMuted(next);
+        if (next) {
+          music.volume = 0;
+        } else {
+          music.volume = 0.5;
+          if (engine.gState === 'playing' && !pausedRef.current) music.play().catch(() => {});
+        }
+        return;
+      }
+      if (!pausedRef.current) engine.handleKey(e.code, true);
     };
-    const onUp = (e) => engine.handleKey(e.code, false);
+    const onUp = (e) => { if (!pausedRef.current) engine.handleKey(e.code, false); };
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
 
-    // loop
+    // game loop — always render, skip tick when paused, draw pause overlay on top
     function loop() {
-      engine.tick();
-      frameRef.current++;
+      if (!pausedRef.current) {
+        engine.tick();
+        frameRef.current++;
+      }
       renderFrame(ctx, engine, frameRef.current);
+
+      if (pausedRef.current) {
+        ctx.fillStyle = 'rgba(0,0,0,0.62)';
+        ctx.fillRect(0, 0, 780, 520);
+        ctx.fillStyle = GLD;
+        ctx.font = '22px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', 390, 242);
+        ctx.fillStyle = CREAM;
+        ctx.font = '8px "Press Start 2P"';
+        ctx.fillText('PRESS P · ESC · OR TAP RESUME', 390, 276);
+      }
+
       rafRef.current = requestAnimationFrame(loop);
     }
     loop();
 
-    // pause music when tab is hidden or user leaves the page
+    // stop music when tab is hidden, resume when tab returns
     const onVisibility = () => {
-      if (document.hidden) music.pause();
+      if (document.hidden) {
+        music.pause();
+      } else if (engine.gState === 'playing' && !pausedRef.current && !mutedRef.current) {
+        music.play().catch(() => {});
+      }
     };
     document.addEventListener('visibilitychange', onVisibility);
 
-    // pause music when game scrolls out of view
+    // stop music when canvas scrolls out of view (≥85% must be visible)
+    // resume automatically when it scrolls back in
     const observer = new IntersectionObserver(
-      ([entry]) => { if (!entry.isIntersecting) music.pause(); },
-      { threshold: 0.1 }
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          music.pause();
+        } else if (engine.gState === 'playing' && !pausedRef.current && !mutedRef.current) {
+          music.play().catch(() => {});
+        }
+      },
+      { threshold: 0.85 }
     );
     observer.observe(canvas);
 
@@ -106,47 +161,75 @@ export default function PizzaGame() {
     };
   }, []);
 
-  // stop music when game ends or returns to menus
+  // stop music when game ends or goes back to menus
   useEffect(() => {
     const music = musicRef.current;
     if (!music) return;
     if (['gameover', 'win', 'title', 'charselect'].includes(gameState.state)) {
       music.pause();
       music.currentTime = 0;
+      pausedRef.current = false;
+      setIsPaused(false);
     }
   }, [gameState.state]);
 
-  // ── FULLSCREEN ──────────────────────────────
+  // ── FULLSCREEN ───────────────────────────────
   const enterFullscreen = useCallback(async () => {
     try {
-      // Try real browser fullscreen first (works on desktop + Android)
       const el = document.documentElement;
       if (el.requestFullscreen) await el.requestFullscreen();
       else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
       setIsFullscreen(true);
-    } catch {
-      // iOS Safari doesn't support requestFullscreen — fall back to CSS fullscreen
-      setIsFullscreen(true);
-    }
+    } catch { setIsFullscreen(true); }
   }, []);
 
   const exitFullscreen = useCallback(async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-    } catch {}
+    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch {}
     setIsFullscreen(false);
   }, []);
 
-  // ── MOBILE BUTTON HANDLER ───────────────────
+  // ── PAUSE / MUTE HANDLERS ────────────────────
+  const handlePause = useCallback(() => {
+    const engine = engineRef.current;
+    const music  = musicRef.current;
+    if (!engine || engine.gState !== 'playing') return;
+    const next = !pausedRef.current;
+    pausedRef.current = next;
+    setIsPaused(next);
+    if (music) { if (next) music.pause(); else if (!mutedRef.current) music.play().catch(() => {}); }
+  }, []);
+
+  const handleMute = useCallback(() => {
+    const music  = musicRef.current;
+    const engine = engineRef.current;
+    if (!music) return;
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setIsMuted(next);
+    if (next) {
+      music.volume = 0;
+    } else {
+      music.volume = 0.5;
+      if (engine && engine.gState === 'playing' && !pausedRef.current) music.play().catch(() => {});
+    }
+  }, []);
+
+  // ── TOUCH / CLICK HANDLER ────────────────────
   const mb = useCallback((key, down) => {
     const engine = engineRef.current;
     if (!engine) return;
     const st = engine.gState;
 
+    if (key === 'pause') { if (down) handlePause(); return; }
+    if (key === 'mute')  { if (down) handleMute();  return; }
+    if (key === 'fs')    { if (down) { isFullscreen ? exitFullscreen() : enterFullscreen(); } return; }
+
+    if (pausedRef.current) return; // block gameplay while paused
+
     if (key === 'jump') {
       if (down && st === 'playing') engine.jump();
     } else if (key === 'start') {
-      if (st === 'title')      { engine.gState = 'charselect'; engine.sync(); }
+      if (st === 'title')           { engine.gState = 'charselect'; engine.sync(); }
       else if (st === 'charselect') { engine.charIdx = engine.selChar; engine.startGame(); }
       else if (st === 'gameover')   engine.startGame();
       else if (st === 'win')        { engine.gState = 'charselect'; engine.sync(); }
@@ -156,37 +239,28 @@ export default function PizzaGame() {
     } else if (key === 'right' && down) {
       if (st === 'charselect') { engine.selChar = (engine.selChar + 1) % 3; engine.sync(); }
       else engine.keys['ArrowRight'] = true;
-    } else if (key === 'left' && !down) {
-      engine.keys['ArrowLeft'] = false;
-    } else if (key === 'right' && !down) {
-      engine.keys['ArrowRight'] = false;
-    }
-  }, []);
+    } else if (key === 'left'  && !down) { engine.keys['ArrowLeft']  = false; }
+      else if (key === 'right' && !down) { engine.keys['ArrowRight'] = false; }
+  }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);
 
-  // ── BUTTON COMPONENTS ──────────────────────
-  // Hold button (directional — fires on press, releases on lift)
-  const HoldBtn = ({ label, k, style }) => (
+  // ── SHARED BUTTON BASE STYLE ─────────────────
+  const base = {
+    fontFamily: '"Press Start 2P"',
+    border: 'none', cursor: 'pointer',
+    userSelect: 'none', WebkitUserSelect: 'none',
+    WebkitTouchCallout: 'none', touchAction: 'none',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  };
+
+  // D-pad direction button (hold)
+  const DirBtn = ({ label, k }) => (
     <button
-      style={{
-        fontFamily: '"Press Start 2P"',
-        fontSize: isMobile ? '1.2rem' : '1rem',
-        background: GLD,
-        color: GRN,
-        border: 'none',
-        borderRadius: 10,
-        cursor: 'pointer',
-        boxShadow: `0 6px 0 rgba(0,0,0,0.5)`,
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-        touchAction: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        width: isMobile ? 90 : 80,
-        height: isMobile ? 90 : 76,
-        ...style,
+      style={{ ...base,
+        fontSize: isMobile ? '1.5rem' : '1.1rem',
+        background: GLD, color: GRN,
+        borderRadius: 8,
+        boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
+        width: isMobile ? 86 : 70, height: isMobile ? 86 : 70,
       }}
       onTouchStart={e => { e.preventDefault(); mb(k, true); }}
       onTouchEnd={e => { e.preventDefault(); mb(k, false); }}
@@ -195,45 +269,70 @@ export default function PizzaGame() {
       onMouseDown={() => mb(k, true)}
       onMouseUp={() => mb(k, false)}
       onMouseLeave={() => mb(k, false)}
-    >
-      {label}
-    </button>
+    >{label}</button>
   );
 
-  // Tap button (action — fires once on press)
-  const TapBtn = ({ label, k, bg, size, style }) => (
+  // Round action button (tap)
+  const ActBtn = ({ label, k, bg, size }) => (
     <button
-      style={{
-        fontFamily: '"Press Start 2P"',
-        fontSize: isMobile ? '0.85rem' : '0.75rem',
-        background: bg || '#e74c3c',
-        color: '#fff',
-        border: 'none',
+      style={{ ...base,
+        fontSize: isMobile ? '0.72rem' : '0.6rem',
+        background: bg || '#e74c3c', color: '#fff',
         borderRadius: '50%',
-        cursor: 'pointer',
-        boxShadow: `0 6px 0 rgba(0,0,0,0.5)`,
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-        touchAction: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        whiteSpace: 'pre-line',
-        textAlign: 'center',
-        lineHeight: 1.3,
-        width: size || (isMobile ? 100 : 88),
-        height: size || (isMobile ? 100 : 88),
-        ...style,
+        boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
+        whiteSpace: 'pre-line', textAlign: 'center', lineHeight: 1.4,
+        width: size || (isMobile ? 100 : 86), height: size || (isMobile ? 100 : 86),
       }}
       onTouchStart={e => { e.preventDefault(); mb(k, true); }}
       onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
       onMouseDown={() => mb(k, true)}
-    >
-      {label}
-    </button>
+    >{label}</button>
+  );
+
+  // Small pill utility button
+  const PillBtn = ({ label, onPress, active, activeColor }) => (
+    <button
+      style={{ ...base,
+        fontSize: isMobile ? '0.44rem' : '0.38rem',
+        background: active ? (activeColor || '#e67e22') : '#1a271a',
+        color: active ? '#fff' : '#888',
+        border: `2px solid ${active ? (activeColor || '#e67e22') : '#2e3e2e'}`,
+        borderRadius: 20,
+        padding: isMobile ? '9px 16px' : '7px 13px',
+        boxShadow: '0 3px 0 rgba(0,0,0,0.45)',
+      }}
+      onTouchStart={e => { e.preventDefault(); onPress(); }}
+      onTouchEnd={e => e.preventDefault()}
+      onContextMenu={e => e.preventDefault()}
+      onMouseDown={onPress}
+    >{label}</button>
+  );
+
+  // Fullscreen overlay button (bottom-right of canvas)
+  const FsBtn = () => (
+    <button
+      style={{
+        position: 'absolute', bottom: 6, right: 6, zIndex: 20,
+        background: 'rgba(0,0,0,0.65)', color: GLD,
+        border: `1px solid rgba(226,168,32,0.4)`,
+        borderRadius: 5, padding: '3px 8px',
+        fontFamily: '"Press Start 2P"', fontSize: '0.65rem',
+        cursor: 'pointer', lineHeight: 1,
+        userSelect: 'none', touchAction: 'none',
+      }}
+      onTouchStart={e => { e.preventDefault(); isFullscreen ? exitFullscreen() : enterFullscreen(); }}
+      onTouchEnd={e => e.preventDefault()}
+      onContextMenu={e => e.preventDefault()}
+      onMouseDown={() => isFullscreen ? exitFullscreen() : enterFullscreen()}
+    >{isFullscreen ? '⊠' : '⛶'}</button>
+  );
+
+  // label under a button
+  const BtnLabel = ({ text }) => (
+    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.28rem', color: 'rgba(226,168,32,0.45)', marginTop: 2 }}>
+      {text}
+    </span>
   );
 
   // ── CONTROL BAR ─────────────────────────────
@@ -241,98 +340,68 @@ export default function PizzaGame() {
     <div style={{
       background: GRN,
       borderTop: `3px solid ${GLD}`,
-      padding: isMobile ? '14px 16px' : '10px 16px',
-      paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 10,
+      padding: isMobile ? '10px 14px 12px' : '8px 20px 10px',
+      paddingBottom: `max(${isMobile ? '12px' : '10px'}, env(safe-area-inset-bottom, ${isMobile ? '12px' : '10px'}))`,
+      display: 'flex', flexDirection: 'column', gap: 8,
     }}>
-      {/* fullscreen toggle row */}
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <button
-          style={{
-            fontFamily: '"Press Start 2P"',
-            fontSize: '0.55rem',
-            background: isFullscreen ? '#c0392b' : GRN2,
-            color: CREAM,
-            border: `2px solid ${GLD}`,
-            borderRadius: 6,
-            padding: '7px 18px',
-            cursor: 'pointer',
-            boxShadow: '2px 2px 0 #000',
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            touchAction: 'none',
-          }}
-          onMouseDown={isFullscreen ? exitFullscreen : enterFullscreen}
-          onTouchStart={e => { e.preventDefault(); isFullscreen ? exitFullscreen() : enterFullscreen(); }}
-        >
-          {isFullscreen ? '✕  EXIT FULLSCREEN' : '⛶  FULLSCREEN'}
-        </button>
+
+      {/* ── Utility row: PAUSE + MUTE ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+        <PillBtn
+          label={isPaused ? '▶  RESUME' : '⏸  PAUSE'}
+          onPress={handlePause}
+          active={isPaused}
+          activeColor='#e67e22'
+        />
+        <PillBtn
+          label={isMuted ? '🔇  MUTED' : '🔊  MUSIC'}
+          onPress={handleMute}
+          active={isMuted}
+          activeColor='#555'
+        />
       </div>
 
-      {/* NES layout: ◀  ▶  |  START  |  A(JUMP) */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-      }}>
-        {/* D-pad: left + right only */}
-        <div style={{ display: 'flex', gap: 10 }}>
-          <HoldBtn label="◀" k="left" />
-          <HoldBtn label="▶" k="right" />
+      {/* ── Controls row ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+        {/* Left: D-pad */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <DirBtn label="◀" k="left" />
+            <DirBtn label="▶" k="right" />
+          </div>
+          <BtnLabel text="MOVE" />
         </div>
 
-        {/* center: START pill + hint */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        {/* Center: START + keyboard hint (desktop only) */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <button
-            style={{
-              fontFamily: '"Press Start 2P"',
-              fontSize: '0.55rem',
-              background: '#2a2a2a',
-              color: '#ddd',
-              border: '2px solid #555',
+            style={{ ...base,
+              fontSize: '0.48rem',
+              background: '#252525', color: '#ccc',
+              border: '2px solid #4a4a4a',
               borderRadius: 20,
-              padding: '8px 18px',
-              cursor: 'pointer',
+              padding: isMobile ? '10px 22px' : '8px 20px',
               boxShadow: '0 4px 0 rgba(0,0,0,0.5)',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              touchAction: 'none',
             }}
             onTouchStart={e => { e.preventDefault(); mb('start', true); }}
             onTouchEnd={e => e.preventDefault()}
             onContextMenu={e => e.preventDefault()}
             onMouseDown={() => mb('start', true)}
-          >
-            START
-          </button>
+          >START</button>
           {!isMobile && (
-            <div style={{
-              fontFamily: '"Press Start 2P"',
-              fontSize: '0.28rem',
-              color: 'rgba(226,168,32,0.35)',
-              textAlign: 'center',
-              lineHeight: 2.2,
-            }}>
-              ← → MOVE{'\n'}SPACE JUMP
+            <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.26rem', color: 'rgba(226,168,32,0.32)', textAlign: 'center', lineHeight: 2.1 }}>
+              ← → MOVE &nbsp;·&nbsp; SPACE JUMP<br />
+              P / ESC = PAUSE &nbsp;·&nbsp; M = MUTE
             </div>
           )}
         </div>
 
-        {/* A = JUMP — big round red button */}
-        <TapBtn label={'A\nJUMP'} k="jump" bg="#e74c3c"
-          size={isMobile ? 108 : 94} />
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <span style={{
-          fontFamily: '"Press Start 2P"', fontSize: '0.28rem',
-          color: 'rgba(226,168,32,0.32)',
-        }}>
-          A = JUMP
-        </span>
+        {/* Right: JUMP */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <ActBtn label={'A\nJUMP'} k="jump" bg="#c0392b" size={isMobile ? 100 : 86} />
+          <BtnLabel text="JUMP" />
+        </div>
       </div>
     </div>
   );
@@ -340,28 +409,14 @@ export default function PizzaGame() {
   // ── FULLSCREEN LAYOUT ───────────────────────
   if (isFullscreen) {
     return (
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#000',
-        display: 'flex', flexDirection: 'column',
-      }}>
-        <div style={{
-          flex: 1,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden', background: '#000',
-        }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#000' }}>
           <canvas
             ref={canvasRef}
-            width={780}
-            height={520}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-              imageRendering: 'pixelated',
-              display: 'block',
-              objectFit: 'contain',
-            }}
+            width={780} height={520}
+            style={{ maxWidth: '100%', maxHeight: '100%', imageRendering: 'pixelated', display: 'block' }}
           />
+          <FsBtn />
         </div>
         <ControlBar />
       </div>
@@ -370,31 +425,20 @@ export default function PizzaGame() {
 
   // ── NORMAL LAYOUT ───────────────────────────
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '0.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
       <div style={{
-        border: `4px solid ${GLD}`,
-        boxShadow: `4px 4px 0 #000`,
-        background: '#000',
-        width: '100%',
-        maxWidth: 780,
-        alignSelf: 'center',
+        position: 'relative',
+        border: `4px solid ${GLD}`, boxShadow: `4px 4px 0 #000`,
+        background: '#000', width: '100%', maxWidth: 780, alignSelf: 'center',
       }}>
         <canvas
           ref={canvasRef}
-          width={780}
-          height={520}
+          width={780} height={520}
           style={{ width: '100%', display: 'block', imageRendering: 'pixelated' }}
         />
+        <FsBtn />
       </div>
       <ControlBar />
-      <p style={{
-        fontFamily: '"Press Start 2P"',
-        fontSize: '0.3rem',
-        color: 'rgba(226,168,32,0.25)',
-        textAlign: 'center',
-      }}>
-        ← → MOVE &nbsp;|&nbsp; SPACE / A = JUMP &nbsp;|&nbsp; ENTER = START
-      </p>
     </div>
   );
 }
