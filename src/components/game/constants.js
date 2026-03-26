@@ -73,15 +73,15 @@ export const LEVELS = [
     id: 3,
     name: 'FERNDALE',
     subtitle: 'Nine Mile · 2:00 AM',
-    // Sky: deep night, neon
-    skyTop: '#020508',
-    skyBot: '#080f18',
-    groundTop: '#080808',
-    groundColor: '#0a0a0a',
+    // Sky: deep night, neon — lightened for visibility
+    skyTop: '#0d0820',
+    skyBot: '#1a1035',
+    groundTop: '#1a1a1a',
+    groundColor: '#222222',
     laneColor: '#e74c3c',
-    buildingCols: ['#1a0530','#25083a','#100220','#1e0630'],
-    windowColor: '#ff44aa',
-    windowColor2: '#44aaff',
+    buildingCols: ['#2e0d50','#3a1060','#230840','#320c58'],
+    windowColor: '#ff55bb',
+    windowColor2: '#55bbff',
     hasNeon: true,
     hasStars: true,
     // Gameplay — hardest

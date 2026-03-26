@@ -97,7 +97,7 @@ function drawSky(ctx, lvl, frame, scrollX) {
     // Ferndale neon glow at horizon
     const glow = ctx.createLinearGradient(0, GROUND-60, 0, GROUND);
     glow.addColorStop(0, 'rgba(255,60,180,0)');
-    glow.addColorStop(1, 'rgba(255,60,180,0.12)');
+    glow.addColorStop(1, 'rgba(255,60,180,0.22)');
     ctx.fillStyle = glow; ctx.fillRect(0, GROUND-60, W, 60);
   }
 

@@ -267,9 +267,9 @@ export class GameEngine {
       if (b.hitFlash > 0) b.hitFlash--;
       const bOx = b.x - this.scrollX;
 
-      // bounce
-      if (bOx < 60) b.vx = Math.abs(b.vx);
-      if (bOx > W - b.w - 60) b.vx = -Math.abs(b.vx);
+      // bounce — keep boss away from screen edges so player isn't cornered
+      if (bOx < 140) b.vx = Math.abs(b.vx);
+      if (bOx > W - b.w - 140) b.vx = -Math.abs(b.vx);
 
       // stomp boss
       const pb = pl.y + PH;
@@ -277,7 +277,7 @@ export class GameEngine {
       const stomping = pl.vy > 0 && pb >= b.y && pb <= b.y + 18 && overlapX;
 
       if (stomping && b.inv === 0) {
-        b.hp -= 40; b.inv = 50; b.hitFlash = 20; pl.vy = -12;
+        b.hp -= 40; b.inv = 50; b.hitFlash = 20; pl.vy = -12; pl.vx = 0;
         this.sc += 500;
         this._addParts(bOx + b.w/2, b.y, GLD, 18);
         if (b.hp <= 0) { b.dead = true; this.bossDeadTimer = 120; this.sc += 2000; }
@@ -327,7 +327,7 @@ export class GameEngine {
             this._addParts(ox + o.w/2, o.y, GLD, 10);
             this.sync();
           }
-          pl.vy = -10;
+          pl.vy = -10; pl.vx = 0;
           return true;
         }
       }
