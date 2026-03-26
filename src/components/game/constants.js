@@ -41,7 +41,7 @@ export const LEVELS = [
     hasClouds: true,
     // Gameplay — easiest
     spawnRate: 120,
-    enemySpeed: 2.5,
+    enemySpeed: 1.4,
     enemyTypes: ['cone','metermaid','rat'],   // limited enemy variety
     pizzaRate: 80,
     heartRate: 200,          // hearts spawn often
@@ -63,7 +63,7 @@ export const LEVELS = [
     hasStars: true,
     // Gameplay — medium
     spawnRate: 85,
-    enemySpeed: 3.5,
+    enemySpeed: 2.0,
     enemyTypes: ['cone','metermaid','muscledude','rat'],
     pizzaRate: 72,
     heartRate: 280,
@@ -86,7 +86,7 @@ export const LEVELS = [
     hasStars: true,
     // Gameplay — hardest
     spawnRate: 55,
-    enemySpeed: 5.0,
+    enemySpeed: 3.0,
     enemyTypes: ['cone','metermaid','muscledude','rat','biker'],
     pizzaRate: 60,
     heartRate: 380,          // hearts rare

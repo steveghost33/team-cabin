@@ -275,16 +275,13 @@ function drawLevelUp(ctx, frame, lvlIdx, lvl) {
   const bg = ctx.createLinearGradient(0,0,0,H);
   bg.addColorStop(0,lvl.skyTop); bg.addColorStop(1,lvl.skyBot);
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(0,0,0,0.82)'; ctx.fillRect(W/2-260,H/2-130,520,260);
-  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-260,H/2-130,520,260);
+  ctx.fillStyle='rgba(0,0,0,0.82)'; ctx.fillRect(W/2-220,H/2-90,440,180);
+  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-220,H/2-90,440,180);
   ctx.fillStyle=GLD; ctx.font='14px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('LEVEL '+(lvlIdx+1)+' COMPLETE!',W/2,H/2-90);
+  ctx.fillText('LEVEL '+(lvlIdx+1)+' COMPLETE!',W/2,H/2-40);
   ctx.fillStyle=CREAM; ctx.font='20px "Press Start 2P"';
-  ctx.fillText('→ '+lvl.name,W/2,H/2-50);
-  ctx.fillStyle='rgba(226,168,32,0.65)'; ctx.font='9px "Press Start 2P"';
-  ctx.fillText(lvl.subtitle,W/2,H/2-22);
-  ctx.fillText('ENEMIES FASTER · MORE TYPES · TOUGHER BOSS',W/2,H/2+14);
-  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+60);}
+  ctx.fillText('→ '+lvl.name,W/2,H/2+10);
+  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+55);}
 }
 
 function drawGameOver(ctx, frame, sc, highSc) {

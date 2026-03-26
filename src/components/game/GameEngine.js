@@ -196,6 +196,13 @@ export class GameEngine {
     this.frame++;
     const { pl, lvl } = this;
 
+    // ── LEVEL UP TIMER ────────────────────────
+    if (this.gState === 'levelup') {
+      this.nextLvlTimer--;
+      if (this.nextLvlTimer <= 0) { this.gState = 'playing'; this.sync(); }
+      return;
+    }
+
     if (this.gState !== 'playing') return;
 
     // ── DYING animation ───────────────────────
@@ -299,12 +306,6 @@ export class GameEngine {
           this.sync();
         }
       }
-    }
-
-    // level up timer
-    if (this.gState === 'levelup') {
-      this.nextLvlTimer--;
-      if (this.nextLvlTimer <= 0) { this.gState = 'playing'; this.sync(); }
     }
 
     // ── ENEMIES ───────────────────────────────
