@@ -14,6 +14,7 @@ export default function PizzaGame() {
   const engineRef  = useRef(null);
   const rafRef     = useRef(null);
   const frameRef   = useRef(0);
+  const musicRef   = useRef(null);
 
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -50,6 +51,7 @@ export default function PizzaGame() {
     const music = new Audio('/kylesong.mp3');
     music.loop = true;
     music.volume = 0.5;
+    musicRef.current = music;
 
     const origStart = engine.startGame.bind(engine);
     engine.startGame = () => {
@@ -81,13 +83,38 @@ export default function PizzaGame() {
     }
     loop();
 
+    // pause music when tab is hidden or user leaves the page
+    const onVisibility = () => {
+      if (document.hidden) music.pause();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // pause music when game scrolls out of view
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (!entry.isIntersecting) music.pause(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(canvas);
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
+      document.removeEventListener('visibilitychange', onVisibility);
+      observer.disconnect();
       music.pause();
     };
   }, []);
+
+  // stop music when game ends or returns to menus
+  useEffect(() => {
+    const music = musicRef.current;
+    if (!music) return;
+    if (['gameover', 'win', 'title', 'charselect'].includes(gameState.state)) {
+      music.pause();
+      music.currentTime = 0;
+    }
+  }, [gameState.state]);
 
   // ── FULLSCREEN ──────────────────────────────
   const enterFullscreen = useCallback(async () => {
