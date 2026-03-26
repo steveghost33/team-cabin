@@ -243,7 +243,7 @@ export default function PizzaGame() {
       else if (key === 'right' && !down) { engine.keys['ArrowRight'] = false; }
   }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);
 
-  // ── SHARED BUTTON BASE STYLE ─────────────────
+  // ── SHARED BASE STYLE ───────────────────────
   const base = {
     fontFamily: '"Press Start 2P"',
     border: 'none', cursor: 'pointer',
@@ -252,64 +252,7 @@ export default function PizzaGame() {
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   };
 
-  // D-pad direction button (hold)
-  const DirBtn = ({ label, k }) => (
-    <button
-      style={{ ...base,
-        fontSize: isMobile ? '1.5rem' : '1.1rem',
-        background: GLD, color: GRN,
-        borderRadius: 8,
-        boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
-        width: isMobile ? 86 : 70, height: isMobile ? 86 : 70,
-      }}
-      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
-      onTouchEnd={e => { e.preventDefault(); mb(k, false); }}
-      onTouchCancel={e => { e.preventDefault(); mb(k, false); }}
-      onContextMenu={e => e.preventDefault()}
-      onMouseDown={() => mb(k, true)}
-      onMouseUp={() => mb(k, false)}
-      onMouseLeave={() => mb(k, false)}
-    >{label}</button>
-  );
-
-  // Round action button (tap)
-  const ActBtn = ({ label, k, bg, size }) => (
-    <button
-      style={{ ...base,
-        fontSize: isMobile ? '0.72rem' : '0.6rem',
-        background: bg || '#e74c3c', color: '#fff',
-        borderRadius: '50%',
-        boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
-        whiteSpace: 'pre-line', textAlign: 'center', lineHeight: 1.4,
-        width: size || (isMobile ? 100 : 86), height: size || (isMobile ? 100 : 86),
-      }}
-      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
-      onTouchEnd={e => e.preventDefault()}
-      onContextMenu={e => e.preventDefault()}
-      onMouseDown={() => mb(k, true)}
-    >{label}</button>
-  );
-
-  // Small pill utility button
-  const PillBtn = ({ label, onPress, active, activeColor }) => (
-    <button
-      style={{ ...base,
-        fontSize: isMobile ? '0.44rem' : '0.38rem',
-        background: active ? (activeColor || '#e67e22') : '#1a271a',
-        color: active ? '#fff' : '#888',
-        border: `2px solid ${active ? (activeColor || '#e67e22') : '#2e3e2e'}`,
-        borderRadius: 20,
-        padding: isMobile ? '9px 16px' : '7px 13px',
-        boxShadow: '0 3px 0 rgba(0,0,0,0.45)',
-      }}
-      onTouchStart={e => { e.preventDefault(); onPress(); }}
-      onTouchEnd={e => e.preventDefault()}
-      onContextMenu={e => e.preventDefault()}
-      onMouseDown={onPress}
-    >{label}</button>
-  );
-
-  // Fullscreen overlay button (bottom-right of canvas)
+  // ── FULLSCREEN OVERLAY BUTTON ────────────────
   const FsBtn = () => (
     <button
       style={{
@@ -328,60 +271,191 @@ export default function PizzaGame() {
     >{isFullscreen ? '⊠' : '⛶'}</button>
   );
 
-  // label under a button
-  const BtnLabel = ({ text }) => (
-    <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.28rem', color: 'rgba(226,168,32,0.45)', marginTop: 2 }}>
-      {text}
-    </span>
+  // ── DESKTOP CONTROLS ────────────────────────
+  // Visual keyboard keycap (non-interactive display)
+  const Key = ({ label, w = 44, h = 44 }) => (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      background: 'linear-gradient(to bottom, #eaeaea, #c8c8c8)',
+      color: '#111',
+      border: '1px solid #999',
+      borderBottom: '4px solid #777',
+      borderRadius: 6,
+      minWidth: w, height: h,
+      padding: '0 8px',
+      fontFamily: '"Press Start 2P"',
+      fontSize: w > 80 ? '0.55rem' : '0.6rem',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7), 0 2px 3px rgba(0,0,0,0.35)',
+      userSelect: 'none',
+      whiteSpace: 'nowrap',
+    }}>{label}</div>
   );
 
-  // ── CONTROL BAR ─────────────────────────────
-  const ControlBar = () => (
+  // Clickable keycap (PAUSE, MUTE — same look, but interactive)
+  const ClickKey = ({ label, onPress, active, activeColor = '#e67e22' }) => (
+    <button
+      style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        background: active
+          ? `linear-gradient(to bottom, ${activeColor}dd, ${activeColor})`
+          : 'linear-gradient(to bottom, #eaeaea, #c8c8c8)',
+        color: active ? '#fff' : '#111',
+        border: `1px solid ${active ? activeColor : '#999'}`,
+        borderBottom: `4px solid ${active ? '#a04808' : '#777'}`,
+        borderRadius: 6,
+        height: 44, padding: '0 18px',
+        fontFamily: '"Press Start 2P"', fontSize: '0.55rem',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 3px rgba(0,0,0,0.35)',
+        cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap',
+      }}
+      onMouseDown={onPress}
+    >{label}</button>
+  );
+
+  // One labelled key group
+  const KeyGroup = ({ children, label }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
+      {children}
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: GLD, letterSpacing: 1 }}>
+        {label}
+      </span>
+    </div>
+  );
+
+  const DesktopControls = () => (
     <div style={{
       background: GRN,
       borderTop: `3px solid ${GLD}`,
-      padding: isMobile ? '10px 14px 12px' : '8px 20px 10px',
-      paddingBottom: `max(${isMobile ? '12px' : '10px'}, env(safe-area-inset-bottom, ${isMobile ? '12px' : '10px'}))`,
-      display: 'flex', flexDirection: 'column', gap: 8,
+      padding: '14px 28px 16px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
     }}>
-
-      {/* ── Utility row: PAUSE + MUTE ── */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-        <PillBtn
+      {/* Row 1 — clickable utility keys */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <ClickKey
           label={isPaused ? '▶  RESUME' : '⏸  PAUSE'}
           onPress={handlePause}
           active={isPaused}
           activeColor='#e67e22'
         />
-        <PillBtn
-          label={isMuted ? '🔇  MUTED' : '🔊  MUSIC'}
+        <ClickKey
+          label={isMuted ? '🔇  MUTED' : '🔊  MUSIC ON'}
           onPress={handleMute}
           active={isMuted}
           activeColor='#555'
         />
       </div>
 
-      {/* ── Controls row ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* Row 2 — visual keyboard map */}
+      <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <KeyGroup label="MOVE LEFT / RIGHT">
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Key label="←" />
+            <Key label="→" />
+          </div>
+        </KeyGroup>
 
-        {/* Left: D-pad */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+        <KeyGroup label="JUMP">
+          <Key label="SPACE BAR" w={148} />
+        </KeyGroup>
+
+        <KeyGroup label="START / CONFIRM">
+          <Key label="ENTER" w={88} />
+        </KeyGroup>
+
+        <KeyGroup label="PAUSE">
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Key label="P" />
+            <Key label="ESC" w={60} />
+          </div>
+        </KeyGroup>
+
+        <KeyGroup label="MUTE MUSIC">
+          <Key label="M" />
+        </KeyGroup>
+      </div>
+    </div>
+  );
+
+  // ── MOBILE CONTROLS ──────────────────────────
+  const DirBtn = ({ label, k }) => (
+    <button
+      style={{ ...base,
+        fontSize: '1.5rem', background: GLD, color: GRN,
+        borderRadius: 8, boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
+        width: 86, height: 86,
+      }}
+      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
+      onTouchEnd={e => { e.preventDefault(); mb(k, false); }}
+      onTouchCancel={e => { e.preventDefault(); mb(k, false); }}
+      onContextMenu={e => e.preventDefault()}
+      onMouseDown={() => mb(k, true)}
+      onMouseUp={() => mb(k, false)}
+      onMouseLeave={() => mb(k, false)}
+    >{label}</button>
+  );
+
+  const ActBtn = ({ label, k, bg, size = 100 }) => (
+    <button
+      style={{ ...base,
+        fontSize: '0.72rem', background: bg || '#e74c3c', color: '#fff',
+        borderRadius: '50%', boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
+        whiteSpace: 'pre-line', textAlign: 'center', lineHeight: 1.4,
+        width: size, height: size,
+      }}
+      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
+      onTouchEnd={e => e.preventDefault()}
+      onContextMenu={e => e.preventDefault()}
+      onMouseDown={() => mb(k, true)}
+    >{label}</button>
+  );
+
+  const PillBtn = ({ label, onPress, active, activeColor }) => (
+    <button
+      style={{ ...base,
+        fontSize: '0.44rem',
+        background: active ? (activeColor || '#e67e22') : '#1a271a',
+        color: active ? '#fff' : '#888',
+        border: `2px solid ${active ? (activeColor || '#e67e22') : '#2e3e2e'}`,
+        borderRadius: 20, padding: '9px 16px',
+        boxShadow: '0 3px 0 rgba(0,0,0,0.45)',
+      }}
+      onTouchStart={e => { e.preventDefault(); onPress(); }}
+      onTouchEnd={e => e.preventDefault()}
+      onContextMenu={e => e.preventDefault()}
+      onMouseDown={onPress}
+    >{label}</button>
+  );
+
+  const MobileControls = () => (
+    <div style={{
+      background: GRN,
+      borderTop: `3px solid ${GLD}`,
+      padding: '10px 14px 12px',
+      paddingBottom: 'max(12px, env(safe-area-inset-bottom, 12px))',
+      display: 'flex', flexDirection: 'column', gap: 8,
+    }}>
+      {/* Utility row */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+        <PillBtn label={isPaused ? '▶  RESUME' : '⏸  PAUSE'} onPress={handlePause} active={isPaused} activeColor='#e67e22' />
+        <PillBtn label={isMuted ? '🔇  MUTED' : '🔊  MUSIC'} onPress={handleMute} active={isMuted} activeColor='#555' />
+      </div>
+
+      {/* Controls row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* D-pad */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
           <div style={{ display: 'flex', gap: 8 }}>
             <DirBtn label="◀" k="left" />
             <DirBtn label="▶" k="right" />
           </div>
-          <BtnLabel text="MOVE" />
+          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: 'rgba(226,168,32,0.5)' }}>MOVE</span>
         </div>
 
-        {/* Center: START + keyboard hint (desktop only) */}
+        {/* START */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           <button
-            style={{ ...base,
-              fontSize: '0.48rem',
-              background: '#252525', color: '#ccc',
-              border: '2px solid #4a4a4a',
-              borderRadius: 20,
-              padding: isMobile ? '10px 22px' : '8px 20px',
+            style={{ ...base, fontSize: '0.48rem', background: '#252525', color: '#ccc',
+              border: '2px solid #4a4a4a', borderRadius: 20, padding: '10px 22px',
               boxShadow: '0 4px 0 rgba(0,0,0,0.5)',
             }}
             onTouchStart={e => { e.preventDefault(); mb('start', true); }}
@@ -389,22 +463,18 @@ export default function PizzaGame() {
             onContextMenu={e => e.preventDefault()}
             onMouseDown={() => mb('start', true)}
           >START</button>
-          {!isMobile && (
-            <div style={{ fontFamily: '"Press Start 2P"', fontSize: '0.26rem', color: 'rgba(226,168,32,0.32)', textAlign: 'center', lineHeight: 2.1 }}>
-              ← → MOVE &nbsp;·&nbsp; SPACE JUMP<br />
-              P / ESC = PAUSE &nbsp;·&nbsp; M = MUTE
-            </div>
-          )}
         </div>
 
-        {/* Right: JUMP */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
-          <ActBtn label={'A\nJUMP'} k="jump" bg="#c0392b" size={isMobile ? 100 : 86} />
-          <BtnLabel text="JUMP" />
+        {/* JUMP */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <ActBtn label={'A\nJUMP'} k="jump" bg="#c0392b" size={100} />
+          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: 'rgba(226,168,32,0.5)' }}>JUMP</span>
         </div>
       </div>
     </div>
   );
+
+  const Controls = isMobile ? MobileControls : DesktopControls;
 
   // ── FULLSCREEN LAYOUT ───────────────────────
   if (isFullscreen) {
@@ -418,7 +488,7 @@ export default function PizzaGame() {
           />
           <FsBtn />
         </div>
-        <ControlBar />
+        <Controls />
       </div>
     );
   }
@@ -438,7 +508,7 @@ export default function PizzaGame() {
         />
         <FsBtn />
       </div>
-      <ControlBar />
+      <Controls />
     </div>
   );
 }
