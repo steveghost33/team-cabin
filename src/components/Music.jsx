@@ -1,7 +1,7 @@
 // Music.jsx — single expandable "Listen Now" button
 import { useState } from 'react';
 import SectionTitle from './SectionTitle';
-import { C, MUSIC_LINKS } from '../data/constants';
+import { C, MUSIC_LINKS } from './game/constants';
 
 export default function Music() {
   const [open, setOpen] = useState(false);

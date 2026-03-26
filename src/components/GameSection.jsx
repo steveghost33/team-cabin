@@ -1,6 +1,6 @@
 import SectionTitle from './SectionTitle';
 import PizzaGame from './PizzaGame';
-import { C } from '../data/constants';
+import { C } from './game/constants';
 
 export default function GameSection() {
   return (

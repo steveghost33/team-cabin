@@ -7,7 +7,7 @@
 //    <SectionTitle>FIND OUR MUSIC</SectionTitle>
 //    <SectionTitle color="#ff0000">SHOWS</SectionTitle>
 // ─────────────────────────────────────
-import { C } from '../data/constants';
+import { C } from './game/constants';
 
 export default function SectionTitle({ children, color }) {
   const c = color || C.gold;
