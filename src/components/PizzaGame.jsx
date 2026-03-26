@@ -103,12 +103,29 @@ export default function PizzaGame() {
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
 
-    // game loop — always render, skip tick when paused, draw pause overlay on top
-    function loop() {
+    // ── FIXED-TIMESTEP GAME LOOP ─────────────────
+    // Always ticks at 60 fps worth of physics regardless of display refresh rate.
+    // This keeps mobile (30 Hz screens) and desktop (60/120 Hz) at the same speed.
+    const TICK_MS = 1000 / 60;
+    let accumulator = 0;
+    let lastTime = 0;
+
+    function loop(now) {
+      if (lastTime === 0) lastTime = now;
+      const raw = now - lastTime;
+      lastTime = now;
+      // cap delta so a tab-switch pause doesn't cause a massive catch-up burst
+      const delta = Math.min(raw, 100);
+
       if (!pausedRef.current) {
-        engine.tick();
-        frameRef.current++;
+        accumulator += delta;
+        while (accumulator >= TICK_MS) {
+          engine.tick();
+          frameRef.current++;
+          accumulator -= TICK_MS;
+        }
       }
+
       renderFrame(ctx, engine, frameRef.current);
 
       if (pausedRef.current) {
@@ -125,7 +142,19 @@ export default function PizzaGame() {
 
       rafRef.current = requestAnimationFrame(loop);
     }
-    loop();
+    requestAnimationFrame(loop);
+
+    // ── GLOBAL DIRECTION-KEY SAFETY NET ──────────
+    // If a touch is cancelled by the OS (notification, gesture, etc.) the
+    // per-button handlers might never fire.  We clear BOTH direction keys on
+    // ANY global touchend / pointerup so the player can never get permanently stuck.
+    const clearDirKeys = () => {
+      engine.keys['ArrowLeft']  = false;
+      engine.keys['ArrowRight'] = false;
+    };
+    window.addEventListener('touchend',    clearDirKeys, { passive: true });
+    window.addEventListener('touchcancel', clearDirKeys, { passive: true });
+    window.addEventListener('pointerup',   clearDirKeys, { passive: true });
 
     // stop music when tab is hidden, resume when tab returns
     const onVisibility = () => {
@@ -155,6 +184,9 @@ export default function PizzaGame() {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
+      window.removeEventListener('touchend',    clearDirKeys);
+      window.removeEventListener('touchcancel', clearDirKeys);
+      window.removeEventListener('pointerup',   clearDirKeys);
       document.removeEventListener('visibilitychange', onVisibility);
       observer.disconnect();
       music.pause();
@@ -233,14 +265,28 @@ export default function PizzaGame() {
       else if (st === 'charselect') { engine.charIdx = engine.selChar; engine.startGame(); }
       else if (st === 'gameover')   engine.startGame();
       else if (st === 'win')        { engine.gState = 'charselect'; engine.sync(); }
-    } else if (key === 'left' && down) {
-      if (st === 'charselect') { engine.selChar = (engine.selChar + 2) % 3; engine.sync(); }
-      else engine.keys['ArrowLeft'] = true;
-    } else if (key === 'right' && down) {
-      if (st === 'charselect') { engine.selChar = (engine.selChar + 1) % 3; engine.sync(); }
-      else engine.keys['ArrowRight'] = true;
-    } else if (key === 'left'  && !down) { engine.keys['ArrowLeft']  = false; }
-      else if (key === 'right' && !down) { engine.keys['ArrowRight'] = false; }
+    } else if (key === 'left') {
+      if (down) {
+        if (st === 'charselect') { engine.selChar = (engine.selChar + 2) % 3; engine.sync(); }
+        else {
+          // always clear the opposite key first — prevents both-stuck scenario
+          engine.keys['ArrowRight'] = false;
+          engine.keys['ArrowLeft']  = true;
+        }
+      } else {
+        engine.keys['ArrowLeft'] = false;
+      }
+    } else if (key === 'right') {
+      if (down) {
+        if (st === 'charselect') { engine.selChar = (engine.selChar + 1) % 3; engine.sync(); }
+        else {
+          engine.keys['ArrowLeft']  = false;
+          engine.keys['ArrowRight'] = true;
+        }
+      } else {
+        engine.keys['ArrowRight'] = false;
+      }
+    }
   }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);
 
   // ── SHARED BASE STYLE ───────────────────────
@@ -377,20 +423,29 @@ export default function PizzaGame() {
   );
 
   // ── MOBILE CONTROLS ──────────────────────────
+  // DirBtn uses Pointer Events + setPointerCapture so pointerup ALWAYS fires
+  // on the originating element even if the finger slides off — no stuck keys.
   const DirBtn = ({ label, k }) => (
     <button
       style={{ ...base,
         fontSize: '1.5rem', background: GLD, color: GRN,
         borderRadius: 8, boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
-        width: 86, height: 86,
+        width: 86, height: 86, touchAction: 'none',
       }}
-      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
-      onTouchEnd={e => { e.preventDefault(); mb(k, false); }}
-      onTouchCancel={e => { e.preventDefault(); mb(k, false); }}
+      onPointerDown={e => {
+        e.preventDefault();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        mb(k, true);
+      }}
+      onPointerUp={e => {
+        e.preventDefault();
+        mb(k, false);
+      }}
+      onPointerCancel={e => {
+        e.preventDefault();
+        mb(k, false);
+      }}
       onContextMenu={e => e.preventDefault()}
-      onMouseDown={() => mb(k, true)}
-      onMouseUp={() => mb(k, false)}
-      onMouseLeave={() => mb(k, false)}
     >{label}</button>
   );
 
@@ -400,12 +455,12 @@ export default function PizzaGame() {
         fontSize: '0.72rem', background: bg || '#e74c3c', color: '#fff',
         borderRadius: '50%', boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
         whiteSpace: 'pre-line', textAlign: 'center', lineHeight: 1.4,
-        width: size, height: size,
+        width: size, height: size, touchAction: 'none',
       }}
-      onTouchStart={e => { e.preventDefault(); mb(k, true); }}
-      onTouchEnd={e => e.preventDefault()}
+      onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
+      onPointerUp={e => e.preventDefault()}
+      onPointerCancel={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
-      onMouseDown={() => mb(k, true)}
     >{label}</button>
   );
 
@@ -418,11 +473,11 @@ export default function PizzaGame() {
         border: `2px solid ${active ? (activeColor || '#e67e22') : '#2e3e2e'}`,
         borderRadius: 20, padding: '9px 16px',
         boxShadow: '0 3px 0 rgba(0,0,0,0.45)',
+        touchAction: 'none',
       }}
-      onTouchStart={e => { e.preventDefault(); onPress(); }}
-      onTouchEnd={e => e.preventDefault()}
+      onPointerDown={e => { e.preventDefault(); onPress(); }}
+      onPointerUp={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
-      onMouseDown={onPress}
     >{label}</button>
   );
 
@@ -456,12 +511,11 @@ export default function PizzaGame() {
           <button
             style={{ ...base, fontSize: '0.48rem', background: '#252525', color: '#ccc',
               border: '2px solid #4a4a4a', borderRadius: 20, padding: '10px 22px',
-              boxShadow: '0 4px 0 rgba(0,0,0,0.5)',
+              boxShadow: '0 4px 0 rgba(0,0,0,0.5)', touchAction: 'none',
             }}
-            onTouchStart={e => { e.preventDefault(); mb('start', true); }}
-            onTouchEnd={e => e.preventDefault()}
+            onPointerDown={e => { e.preventDefault(); mb('start', true); }}
+            onPointerUp={e => e.preventDefault()}
             onContextMenu={e => e.preventDefault()}
-            onMouseDown={() => mb('start', true)}
           >START</button>
         </div>
 
