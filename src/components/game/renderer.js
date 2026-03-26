@@ -186,10 +186,20 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = CREAM; ctx.font = '7px "Press Start 2P"';
   ctx.fillText(`LVL ${engine.lvlIdx+1} · ${lvl.name} · ${lvl.subtitle}`, W/2, 40);
 
-  ctx.textAlign = 'right'; ctx.font = '13px serif';
-  let hearts = '';
-  for (let i = 0; i < 3; i++) hearts += i < lives ? '❤' : '🖤';
-  ctx.fillText(hearts, W-10, 24);
+  // pixel hearts — red when alive, dark when spent
+  for (let i = 0; i < 3; i++) {
+    const hx = W - 14 - (2 - i) * 18;
+    const hy = 20;
+    const s = 2;
+    ctx.fillStyle = i < lives ? '#e74c3c' : '#2a2a2a';
+    ctx.fillRect(hx+s,   hy,     s, s); ctx.fillRect(hx+2*s, hy,     s, s); // top bumps
+    ctx.fillRect(hx+4*s, hy,     s, s); ctx.fillRect(hx+5*s, hy,     s, s);
+    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+s,   s, s);         // row 1
+    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+2*s, s, s);         // row 2
+    for (let j = 1; j < 6; j++) ctx.fillRect(hx+j*s, hy+3*s, s, s);         // row 3
+    for (let j = 2; j < 5; j++) ctx.fillRect(hx+j*s, hy+4*s, s, s);         // row 4
+    ctx.fillRect(hx+3*s, hy+5*s, s, s);                                      // tip
+  }
 
   // pizza counter or boss HP
   if (!engine.boss) {
@@ -260,7 +270,9 @@ function drawCharSelect(ctx, frame, selChar) {
     ctx.fillStyle=sel?'rgba(226,168,32,0.12)':'rgba(0,0,0,0.5)'; ctx.fillRect(cx,cy,cW,cH);
     ctx.strokeStyle=sel?GLD:'rgba(226,168,32,0.2)'; ctx.lineWidth=sel?4:2; ctx.strokeRect(cx,cy,cW,cH);
     if(sel){ctx.shadowBlur=14;ctx.shadowColor=GLD;ctx.strokeRect(cx,cy,cW,cH);ctx.shadowBlur=0;}
-    drawCharPreview(ctx, i, cx+cW/2, cy+cH*0.50, 3);
+    ctx.save(); ctx.beginPath(); ctx.rect(cx+3,cy+3,cW-6,cH-6); ctx.clip();
+    drawCharPreview(ctx, i, cx+cW/2, cy+cH*0.44, 3);
+    ctx.restore();
     ctx.fillStyle=sel?GLD:CREAM; ctx.font=`${sel?'13':'11'}px "Press Start 2P"`; ctx.textAlign='center';
     ctx.fillText(ch.name, cx+cW/2, cy+cH-55);
     ctx.fillStyle='rgba(226,168,32,0.6)'; ctx.font='8px "Press Start 2P"';

@@ -77,7 +77,8 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
 // ── CHAR SELECT PREVIEW (scaled up) ───────────
 export function drawCharPreview(ctx, idx, cx, cy, scale) {
   ctx.save();
-  ctx.translate(cx - 11*scale, cy - 18*scale);
+  // local character bounds: x [-5,29] center=12, y [-18,30] center=6
+  ctx.translate(cx - 12*scale, cy - 6*scale);
   ctx.scale(scale, scale);
   const px=0, py=0;
 
