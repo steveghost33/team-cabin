@@ -1,0 +1,414 @@
+// ─────────────────────────────────────────────
+//  game/GameEngine.js
+//  Core game logic — state machine, physics,
+//  spawning, collision. No React, no canvas
+//  drawing. Returns draw-ready state each frame.
+// ─────────────────────────────────────────────
+import {
+  W, H, GROUND, PW, PH,
+  GRAVITY, JUMP_POWER, MOVE_SPEED,
+  MAX_HP, HP_REGEN, MAX_LIVES, PIZZA_TO_BOSS,
+  GLD
+} from './constants.js';
+import { LEVELS } from './constants.js';
+
+export class GameEngine {
+  constructor(onSync) {
+    this.onSync = onSync;    // callback to update React state
+    this.reset();
+  }
+
+  reset() {
+    this.gState = 'title';
+    this.sc = 0;
+    this.lives = MAX_LIVES;
+    this.pc = 0;               // pizza count
+    this.lvlIdx = 0;           // current level index
+    this.frame = 0;
+    this.scrollX = 0;
+    this.spT = 0;              // spawn timer
+    this.piT = 0;              // pizza timer
+    this.hpT = 0;              // heart timer
+    this.highSc = 0;
+    this.obs = [];
+    this.pizzas = [];
+    this.hearts = [];
+    this.parts = [];
+    this.blds = [];
+    this.boss = null;
+    this.bossDeadTimer = 0;
+    this.nextLvlTimer = 0;
+    this.keys = {};
+    this.charIdx = 0;
+    this.selChar = 0;
+    this.jumpPressed = false;
+    this.eid = 0;
+
+    this.pl = {
+      x: 80, y: GROUND - PH,
+      vx: 0, vy: 0,
+      og: true,          // on ground
+      face: 1,
+      inv: 0,            // invincibility frames
+      hp: MAX_HP,
+      dying: false,
+      dyingTimer: 0,
+    };
+  }
+
+  get lvl() { return LEVELS[this.lvlIdx]; }
+
+  sync() {
+    this.onSync({
+      state: this.gState,
+      score: this.sc,
+      lives: this.lives,
+      pizza: this.pc,
+      hp: this.pl.hp,
+      maxHp: MAX_HP,
+      level: this.lvlIdx + 1,
+      levelName: this.lvl.name,
+      highScore: this.highSc,
+      boss: this.boss ? { hp: this.boss.hp, maxHp: this.boss.maxHp, label: this.boss.label } : null,
+      pizzaTarget: PIZZA_TO_BOSS,
+    });
+  }
+
+  startGame() {
+    this.sc = 0; this.lives = MAX_LIVES; this.lvlIdx = 0; this.pc = 0;
+    this.charIdx = this.selChar;
+    this._resetLevel();
+    this.gState = 'playing';
+    this.sync();
+  }
+
+  respawn() {
+    this.pl.hp = MAX_HP;
+    this.pl.x = 80; this.pl.y = GROUND - PH;
+    this.pl.vx = 0; this.pl.vy = 0;
+    this.pl.og = true; this.pl.inv = 180;
+    this.pl.dying = false; this.pl.dyingTimer = 0;
+    this.charIdx = this.selChar;
+    this.gState = 'playing';
+    this.sync();
+  }
+
+  _resetLevel() {
+    const pl = this.pl;
+    pl.x = 80; pl.y = GROUND - PH;
+    pl.vx = 0; pl.vy = 0;
+    pl.og = true; pl.inv = 60; pl.hp = MAX_HP;
+    pl.dying = false; pl.dyingTimer = 0;
+    this.obs = []; this.pizzas = []; this.hearts = [];
+    this.parts = []; this.blds = [];
+    this.boss = null;
+    this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
+    for (let i = 0; i < 26; i++) this.blds.push(this._mkBld(i * 165 + 200));
+  }
+
+  _mkBld(x) {
+    const lvl = this.lvl;
+    const cols = lvl.buildingCols;
+    return {
+      x, w: 50 + Math.random() * 90,
+      h: 70 + Math.random() * 165,
+      color: cols[Math.floor(Math.random() * cols.length)],
+      wc: Math.floor(Math.random() * 4) + 2,
+      wr: Math.floor(Math.random() * 3) + 2,
+    };
+  }
+
+  jump() {
+    const pl = this.pl;
+    if (pl.og && !pl.dying) { pl.vy = JUMP_POWER; pl.og = false; }
+  }
+
+  _spawnEnemy() {
+    if (this.boss) return;
+    const lvl = this.lvl;
+    const types = lvl.enemyTypes;
+    const type = types[Math.floor(Math.random() * types.length)];
+    const geo = {
+      cone: { w: 18, h: 26 }, metermaid: { w: 22, h: 38 },
+      muscledude: { w: 28, h: 40 }, rat: { w: 20, h: 16 }, biker: { w: 26, h: 40 },
+    }[type];
+    const speed = lvl.enemySpeed + Math.random() * 0.8;
+    this.obs.push({
+      id: this.eid++, type,
+      x: this.scrollX + W + 80,
+      y: GROUND - geo.h, w: geo.w, h: geo.h,
+      vx: -(speed), at: 0,
+      dead: false, deadTimer: 0,
+      hp: type === 'muscledude' || type === 'biker' ? 2 : 1,
+    });
+  }
+
+  _spawnPizza() {
+    if (this.boss) return;
+    const fly = Math.random() < 0.38;
+    this.pizzas.push({
+      x: this.scrollX + W + 80,
+      y: fly ? GROUND - PH - 48 - Math.random() * 55 : GROUND - PH - 4,
+      bob: Math.random() * Math.PI * 2,
+      collected: false,
+    });
+  }
+
+  _spawnHeart() {
+    if (this.boss) return;
+    this.hearts.push({
+      x: this.scrollX + W + 90,
+      y: GROUND - PH - 6,
+      bob: Math.random() * Math.PI * 2,
+      collected: false,
+    });
+  }
+
+  _triggerBoss() {
+    this.obs = []; this.pizzas = []; this.hearts = [];
+    const bossDefs = {
+      landlord: { w: 60, h: 82, maxHp: 200, label: 'LANDLORD', speed: 1.8 },
+      ratking:  { w: 62, h: 92, maxHp: 280, label: 'RAT KING', speed: 2.2 },
+      recordexec: { w: 60, h: 82, maxHp: 340, label: 'RECORD EXEC', speed: 2.8 },
+    };
+    const def = bossDefs[this.lvl.boss];
+    this.boss = {
+      type: this.lvl.boss, ...def,
+      x: this.scrollX + W + 80, y: GROUND - def.h,
+      vx: -def.speed, hp: def.maxHp,
+      inv: 0, hitFlash: 0,
+      dead: false,
+    };
+    this.sync();
+  }
+
+  _addParts(x, y, col, n) {
+    for (let i = 0; i < n; i++) this.parts.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 7,
+      vy: (Math.random() - 0.5) * 7 - 2,
+      life: 50 + Math.random() * 20, ml: 70,
+      col, sz: 3 + Math.random() * 4,
+    });
+  }
+
+  tick() {
+    this.frame++;
+    const { pl, lvl } = this;
+
+    if (this.gState !== 'playing') return;
+
+    // ── DYING animation ───────────────────────
+    if (pl.dying) {
+      pl.vy += GRAVITY * 0.6;
+      pl.y += pl.vy;
+      pl.dyingTimer--;
+      if (pl.dyingTimer <= 0) {
+        this.lives--;
+        if (this.lives <= 0) {
+          if (this.sc > this.highSc) this.highSc = this.sc;
+          this.gState = 'gameover';
+          this.sync();
+        } else {
+          this.respawn();
+        }
+      }
+      return;
+    }
+
+    // ── MOVEMENT ──────────────────────────────
+    if (this.keys['ArrowLeft']) { pl.vx = -MOVE_SPEED; pl.face = -1; }
+    else if (this.keys['ArrowRight']) { pl.vx = MOVE_SPEED; pl.face = 1; }
+    else pl.vx *= 0.5;
+
+    if ((this.keys['ArrowUp'] || this.keys['Space'] || this.keys['KeyW']) && !this.jumpPressed) {
+      this.jumpPressed = true;
+      this.jump();
+    }
+    if (!this.keys['ArrowUp'] && !this.keys['Space'] && !this.keys['KeyW']) {
+      this.jumpPressed = false;
+    }
+
+    pl.vy += GRAVITY;
+    pl.x += pl.vx;
+    pl.y += pl.vy;
+    if (pl.y + PH >= GROUND) { pl.y = GROUND - PH; pl.vy = 0; pl.og = true; } else pl.og = false;
+    if (pl.x < 10) pl.x = 10;
+    if (pl.x > W - PW - 10) pl.x = W - PW - 10;
+    if (pl.inv > 0) pl.inv--;
+
+    // scroll camera
+    if (pl.x > W * 0.42) { const d = pl.x - W * 0.42; this.scrollX += d; pl.x = W * 0.42; }
+
+    // ── SPAWNING ──────────────────────────────
+    if (!this.boss) {
+      this.spT++;
+      if (this.spT >= lvl.spawnRate) { this._spawnEnemy(); this.spT = 0; }
+      this.piT++;
+      if (this.piT >= lvl.pizzaRate) { this._spawnPizza(); this.piT = 0; }
+      this.hpT++;
+      if (this.hpT >= lvl.heartRate) { this._spawnHeart(); this.hpT = 0; }
+    }
+
+    if (this.pc >= PIZZA_TO_BOSS && !this.boss) this._triggerBoss();
+
+    // ── BOSS LOGIC ────────────────────────────
+    if (this.boss && !this.boss.dead) {
+      const b = this.boss;
+      b.x += b.vx;
+      if (b.inv > 0) b.inv--;
+      if (b.hitFlash > 0) b.hitFlash--;
+      const bOx = b.x - this.scrollX;
+
+      // bounce
+      if (bOx < 60) b.vx = Math.abs(b.vx);
+      if (bOx > W - b.w - 60) b.vx = -Math.abs(b.vx);
+
+      // stomp boss
+      const pb = pl.y + PH;
+      const overlapX = pl.x + PW > bOx && pl.x < bOx + b.w;
+      const stomping = pl.vy > 0 && pb >= b.y && pb <= b.y + 18 && overlapX;
+
+      if (stomping && b.inv === 0) {
+        b.hp -= 40; b.inv = 50; b.hitFlash = 20; pl.vy = -12;
+        this.sc += 500;
+        this._addParts(bOx + b.w/2, b.y, GLD, 18);
+        if (b.hp <= 0) { b.dead = true; this.bossDeadTimer = 120; this.sc += 2000; }
+        this.sync();
+      } else if (pl.inv === 0 && overlapX && pl.y < b.y + b.h && pl.y + PH > b.y && !stomping) {
+        pl.hp -= 18;
+        pl.inv = 80;
+        this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 10);
+        if (pl.hp <= 0) this._die();
+        this.sync();
+      }
+    }
+
+    if (this.boss && this.boss.dead) {
+      this.bossDeadTimer--;
+      if (this.bossDeadTimer <= 0) {
+        if (this.lvlIdx < LEVELS.length - 1) {
+          this.lvlIdx++;
+          this._resetLevel();
+          this.gState = 'levelup';
+          this.nextLvlTimer = 180;
+          this.sync();
+        } else {
+          if (this.sc > this.highSc) this.highSc = this.sc;
+          this.gState = 'win';
+          this.sync();
+        }
+      }
+    }
+
+    // level up timer
+    if (this.gState === 'levelup') {
+      this.nextLvlTimer--;
+      if (this.nextLvlTimer <= 0) { this.gState = 'playing'; this.sync(); }
+    }
+
+    // ── ENEMIES ───────────────────────────────
+    this.obs = this.obs.filter(o => {
+      const ox = o.x - this.scrollX;
+      if (ox < -120) return false;
+      if (o.dead) { o.deadTimer--; return o.deadTimer > 0; }
+      o.x += o.vx;
+      o.at++;
+
+      // stomp
+      if (!pl.og && pl.vy > 0) {
+        const pb = pl.y + PH;
+        if (ox + o.w > pl.x && ox < pl.x + PW && pb >= o.y && pb <= o.y + 16) {
+          o.hp--;
+          if (o.hp <= 0) {
+            o.dead = true; o.deadTimer = 30;
+            this.sc += 200;
+            this._addParts(ox + o.w/2, o.y, GLD, 10);
+            this.sync();
+          }
+          pl.vy = -10;
+          return true;
+        }
+      }
+      // hurt player
+      if (pl.inv === 0 && ox + o.w > pl.x && ox < pl.x + PW && o.y + o.h > pl.y && o.y < pl.y + PH) {
+        pl.hp -= 12;
+        pl.inv = 70;
+        this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 8);
+        if (pl.hp <= 0) this._die();
+        this.sync();
+      }
+      return true;
+    });
+
+    // ── PIZZAS ────────────────────────────────
+    this.pizzas = this.pizzas.filter(pz => {
+      if (pz.collected) return false;
+      const ox = pz.x - this.scrollX;
+      if (ox < -80) return false;
+      const oy = pz.y + Math.sin(this.frame * 0.08 + pz.bob) * 5;
+      if (pl.x < ox + 28 && pl.x + PW > ox && pl.y < oy + 28 && pl.y + PH > oy) {
+        pz.collected = true;
+        this.sc += 100; this.pc++;
+        this._addParts(ox + 14, pz.y, GLD, 12);
+        this.sync();
+        return false;
+      }
+      return true;
+    });
+
+    // ── HEARTS ────────────────────────────────
+    this.hearts = this.hearts.filter(h => {
+      if (h.collected) return false;
+      const ox = h.x - this.scrollX;
+      if (ox < -60) return false;
+      const oy = h.y + Math.sin(this.frame * 0.1 + h.bob) * 4;
+      if (pl.x < ox + 16 && pl.x + PW > ox && pl.y < oy + 16 && pl.y + PH > oy) {
+        h.collected = true;
+        pl.hp = Math.min(MAX_HP, pl.hp + HP_REGEN);
+        this._addParts(ox + 8, h.y, '#e74c3c', 8);
+        this.sync();
+        return false;
+      }
+      return true;
+    });
+
+    // ── PARTICLES ─────────────────────────────
+    this.parts = this.parts.filter(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--;
+      return p.life > 0;
+    });
+
+    // ── BUILDINGS ─────────────────────────────
+    if (!this.blds.length || this.blds[this.blds.length-1].x - this.scrollX < W + 300) {
+      this.blds.push(this._mkBld((this.blds[this.blds.length-1]?.x || 200) + 100 + Math.random() * 120));
+    }
+    this.blds = this.blds.filter(b => b.x - this.scrollX > -300);
+  }
+
+  _die() {
+    const pl = this.pl;
+    pl.dying = true;
+    pl.dyingTimer = 80;
+    pl.vy = JUMP_POWER * 0.7;
+  }
+
+  handleKey(code, down) {
+    this.keys[code] = down;
+    if (!down) return;
+    if (code === 'Space' && this.gState === 'playing') { this.jump(); return; }
+    if (this.gState === 'charselect') {
+      if (code === 'ArrowLeft') { this.selChar = (this.selChar + 2) % 3; this.sync(); }
+      if (code === 'ArrowRight') { this.selChar = (this.selChar + 1) % 3; this.sync(); }
+    }
+    if (code === 'Enter') {
+      if (this.gState === 'title') { this.gState = 'charselect'; this.sync(); }
+      else if (this.gState === 'charselect') { this.charIdx = this.selChar; this.startGame(); }
+      else if (this.gState === 'gameover') { this.startGame(); }
+      else if (this.gState === 'dead') {
+        if (this.lives > 0) this.respawn(); else { this.gState = 'charselect'; this.sync(); }
+      }
+      else if (this.gState === 'win') { this.gState = 'charselect'; this.sync(); }
+    }
+  }
+}
