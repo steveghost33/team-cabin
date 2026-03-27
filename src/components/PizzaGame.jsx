@@ -142,17 +142,17 @@ export default function PizzaGame() {
     }
     requestAnimationFrame(loop);
 
-    // ── GLOBAL DIRECTION-KEY SAFETY NET ──────────
-    // If a touch is cancelled by the OS (notification, gesture, etc.) the
-    // per-button handlers might never fire.  We clear BOTH direction keys on
-    // ANY global touchend / pointerup so the player can never get permanently stuck.
+    // ── DIRECTION-KEY SAFETY NET ──────────────────
+    // Only fires on touchcancel (OS interrupt — notification, call, etc.).
+    // We do NOT hook pointerup/touchend globally because those fire for the
+    // JUMP button too, which would wipe ArrowRight mid-air.
+    // setPointerCapture on each DirBtn already guarantees pointerup reaches
+    // the correct button element, so no global pointerup hook is needed.
     const clearDirKeys = () => {
       engine.keys['ArrowLeft']  = false;
       engine.keys['ArrowRight'] = false;
     };
-    window.addEventListener('touchend',    clearDirKeys, { passive: true });
     window.addEventListener('touchcancel', clearDirKeys, { passive: true });
-    window.addEventListener('pointerup',   clearDirKeys, { passive: true });
 
     // stop music when tab is hidden, resume when tab returns
     const onVisibility = () => {
@@ -182,9 +182,7 @@ export default function PizzaGame() {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
-      window.removeEventListener('touchend',    clearDirKeys);
       window.removeEventListener('touchcancel', clearDirKeys);
-      window.removeEventListener('pointerup',   clearDirKeys);
       document.removeEventListener('visibilitychange', onVisibility);
       observer.disconnect();
       music.pause();
