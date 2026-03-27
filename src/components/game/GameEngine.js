@@ -192,13 +192,17 @@ export class GameEngine {
     });
   }
 
-  tick() {
-    this.frame++;
+  // dt = elapsed ms / 16.667  (1.0 at 60 Hz, 0.5 at 120 Hz, 2.0 at 30 Hz)
+  // Every per-frame accumulation is multiplied by dt so physics are identical
+  // at any display refresh rate.  Instantaneous resets (jump impulse, etc.)
+  // are NOT multiplied — they are velocity assignments, not accumulations.
+  tick(dt = 1) {
+    this.frame += dt;
     const { pl, lvl } = this;
 
     // ── LEVEL UP TIMER ────────────────────────
     if (this.gState === 'levelup') {
-      this.nextLvlTimer--;
+      this.nextLvlTimer -= dt;
       if (this.nextLvlTimer <= 0) { this.gState = 'playing'; this.sync(); }
       return;
     }
@@ -207,9 +211,9 @@ export class GameEngine {
 
     // ── DYING animation ───────────────────────
     if (pl.dying) {
-      pl.vy += GRAVITY * 0.6;
-      pl.y += pl.vy;
-      pl.dyingTimer--;
+      pl.vy += GRAVITY * 0.6 * dt;
+      pl.y  += pl.vy * dt;
+      pl.dyingTimer -= dt;
       if (pl.dyingTimer <= 0) {
         this.lives--;
         if (this.lives <= 0) {
@@ -224,9 +228,15 @@ export class GameEngine {
     }
 
     // ── MOVEMENT ──────────────────────────────
-    if (this.keys['ArrowLeft']) { pl.vx = -MOVE_SPEED; pl.face = -1; }
-    else if (this.keys['ArrowRight']) { pl.vx = MOVE_SPEED; pl.face = 1; }
-    else pl.vx *= 0.5;
+    // vx is a target velocity, not an accumulation → no dt on the assignment.
+    // Position update below DOES use dt.
+    if (this.keys['ArrowLeft'])       { pl.vx = -MOVE_SPEED; pl.face = -1; }
+    else if (this.keys['ArrowRight']) { pl.vx =  MOVE_SPEED; pl.face =  1; }
+    else {
+      // frame-rate-independent friction: same result at any hz
+      pl.vx *= Math.pow(0.5, dt);
+      if (Math.abs(pl.vx) < 0.05) pl.vx = 0;
+    }
 
     if ((this.keys['ArrowUp'] || this.keys['Space'] || this.keys['KeyW']) && !this.jumpPressed) {
       this.jumpPressed = true;
@@ -236,24 +246,25 @@ export class GameEngine {
       this.jumpPressed = false;
     }
 
-    pl.vy += GRAVITY;
-    pl.x += pl.vx;
-    pl.y += pl.vy;
+    pl.vy += GRAVITY * dt;
+    pl.x  += pl.vx  * dt;
+    pl.y  += pl.vy  * dt;
+
     if (pl.y + PH >= GROUND) { pl.y = GROUND - PH; pl.vy = 0; pl.og = true; } else pl.og = false;
-    if (pl.x < 10) pl.x = 10;
+    if (pl.x < 10)           pl.x = 10;
     if (pl.x > W - PW - 10) pl.x = W - PW - 10;
-    if (pl.inv > 0) pl.inv--;
+    pl.inv = Math.max(0, pl.inv - dt);
 
     // scroll camera
     if (pl.x > W * 0.42) { const d = pl.x - W * 0.42; this.scrollX += d; pl.x = W * 0.42; }
 
     // ── SPAWNING ──────────────────────────────
     if (!this.boss) {
-      this.spT++;
+      this.spT += dt;
       if (this.spT >= lvl.spawnRate) { this._spawnEnemy(); this.spT = 0; }
-      this.piT++;
+      this.piT += dt;
       if (this.piT >= lvl.pizzaRate) { this._spawnPizza(); this.piT = 0; }
-      this.hpT++;
+      this.hpT += dt;
       if (this.hpT >= lvl.heartRate) { this._spawnHeart(); this.hpT = 0; }
     }
 
@@ -262,13 +273,13 @@ export class GameEngine {
     // ── BOSS LOGIC ────────────────────────────
     if (this.boss && !this.boss.dead) {
       const b = this.boss;
-      b.x += b.vx;
-      if (b.inv > 0) b.inv--;
-      if (b.hitFlash > 0) b.hitFlash--;
+      b.x += b.vx * dt;
+      b.inv     = Math.max(0, b.inv     - dt);
+      b.hitFlash = Math.max(0, b.hitFlash - dt);
       const bOx = b.x - this.scrollX;
 
       // bounce — keep boss away from screen edges so player isn't cornered
-      if (bOx < 140) b.vx = Math.abs(b.vx);
+      if (bOx < 140)          b.vx =  Math.abs(b.vx);
       if (bOx > W - b.w - 140) b.vx = -Math.abs(b.vx);
 
       // stomp boss
@@ -276,13 +287,15 @@ export class GameEngine {
       const overlapX = pl.x + PW > bOx && pl.x < bOx + b.w;
       const stomping = pl.vy > 0 && pb >= b.y && pb <= b.y + 18 && overlapX;
 
-      if (stomping && b.inv === 0) {
-        b.hp -= 40; b.inv = 50; b.hitFlash = 20; pl.vy = -12; pl.vx = 0;
+      if (stomping && b.inv <= 0) {
+        b.hp -= 40; b.inv = 50; b.hitFlash = 20;
+        pl.vy = -12;            // impulse — no dt
+        pl.vx = 0;
         this.sc += 500;
         this._addParts(bOx + b.w/2, b.y, GLD, 18);
         if (b.hp <= 0) { b.dead = true; this.bossDeadTimer = 120; this.sc += 2000; }
         this.sync();
-      } else if (pl.inv === 0 && overlapX && pl.y < b.y + b.h && pl.y + PH > b.y && !stomping) {
+      } else if (pl.inv <= 0 && overlapX && pl.y < b.y + b.h && pl.y + PH > b.y && !stomping) {
         pl.hp -= 18;
         pl.inv = 80;
         this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 10);
@@ -292,7 +305,7 @@ export class GameEngine {
     }
 
     if (this.boss && this.boss.dead) {
-      this.bossDeadTimer--;
+      this.bossDeadTimer -= dt;
       if (this.bossDeadTimer <= 0) {
         if (this.lvlIdx < LEVELS.length - 1) {
           this.lvlIdx++;
@@ -312,9 +325,9 @@ export class GameEngine {
     this.obs = this.obs.filter(o => {
       const ox = o.x - this.scrollX;
       if (ox < -120) return false;
-      if (o.dead) { o.deadTimer--; return o.deadTimer > 0; }
-      o.x += o.vx;
-      o.at++;
+      if (o.dead) { o.deadTimer -= dt; return o.deadTimer > 0; }
+      o.x  += o.vx * dt;
+      o.at += dt;
 
       // stomp
       if (!pl.og && pl.vy > 0) {
@@ -327,12 +340,12 @@ export class GameEngine {
             this._addParts(ox + o.w/2, o.y, GLD, 10);
             this.sync();
           }
-          pl.vy = -10; pl.vx = 0;
+          pl.vy = -10; pl.vx = 0;  // impulse — no dt
           return true;
         }
       }
       // hurt player
-      if (pl.inv === 0 && ox + o.w > pl.x && ox < pl.x + PW && o.y + o.h > pl.y && o.y < pl.y + PH) {
+      if (pl.inv <= 0 && ox + o.w > pl.x && ox < pl.x + PW && o.y + o.h > pl.y && o.y < pl.y + PH) {
         pl.hp -= 12;
         pl.inv = 70;
         this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 8);
@@ -376,7 +389,10 @@ export class GameEngine {
 
     // ── PARTICLES ─────────────────────────────
     this.parts = this.parts.filter(p => {
-      p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--;
+      p.x    += p.vx  * dt;
+      p.y    += p.vy  * dt;
+      p.vy   += 0.2   * dt;
+      p.life -= dt;
       return p.life > 0;
     });
 

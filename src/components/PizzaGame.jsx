@@ -103,27 +103,25 @@ export default function PizzaGame() {
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
 
-    // ── FIXED-TIMESTEP GAME LOOP ─────────────────
-    // Always ticks at 60 fps worth of physics regardless of display refresh rate.
-    // This keeps mobile (30 Hz screens) and desktop (60/120 Hz) at the same speed.
-    const TICK_MS = 1000 / 60;
-    let accumulator = 0;
+    // ── DELTA-TIME GAME LOOP ──────────────────────
+    // One physics tick per animation frame, scaled by dt so motion is
+    // identical at 30 Hz, 60 Hz, 90 Hz, 120 Hz — perfectly smooth everywhere.
+    //   dt = 1.0  → 60 fps (baseline)
+    //   dt = 0.5  → 120 fps  (half step, twice as often)
+    //   dt = 2.0  → 30 fps   (double step, half as often)
+    const TARGET_MS = 1000 / 60;
     let lastTime = 0;
 
     function loop(now) {
       if (lastTime === 0) lastTime = now;
-      const raw = now - lastTime;
+      // cap at ~4 frames so a tab-switch doesn't launch the player off-screen
+      const elapsed = Math.min(now - lastTime, TARGET_MS * 4);
       lastTime = now;
-      // cap delta so a tab-switch pause doesn't cause a massive catch-up burst
-      const delta = Math.min(raw, 100);
+      const dt = elapsed / TARGET_MS;
 
       if (!pausedRef.current) {
-        accumulator += delta;
-        while (accumulator >= TICK_MS) {
-          engine.tick();
-          frameRef.current++;
-          accumulator -= TICK_MS;
-        }
+        engine.tick(dt);
+        frameRef.current += dt;
       }
 
       renderFrame(ctx, engine, frameRef.current);
