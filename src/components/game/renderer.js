@@ -24,6 +24,9 @@ export function renderFrame(ctx, engine, frame) {
   // ── SKY ──────────────────────────────────────
   drawSky(ctx, lvl, frame, scrollX);
 
+  // ── YPSILANTI WATER TOWER (far background) ───
+  if (engine.lvlIdx === 0) drawWaterTower(ctx, scrollX);
+
   // ── BUILDINGS ────────────────────────────────
   engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
@@ -235,30 +238,145 @@ function drawHUD(ctx, engine, lvl) {
 }
 
 // ── GROVE STUDIOS ──────────────────────────────
+// ── YPSILANTI WATER TOWER ──────────────────────
+// Pixel-art version of the Ypsilanti Water Tower: limestone cylinder +
+// wide mushroom dome cap.  Drawn in the far background with parallax.
+function drawWaterTower(ctx, scrollX) {
+  const bx = Math.round(310 - scrollX * 0.38);
+  if (bx < -120 || bx > W + 80) return;
+  const by = GROUND;
+
+  const S1 = '#cfc090'; // light limestone
+  const S2 = '#a8986a'; // dark limestone / mortar
+  const DM = '#686868'; // dome gray
+  const DK = '#404040'; // dome shadow
+
+  // ── cylinder body ──────────────────────────
+  // solid fill then pixel mortar grid
+  ctx.fillStyle = S1;
+  ctx.fillRect(bx - 18, by - 106, 36, 106);
+
+  // horizontal mortar lines
+  ctx.fillStyle = S2;
+  for (let y = 0; y <= 106; y += 8) ctx.fillRect(bx - 18, by - 106 + y, 36, 1);
+  // staggered vertical mortar
+  for (let row = 0; row < 14; row++) {
+    const xOff = (row % 2) * 11;
+    for (let x = xOff; x < 36; x += 22) ctx.fillRect(bx - 18 + x, by - 106 + row * 8, 1, 8);
+  }
+  // subtle side shading
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillRect(bx + 10, by - 106, 8, 106);
+
+  // small arched windows on the cylinder
+  ctx.fillStyle = DK;
+  ctx.fillRect(bx - 5, by - 72, 10, 8);
+  ctx.fillRect(bx - 4, by - 75, 8, 3);   // arch top
+  ctx.fillRect(bx - 5, by - 42, 10, 8);
+  ctx.fillRect(bx - 4, by - 45, 8, 3);
+
+  // ── mushroom dome cap ───────────────────────
+  // Stacked pixel rows — widest at base, narrowing to peak
+  const rows = [
+    [34, 8], [30, 8], [26, 8], [22, 8], [18, 7], [14, 6], [10, 5], [6, 4], [4, 3],
+  ];
+  let ry = by - 106;
+  for (const [rw, rh] of rows) {
+    ctx.fillStyle = DM;
+    ctx.fillRect(bx - rw / 2, ry - rh, rw, rh);
+    // right-side shadow stripe
+    ctx.fillStyle = DK;
+    ctx.fillRect(bx + rw / 2 - 4, ry - rh, 4, rh);
+    ry -= rh;
+  }
+  // cap tip + antenna
+  ctx.fillStyle = DK; ctx.fillRect(bx - 2, ry - 2, 4, 2);
+  ctx.fillStyle = '#aaa'; ctx.fillRect(bx - 1, ry - 10, 2, 10);
+
+  // ── base grass mound ────────────────────────
+  ctx.fillStyle = 'rgba(50,110,30,0.45)';
+  ctx.fillRect(bx - 30, by - 5, 60, 5);
+}
+
+// ── GROVE STUDIOS ──────────────────────────────
+// Pixel-art version of the real building: dark charcoal upper wall,
+// bright green lower wall, red roof trim, glass-block windows, dark door.
 function drawGroveStudios(ctx) {
-  const bx = W/2 - 70, by = GROUND;
-  // building body
-  ctx.fillStyle = '#6B3A2A'; ctx.fillRect(bx, by-100, 140, 100);
-  ctx.fillStyle = '#8B4513'; ctx.fillRect(bx+4, by-96, 132, 92);
-  // roof parapet
-  ctx.fillStyle = '#4a2010'; ctx.fillRect(bx-6, by-103, 152, 8);
-  // windows — warm yellow glow
-  ctx.fillStyle = '#FFD700';
-  [[10,20],[38,20],[66,20],[94,20],[10,50],[66,50],[94,50]].forEach(([wx,wy]) => {
-    ctx.fillRect(bx+wx, by-100+wy, 18, 14);
-    ctx.fillStyle = 'rgba(255,220,80,0.3)'; ctx.fillRect(bx+wx-1, by-100+wy-1, 20, 16);
-    ctx.fillStyle = '#FFD700';
+  const bw = 220, bh = 82;
+  const bx = W / 2 - bw / 2, by = GROUND;
+  const splitY = 30; // height of green lower band
+
+  // ── roof trim (dark red) ─────────────────────
+  ctx.fillStyle = '#6e1510';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 6);
+
+  // ── upper wall — dark charcoal/navy ──────────
+  ctx.fillStyle = '#252d3a';
+  ctx.fillRect(bx, by - bh, bw, bh - splitY);
+  // slight texture — horizontal lines
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let y = 4; y < bh - splitY; y += 8) ctx.fillRect(bx, by - bh + y, bw, 1);
+
+  // ── lower wall — bright green ─────────────────
+  ctx.fillStyle = '#1f8c28';
+  ctx.fillRect(bx, by - splitY, bw, splitY);
+  // subtle horizontal block lines on green
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  for (let y = 8; y < splitY; y += 8) ctx.fillRect(bx, by - splitY + y, bw, 1);
+
+  // ── door (left side, dark gray metal) ────────
+  ctx.fillStyle = '#373c44';
+  ctx.fillRect(bx + 16, by - splitY - 2, 24, splitY + 2);
+  // door panel inset
+  ctx.fillStyle = '#2a2e36';
+  ctx.fillRect(bx + 18, by - splitY, 8, 14);
+  ctx.fillRect(bx + 18, by - splitY + 16, 8, 10);
+  // small glass window in door
+  ctx.fillStyle = 'rgba(180,220,255,0.25)';
+  ctx.fillRect(bx + 18, by - splitY, 8, 8);
+  // handle
+  ctx.fillStyle = '#8a8a8a';
+  ctx.fillRect(bx + 37, by - 18, 2, 6);
+
+  // ── glass-block windows (3, right side) ──────
+  [82, 126, 170].forEach(wx => {
+    const wy = by - bh + 10;
+    const ww = 32, wh = 26;
+    // frame
+    ctx.fillStyle = '#181e28';
+    ctx.fillRect(bx + wx, wy, ww, wh);
+    // 2×2 glass blocks
+    const blocks = [[1,1],[17,1],[1,14],[17,14]];
+    blocks.forEach(([bkx, bky]) => {
+      ctx.fillStyle = 'rgba(200,230,255,0.18)';
+      ctx.fillRect(bx + wx + bkx, wy + bky, 14, 12);
+      // highlight corner
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillRect(bx + wx + bkx, wy + bky, 14, 2);
+      ctx.fillRect(bx + wx + bkx, wy + bky, 2, 12);
+    });
+    // grid dividers
+    ctx.fillStyle = '#181e28';
+    ctx.fillRect(bx + wx + 15, wy + 1, 2, wh - 2);
+    ctx.fillRect(bx + wx + 1, wy + 13, ww - 2, 2);
   });
-  // door
-  ctx.fillStyle = '#2a1008'; ctx.fillRect(bx+57, by-30, 26, 30);
-  ctx.fillStyle = '#3a1a08'; ctx.fillRect(bx+59, by-28, 10, 26);
-  // sign
-  ctx.fillStyle = '#111'; ctx.fillRect(bx+8, by-75, 124, 18);
-  ctx.shadowBlur = 10; ctx.shadowColor = GLD;
-  ctx.strokeStyle = GLD; ctx.lineWidth = 1; ctx.strokeRect(bx+8, by-75, 124, 18);
-  ctx.fillStyle = GLD; ctx.font = 'bold 9px "Press Start 2P"'; ctx.textAlign = 'center';
-  ctx.fillText('GROVE STUDIOS', W/2, by-62);
+
+  // ── sign board (upper left) ───────────────────
+  ctx.fillStyle = '#080c0a';
+  ctx.fillRect(bx + 6, by - bh + 6, 68, 22);
+  // green glow border
+  ctx.shadowBlur = 8; ctx.shadowColor = '#22dd22';
+  ctx.strokeStyle = '#22aa22'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx + 6, by - bh + 6, 68, 22);
   ctx.shadowBlur = 0;
+  // "GROVE" text in green
+  ctx.fillStyle = '#22dd22';
+  ctx.font = 'bold 8px "Press Start 2P"'; ctx.textAlign = 'left';
+  ctx.fillText('GROVE', bx + 12, by - bh + 20);
+  // "STUDIOS" smaller below
+  ctx.fillStyle = '#189918';
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('STUDIOS', bx + 12, by - bh + 25);
 }
 
 // ── OVERLAY SCREENS ────────────────────────────
