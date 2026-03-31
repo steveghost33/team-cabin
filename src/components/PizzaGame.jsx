@@ -193,7 +193,7 @@ export default function PizzaGame() {
   useEffect(() => {
     const music = musicRef.current;
     if (!music) return;
-    if (['gameover', 'win', 'title', 'charselect', 'initials', 'levelintro'].includes(gameState.state)) {
+    if (['gameover', 'win', 'title', 'charselect', 'initials'].includes(gameState.state)) {
       music.pause();
       music.currentTime = 0;
       pausedRef.current = false;
