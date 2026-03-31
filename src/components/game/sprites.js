@@ -11,10 +11,16 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
   ctx.save();
   if (face === -1) { ctx.translate(px + PW, 0); ctx.scale(-1, 1); ctx.translate(-px, 0); }
 
+  // walk cycle — legs alternate when moving on ground, freeze when airborne
+  const isMoving = Math.abs(pl.vx) > 0.1 && pl.og;
+  const walkOsc  = isMoving ? Math.sin(frame * 0.28) : 0;
+  const lL = Math.round(walkOsc * 3);   // left leg offset  (-3 … +3)
+  const lR = -lL;                        // right leg offset (opposite)
+
   if (charIdx === 0) {
     // STEVE — plaid flannel
-    ctx.fillStyle = '#111'; ctx.fillRect(px, py+26, 8, 4); ctx.fillRect(px+13, py+26, 8, 4);
-    ctx.fillStyle = '#1c1c2c'; ctx.fillRect(px+1, py+16, 7, 11); ctx.fillRect(px+13, py+16, 7, 11);
+    ctx.fillStyle = '#111'; ctx.fillRect(px, py+26+lL, 8, 4); ctx.fillRect(px+13, py+26+lR, 8, 4);
+    ctx.fillStyle = '#1c1c2c'; ctx.fillRect(px+1, py+16+lL, 7, 11); ctx.fillRect(px+13, py+16+lR, 7, 11);
     ctx.fillStyle = '#848688'; ctx.fillRect(px-1, py+5, PW+2, 12);
     ctx.fillStyle = 'rgba(70,72,74,0.5)';
     [px+3,px+9,px+15].forEach(x=>ctx.fillRect(x,py+5,2,12));
@@ -33,9 +39,9 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
   } else if (charIdx === 1) {
     // MIKE — plain grey hoodie, dark gray shoes, mustard hat
     // dark gray shoes — both same
-    ctx.fillStyle = '#3a3a3a'; ctx.fillRect(px,py+26,8,4); ctx.fillRect(px+13,py+26,8,4);
+    ctx.fillStyle = '#3a3a3a'; ctx.fillRect(px,py+26+lL,8,4); ctx.fillRect(px+13,py+26+lR,8,4);
     // maroon pants
-    ctx.fillStyle = '#7B2D3A'; ctx.fillRect(px+1,py+16,7,11); ctx.fillRect(px+13,py+16,7,11);
+    ctx.fillStyle = '#7B2D3A'; ctx.fillRect(px+1,py+16+lL,7,11); ctx.fillRect(px+13,py+16+lR,7,11);
     // plain grey hoodie — NO logo
     ctx.fillStyle = '#9a9a9a'; ctx.fillRect(px-1,py+5,PW+2,12);
     ctx.fillStyle = '#888'; ctx.fillRect(px+3,py+12,16,4); // pocket only
@@ -57,8 +63,8 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
 
   } else {
     // KYLE — green zip fleece, short hair, glasses
-    ctx.fillStyle = '#5D4037'; ctx.fillRect(px,py+26,8,4); ctx.fillRect(px+13,py+26,8,4);
-    ctx.fillStyle = '#283040'; ctx.fillRect(px+1,py+16,7,11); ctx.fillRect(px+13,py+16,7,11);
+    ctx.fillStyle = '#5D4037'; ctx.fillRect(px,py+26+lL,8,4); ctx.fillRect(px+13,py+26+lR,8,4);
+    ctx.fillStyle = '#283040'; ctx.fillRect(px+1,py+16+lL,7,11); ctx.fillRect(px+13,py+16+lR,7,11);
     ctx.fillStyle = '#3D5A2A'; ctx.fillRect(px-1,py+5,PW+2,12);
     ctx.fillStyle = '#2D4A1E'; ctx.fillRect(px+10,py+5,2,12); ctx.fillRect(px+7,py+4,8,3);
     ctx.fillStyle = '#3D5A2A'; ctx.fillRect(px-5,py+5,5,12); ctx.fillRect(px+PW,py+5,5,12);

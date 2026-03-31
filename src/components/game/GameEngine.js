@@ -43,6 +43,8 @@ export class GameEngine {
     this.selChar = 0;
     this.jumpPressed = false;
     this.eid = 0;
+    this.initials = ['A', 'A', 'A'];
+    this.initialsPos = 0;
 
     this.pl = {
       x: 80, y: GROUND - PH,
@@ -71,6 +73,8 @@ export class GameEngine {
       highScore: this.highSc,
       boss: this.boss ? { hp: this.boss.hp, maxHp: this.boss.maxHp, label: this.boss.label } : null,
       pizzaTarget: PIZZA_TO_BOSS,
+      initials: this.initials.join(''),
+      initialsPos: this.initialsPos,
     });
   }
 
@@ -289,8 +293,7 @@ export class GameEngine {
 
       if (stomping && b.inv <= 0) {
         b.hp -= 40; b.inv = 50; b.hitFlash = 20;
-        pl.vy = -12;            // impulse — no dt
-        pl.vx = 0;
+        pl.vy = -12;            // impulse — no dt, keep horizontal momentum
         this.sc += 500;
         this._addParts(bOx + b.w/2, b.y, GLD, 18);
         if (b.hp <= 0) { b.dead = true; this.bossDeadTimer = 120; this.sc += 2000; }
@@ -329,10 +332,11 @@ export class GameEngine {
       o.x  += o.vx * dt;
       o.at += dt;
 
-      // stomp
+      // stomp — use half enemy height as window so taller enemies in later levels register correctly
       if (!pl.og && pl.vy > 0) {
         const pb = pl.y + PH;
-        if (ox + o.w > pl.x && ox < pl.x + PW && pb >= o.y && pb <= o.y + 16) {
+        const stompZone = o.y + Math.max(16, o.h * 0.52);
+        if (ox + o.w > pl.x && ox < pl.x + PW && pb >= o.y && pb <= stompZone) {
           if (o.type === 'cone') {
             // cones are indestructible — bounce player back and deal damage
             if (pl.inv <= 0) {
@@ -342,7 +346,7 @@ export class GameEngine {
               if (pl.hp <= 0) this._die();
               this.sync();
             }
-            pl.vy = -8;   // bounce off
+            pl.vy = -8;   // bounce off, keep horizontal momentum
             return true;
           }
           o.hp--;
@@ -352,7 +356,7 @@ export class GameEngine {
             this._addParts(ox + o.w/2, o.y, GLD, 10);
             this.sync();
           }
-          pl.vy = -10; pl.vx = 0;  // impulse — no dt
+          pl.vy = -10;  // bounce impulse only — keep horizontal momentum
           return true;
         }
       }
@@ -426,14 +430,39 @@ export class GameEngine {
     this.keys[code] = down;
     if (!down) return;
     if (code === 'Space' && this.gState === 'playing') { this.jump(); return; }
+
+    // ── INITIALS ENTRY ────────────────────────────
+    if (this.gState === 'initials') {
+      const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      if (code === 'ArrowLeft' || code === 'ArrowUp') {
+        const cur = CHARS.indexOf(this.initials[this.initialsPos]);
+        this.initials[this.initialsPos] = CHARS[(cur - 1 + CHARS.length) % CHARS.length];
+        this.sync();
+      } else if (code === 'ArrowRight' || code === 'ArrowDown') {
+        const cur = CHARS.indexOf(this.initials[this.initialsPos]);
+        this.initials[this.initialsPos] = CHARS[(cur + 1) % CHARS.length];
+        this.sync();
+      } else if (code === 'Enter' || code === 'Space') {
+        if (this.initialsPos < 2) {
+          this.initialsPos++;
+          this.sync();
+        } else {
+          this.initialsPos = 0;
+          this.gState = 'charselect';
+          this.sync();
+        }
+      }
+      return;
+    }
+
     if (this.gState === 'charselect') {
       if (code === 'ArrowLeft') { this.selChar = (this.selChar + 2) % 3; this.sync(); }
       if (code === 'ArrowRight') { this.selChar = (this.selChar + 1) % 3; this.sync(); }
     }
     if (code === 'Enter') {
-      if (this.gState === 'title') { this.gState = 'charselect'; this.sync(); }
+      if (this.gState === 'title') { this.gState = 'initials'; this.sync(); }
       else if (this.gState === 'charselect') { this.charIdx = this.selChar; this.startGame(); }
-      else if (this.gState === 'gameover') { this.startGame(); }
+      else if (this.gState === 'gameover') { this.gState = 'charselect'; this.sync(); }
       else if (this.gState === 'dead') {
         if (this.lives > 0) this.respawn(); else { this.gState = 'charselect'; this.sync(); }
       }

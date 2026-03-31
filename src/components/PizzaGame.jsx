@@ -193,7 +193,7 @@ export default function PizzaGame() {
   useEffect(() => {
     const music = musicRef.current;
     if (!music) return;
-    if (['gameover', 'win', 'title', 'charselect'].includes(gameState.state)) {
+    if (['gameover', 'win', 'title', 'charselect', 'initials'].includes(gameState.state)) {
       music.pause();
       music.currentTime = 0;
       pausedRef.current = false;
@@ -256,31 +256,35 @@ export default function PizzaGame() {
 
     if (key === 'jump') {
       if (down && st === 'playing') engine.jump();
+      else if (down && st === 'initials') engine.handleKey('Enter', true);
     } else if (key === 'start') {
-      if (st === 'title')           { engine.gState = 'charselect'; engine.sync(); }
+      if (st === 'title')           { engine.gState = 'initials'; engine.sync(); }
+      else if (st === 'initials')   engine.handleKey('Enter', true);
       else if (st === 'charselect') { engine.charIdx = engine.selChar; engine.startGame(); }
-      else if (st === 'gameover')   engine.startGame();
+      else if (st === 'gameover')   { engine.gState = 'charselect'; engine.sync(); }
       else if (st === 'win')        { engine.gState = 'charselect'; engine.sync(); }
     } else if (key === 'left') {
       if (down) {
         if (st === 'charselect') { engine.selChar = (engine.selChar + 2) % 3; engine.sync(); }
+        else if (st === 'initials') engine.handleKey('ArrowLeft', true);
         else {
           // always clear the opposite key first — prevents both-stuck scenario
           engine.keys['ArrowRight'] = false;
           engine.keys['ArrowLeft']  = true;
         }
       } else {
-        engine.keys['ArrowLeft'] = false;
+        if (st !== 'initials') engine.keys['ArrowLeft'] = false;
       }
     } else if (key === 'right') {
       if (down) {
         if (st === 'charselect') { engine.selChar = (engine.selChar + 1) % 3; engine.sync(); }
+        else if (st === 'initials') engine.handleKey('ArrowRight', true);
         else {
           engine.keys['ArrowLeft']  = false;
           engine.keys['ArrowRight'] = true;
         }
       } else {
-        engine.keys['ArrowRight'] = false;
+        if (st !== 'initials') engine.keys['ArrowRight'] = false;
       }
     }
   }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);

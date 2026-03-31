@@ -10,10 +10,11 @@ import { drawPlayer, drawEnemy, drawPizza, drawHeart, drawBoss, drawCharPreview 
 export function renderFrame(ctx, engine, frame) {
   const gs = engine.gState;
 
-  if (gs === 'title')     { drawTitle(ctx, frame, engine.highSc); return; }
+  if (gs === 'title')     { drawTitle(ctx, frame, engine.highSc, engine.initials.join('')); return; }
+  if (gs === 'initials')  { drawInitials(ctx, frame, engine); return; }
   if (gs === 'charselect'){ drawCharSelect(ctx, frame, engine.selChar); return; }
   if (gs === 'gameover')  { drawGameOver(ctx, frame, engine.sc, engine.highSc); return; }
-  if (gs === 'win')       { drawWin(ctx, frame, engine.sc, engine.highSc); return; }
+  if (gs === 'win')       { drawWin(ctx, frame, engine.sc, engine.highSc, engine.initials.join('')); return; }
   if (gs === 'levelup')   { drawLevelUp(ctx, frame, engine.lvlIdx, engine.lvl); return; }
 
   const lvl = engine.lvl;
@@ -260,7 +261,64 @@ function drawGroveStudios(ctx) {
 }
 
 // ── OVERLAY SCREENS ────────────────────────────
-function drawTitle(ctx, frame, highSc) {
+function drawInitials(ctx, frame, engine) {
+  const { initials, initialsPos } = engine;
+  ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
+  for (let i=0;i<40;i++) {
+    const sx=(i*131+frame*0.3)%W, sy=(i*71)%(H*0.55);
+    ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(226,168,32,0.08)';
+    ctx.fillRect(sx,sy,2,2);
+  }
+  ctx.fillStyle='rgba(0,0,0,0.86)'; ctx.fillRect(W/2-260,H/2-160,520,320);
+  ctx.strokeStyle=GLD; ctx.lineWidth=3; ctx.strokeRect(W/2-260,H/2-160,520,320);
+
+  ctx.fillStyle=GLD; ctx.font='13px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('ENTER YOUR INITIALS',W/2,H/2-108);
+  ctx.fillStyle='rgba(245,240,220,0.45)'; ctx.font='6px "Press Start 2P"';
+  ctx.fillText('← → CHANGE LETTER   ENTER / A = CONFIRM',W/2,H/2-82);
+
+  // 3 letter slots
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  for (let i = 0; i < 3; i++) {
+    const cx = W/2 - 80 + i * 80;
+    const cy = H/2 - 18;
+    const active = i === initialsPos;
+
+    // box
+    ctx.fillStyle = active ? 'rgba(226,168,32,0.14)' : 'rgba(0,0,0,0.45)';
+    ctx.fillRect(cx-26, cy-46, 52, 68);
+    ctx.lineWidth = active ? 3 : 1;
+    ctx.strokeStyle = active ? GLD : 'rgba(226,168,32,0.25)';
+    if (active) { ctx.shadowBlur=14; ctx.shadowColor=GLD; }
+    ctx.strokeRect(cx-26, cy-46, 52, 68);
+    ctx.shadowBlur=0;
+
+    // show prev/next letters dimmed for context
+    const curIdx = CHARS.indexOf(initials[i]);
+    ctx.fillStyle='rgba(226,168,32,0.22)'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
+    if (active) {
+      ctx.fillText(CHARS[(curIdx-1+CHARS.length)%CHARS.length], cx, cy-28);
+      ctx.fillText(CHARS[(curIdx+1)%CHARS.length], cx, cy+38);
+    }
+
+    // current letter
+    ctx.fillStyle = active ? GLD : CREAM;
+    ctx.font = active ? '28px "Press Start 2P"' : '24px "Press Start 2P"';
+    ctx.fillText(initials[i], cx, cy+10);
+
+    // blinking underline cursor on active
+    if (active && Math.floor(frame/18)%2===0) {
+      ctx.fillStyle=GLD; ctx.fillRect(cx-16, cy+16, 32, 3);
+    }
+  }
+
+  if (Math.floor(frame/25)%2===0) {
+    ctx.fillStyle='#4A7A30'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
+    ctx.fillText(initialsPos < 2 ? '[ CONFIRM LETTER → NEXT ]' : '[ PRESS ENTER TO CONTINUE ]', W/2, H/2+100);
+  }
+}
+
+function drawTitle(ctx, frame, highSc, playerName) {
   ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
   // star field
   for (let i=0;i<40;i++) {
@@ -288,7 +346,7 @@ function drawTitle(ctx, frame, highSc) {
     ctx.fillStyle='#4A7A30'; ctx.font='11px "Press Start 2P"';
     ctx.fillText('[ PRESS ENTER OR START ]',W/2,H/2+65);
   }
-  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.55)';ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc,W/2,H/2+95);}
+  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.55)';ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+95);}
 }
 
 function drawCharSelect(ctx, frame, selChar) {
@@ -345,7 +403,7 @@ function drawGameOver(ctx, frame, sc, highSc) {
   if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('PRESS ENTER TO TRY AGAIN',W/2,H/2+55);}
 }
 
-function drawWin(ctx, frame, sc, highSc) {
+function drawWin(ctx, frame, sc, highSc, playerName) {
   ctx.fillStyle=GRN; ctx.fillRect(0,0,W,H);
   for(let i=0;i<28;i++){ctx.fillStyle=[GLD,'#e74c3c','#F5F0DC','#4A7A30'][i%4];ctx.fillRect((i*137+frame*2.5)%W,(i*89+frame*1.5)%(H-60),8,8);}
   ctx.fillStyle='rgba(0,0,0,0.85)'; ctx.fillRect(W/2-265,H/2-148,530,296);
@@ -356,6 +414,6 @@ function drawWin(ctx, frame, sc, highSc) {
   ctx.fillText('ALL 3 BOSSES DEFEATED',W/2,H/2-78);
   ctx.fillText('THE BAND FEASTS TONIGHT',W/2,H/2-50);
   ctx.fillText('SCORE: '+sc,W/2,H/2-18);
-  if(sc>0&&sc>=highSc){ctx.fillStyle=GLD;ctx.fillText('✨ NEW HIGH SCORE! ✨',W/2,H/2+18);}
+  if(sc>0&&sc>=highSc){ctx.fillStyle=GLD;ctx.fillText('✨ NEW HIGH SCORE'+(playerName?' · '+playerName:'')+'! ✨',W/2,H/2+18);}
   if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('PRESS ENTER TO PLAY AGAIN',W/2,H/2+62);}
 }
