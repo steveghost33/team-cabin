@@ -210,7 +210,12 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ox+8,oy,3,3); ctx.fillRect(ox+13,oy,3,3);
 
   } else if (o.type === 'rat') {
-    // tail
+    // flip horizontally so rat faces left (toward player)
+    ctx.save();
+    ctx.translate(ox + o.w, 0);
+    ctx.scale(-1, 1);
+    ctx.translate(-ox, 0);
+    // tail (now trails behind on the right)
     ctx.strokeStyle = '#a07050'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(ox,oy+8); ctx.quadraticCurveTo(ox-10,oy+12,ox-14,oy+8); ctx.stroke();
     // body
@@ -231,6 +236,7 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     // legs
     ctx.fillStyle = '#555';
     ctx.fillRect(ox+3,oy+12+walk,4,4); ctx.fillRect(ox+10,oy+12-walk,4,4);
+    ctx.restore();
 
   } else if (o.type === 'biker') {
     // legs

@@ -38,6 +38,11 @@ export function renderFrame(ctx, engine, frame) {
   // ── BOSS ─────────────────────────────────────
   if (engine.boss) drawBoss(ctx, engine.boss, scrollX, frame);
 
+  // ── GROVE STUDIOS (level 1 boss defeated) ───
+  if (engine.lvlIdx === 0 && engine.boss && engine.boss.dead) {
+    drawGroveStudios(ctx);
+  }
+
   // ── PARTICLES ────────────────────────────────
   engine.parts.forEach(p => {
     ctx.globalAlpha = p.life / p.ml;
@@ -227,6 +232,33 @@ function drawHUD(ctx, engine, lvl) {
   }
 }
 
+// ── GROVE STUDIOS ──────────────────────────────
+function drawGroveStudios(ctx) {
+  const bx = W/2 - 70, by = GROUND;
+  // building body
+  ctx.fillStyle = '#6B3A2A'; ctx.fillRect(bx, by-100, 140, 100);
+  ctx.fillStyle = '#8B4513'; ctx.fillRect(bx+4, by-96, 132, 92);
+  // roof parapet
+  ctx.fillStyle = '#4a2010'; ctx.fillRect(bx-6, by-103, 152, 8);
+  // windows — warm yellow glow
+  ctx.fillStyle = '#FFD700';
+  [[10,20],[38,20],[66,20],[94,20],[10,50],[66,50],[94,50]].forEach(([wx,wy]) => {
+    ctx.fillRect(bx+wx, by-100+wy, 18, 14);
+    ctx.fillStyle = 'rgba(255,220,80,0.3)'; ctx.fillRect(bx+wx-1, by-100+wy-1, 20, 16);
+    ctx.fillStyle = '#FFD700';
+  });
+  // door
+  ctx.fillStyle = '#2a1008'; ctx.fillRect(bx+57, by-30, 26, 30);
+  ctx.fillStyle = '#3a1a08'; ctx.fillRect(bx+59, by-28, 10, 26);
+  // sign
+  ctx.fillStyle = '#111'; ctx.fillRect(bx+8, by-75, 124, 18);
+  ctx.shadowBlur = 10; ctx.shadowColor = GLD;
+  ctx.strokeStyle = GLD; ctx.lineWidth = 1; ctx.strokeRect(bx+8, by-75, 124, 18);
+  ctx.fillStyle = GLD; ctx.font = 'bold 9px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('GROVE STUDIOS', W/2, by-62);
+  ctx.shadowBlur = 0;
+}
+
 // ── OVERLAY SCREENS ────────────────────────────
 function drawTitle(ctx, frame, highSc) {
   ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
@@ -290,34 +322,6 @@ function drawLevelUp(ctx, frame, lvlIdx, lvl) {
   const bg = ctx.createLinearGradient(0,0,0,H);
   bg.addColorStop(0,lvl.skyTop); bg.addColorStop(1,lvl.skyBot);
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-
-  // Grove Studios building — shown when completing level 1 (Ypsilanti)
-  if (lvlIdx === 1) {
-    const bx = W/2-70, by = H-80;
-    // building body
-    ctx.fillStyle='#6B3A2A'; ctx.fillRect(bx,by-100,140,100);
-    ctx.fillStyle='#8B4513'; ctx.fillRect(bx+4,by-96,132,92);
-    // roof
-    ctx.fillStyle='#4a2010'; ctx.fillRect(bx-6,by-103,152,8);
-    // windows — lit warm yellow
-    ctx.fillStyle='#FFD700';
-    [[10,20],[38,20],[66,20],[94,20],[10,50],[66,50],[94,50]].forEach(([wx,wy])=>{
-      ctx.fillRect(bx+wx,by-100+wy,18,14);
-      ctx.fillStyle='rgba(255,220,80,0.3)'; ctx.fillRect(bx+wx-1,by-100+wy-1,20,16);
-      ctx.fillStyle='#FFD700';
-    });
-    // door
-    ctx.fillStyle='#2a1008'; ctx.fillRect(bx+57,by-30,26,30);
-    ctx.fillStyle='#3a1a08'; ctx.fillRect(bx+59,by-28,10,26);
-    // sign
-    ctx.fillStyle='#111'; ctx.fillRect(bx+8,by-75,124,18);
-    ctx.fillStyle=GLD; ctx.font='bold 9px "Press Start 2P"'; ctx.textAlign='center';
-    ctx.fillText('GROVE STUDIOS',W/2,by-62);
-    // neon glow under sign
-    ctx.shadowBlur=10; ctx.shadowColor=GLD;
-    ctx.strokeStyle=GLD; ctx.lineWidth=1; ctx.strokeRect(bx+8,by-75,124,18);
-    ctx.shadowBlur=0;
-  }
 
   // overlay box
   ctx.fillStyle='rgba(0,0,0,0.84)'; ctx.fillRect(W/2-230,H/2-110,460,200);
