@@ -421,30 +421,80 @@ export default function PizzaGame() {
   // ── MOBILE CONTROLS ──────────────────────────
   // Console-style button helpers — all use setPointerCapture for reliable release.
 
-  // D-pad directional segment (dark graphite, rectangular with clipped corners)
-  const DirBtn = ({ label, k }) => (
-    <button
-      style={{
-        ...base,
-        fontSize: '1.4rem',
-        color: 'rgba(255,255,255,0.85)',
-        width: 78, height: 78,
-        touchAction: 'none',
-        borderRadius: 14,
-        background: 'radial-gradient(ellipse at 40% 30%, #3a3d50, #1c1e2a)',
-        boxShadow: [
-          '0 6px 0 #0a0b10',
-          '0 8px 14px rgba(0,0,0,0.7)',
-          'inset 0 1px 0 rgba(255,255,255,0.12)',
-          'inset 0 -1px 0 rgba(0,0,0,0.4)',
-        ].join(', '),
-        border: '1.5px solid #2a2d3c',
-      }}
-      onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
-      onPointerUp={e => { e.preventDefault(); mb(k, false); }}
-      onPointerCancel={e => { e.preventDefault(); mb(k, false); }}
-      onContextMenu={e => e.preventDefault()}
-    >{label}</button>
+  // D-pad: a proper controller cross shape.
+  // The left arm and right arm are separate touch targets inside a shared cross layout.
+  const dpadArm = {
+    ...base,
+    touchAction: 'none',
+    background: 'linear-gradient(180deg, #2e3148 0%, #1c1e2c 100%)',
+    border: '1.5px solid #3a3d54',
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: '1.6rem',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+  };
+
+  // horizontal arms (left / right) — wide rectangles
+  const dpadH = { ...dpadArm, width: 72, height: 48, borderRadius: 10 };
+
+  const DPad = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, touchAction: 'none' }}>
+      {/* main row: LEFT  ·  center nub  ·  RIGHT */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+
+        {/* LEFT arm */}
+        <button
+          style={{
+            ...dpadH,
+            borderRadius: '10px 4px 4px 10px',
+            boxShadow: '0 5px 0 #0b0c14, inset 0 1px 0 rgba(255,255,255,0.1)',
+            justifyContent: 'flex-start',
+            paddingLeft: 14,
+          }}
+          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb('left', true); }}
+          onPointerUp={e => { e.preventDefault(); mb('left', false); }}
+          onPointerCancel={e => { e.preventDefault(); mb('left', false); }}
+          onContextMenu={e => e.preventDefault()}
+        >
+          {/* bold SVG triangle arrow */}
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <polygon points="18,11 6,3 6,19" fill="rgba(255,255,255,0.85)" />
+            <polygon points="18,11 6,3 6,19" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+          </svg>
+        </button>
+
+        {/* center nub */}
+        <div style={{
+          width: 28, height: 28,
+          background: 'radial-gradient(circle, #252838, #181a26)',
+          border: '1.5px solid #3a3d54',
+          borderRadius: 4,
+          flexShrink: 0,
+          zIndex: 1,
+        }} />
+
+        {/* RIGHT arm */}
+        <button
+          style={{
+            ...dpadH,
+            borderRadius: '4px 10px 10px 4px',
+            boxShadow: '0 5px 0 #0b0c14, inset 0 1px 0 rgba(255,255,255,0.1)',
+            justifyContent: 'flex-end',
+            paddingRight: 14,
+          }}
+          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb('right', true); }}
+          onPointerUp={e => { e.preventDefault(); mb('right', false); }}
+          onPointerCancel={e => { e.preventDefault(); mb('right', false); }}
+          onContextMenu={e => e.preventDefault()}
+        >
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <polygon points="4,11 16,3 16,19" fill="rgba(255,255,255,0.85)" />
+          </svg>
+        </button>
+
+      </div>
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.25rem', color: 'rgba(255,255,255,0.18)', marginTop: 5, letterSpacing: 2 }}>MOVE</span>
+    </div>
   );
 
   // Large round action button — convex dome like a console face button
@@ -551,14 +601,8 @@ export default function PizzaGame() {
       {/* Main control row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
 
-        {/* Left — d-pad style directional pair */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <DirBtn label="◀" k="left" />
-            <DirBtn label="▶" k="right" />
-          </div>
-          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.28rem', color: 'rgba(255,255,255,0.2)', letterSpacing: 2 }}>MOVE</span>
-        </div>
+        {/* Left — proper d-pad cross */}
+        <DPad />
 
         {/* Center — START */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
