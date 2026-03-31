@@ -75,7 +75,7 @@ export const LEVELS = [
     name: 'DETROIT',
     subtitle: 'Downtown · 2:00 AM',
     mission: "RID THE RATS, SAVE THE CITY",
-    introQuip: "The rats have a king now. His name is Gerald. He's angry.",
+    introQuip: "The Rat King has claimed every pizzeria in Detroit. Not on your watch.",
     skyTop: '#050d03',
     skyBot: '#112009',
     groundTop: '#0c0c0c',
