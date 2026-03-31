@@ -419,57 +419,83 @@ export default function PizzaGame() {
   );
 
   // ── MOBILE CONTROLS ──────────────────────────
-  // DirBtn uses Pointer Events + setPointerCapture so pointerup ALWAYS fires
-  // on the originating element even if the finger slides off — no stuck keys.
+  // Console-style button helpers — all use setPointerCapture for reliable release.
+
+  // D-pad directional segment (dark graphite, rectangular with clipped corners)
   const DirBtn = ({ label, k }) => (
     <button
-      style={{ ...base,
-        fontSize: '1.5rem', background: GLD, color: GRN,
-        borderRadius: 8, boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
-        width: 86, height: 86, touchAction: 'none',
+      style={{
+        ...base,
+        fontSize: '1.4rem',
+        color: 'rgba(255,255,255,0.85)',
+        width: 78, height: 78,
+        touchAction: 'none',
+        borderRadius: 14,
+        background: 'radial-gradient(ellipse at 40% 30%, #3a3d50, #1c1e2a)',
+        boxShadow: [
+          '0 6px 0 #0a0b10',
+          '0 8px 14px rgba(0,0,0,0.7)',
+          'inset 0 1px 0 rgba(255,255,255,0.12)',
+          'inset 0 -1px 0 rgba(0,0,0,0.4)',
+        ].join(', '),
+        border: '1.5px solid #2a2d3c',
       }}
-      onPointerDown={e => {
-        e.preventDefault();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        mb(k, true);
-      }}
-      onPointerUp={e => {
-        e.preventDefault();
-        mb(k, false);
-      }}
-      onPointerCancel={e => {
-        e.preventDefault();
-        mb(k, false);
-      }}
+      onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
+      onPointerUp={e => { e.preventDefault(); mb(k, false); }}
+      onPointerCancel={e => { e.preventDefault(); mb(k, false); }}
       onContextMenu={e => e.preventDefault()}
     >{label}</button>
   );
 
-  const ActBtn = ({ label, k, bg, size = 100 }) => (
+  // Large round action button — convex dome like a console face button
+  const ActBtn = ({ label, k, btnColor = '#c0392b', shadowColor = '#7a1010', size = 96 }) => (
     <button
-      style={{ ...base,
-        fontSize: '0.72rem', background: bg || '#e74c3c', color: '#fff',
-        borderRadius: '50%', boxShadow: '0 5px 0 rgba(0,0,0,0.5)',
-        whiteSpace: 'pre-line', textAlign: 'center', lineHeight: 1.4,
-        width: size, height: size, touchAction: 'none',
+      style={{
+        ...base,
+        width: size, height: size,
+        borderRadius: '50%',
+        touchAction: 'none',
+        flexDirection: 'column',
+        gap: 2,
+        color: '#fff',
+        background: `radial-gradient(circle at 38% 32%, ${btnColor}ee, ${shadowColor}cc)`,
+        boxShadow: [
+          `0 7px 0 ${shadowColor}`,
+          '0 10px 18px rgba(0,0,0,0.65)',
+          'inset 0 2px 2px rgba(255,255,255,0.25)',
+          'inset 0 -2px 4px rgba(0,0,0,0.35)',
+        ].join(', '),
+        border: `1.5px solid ${shadowColor}`,
       }}
       onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
       onPointerUp={e => e.preventDefault()}
       onPointerCancel={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
-    >{label}</button>
+    >
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', lineHeight: 1 }}>A</span>
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.38rem', opacity: 0.8, lineHeight: 1 }}>JUMP</span>
+    </button>
   );
 
-  const PillBtn = ({ label, onPress, active, activeColor }) => (
+  // Small oval utility button — like SELECT / MENU on a real controller
+  const UtilBtn = ({ label, onPress, active, activeColor = '#e67e22' }) => (
     <button
-      style={{ ...base,
-        fontSize: '0.44rem',
-        background: active ? (activeColor || '#e67e22') : '#1a271a',
-        color: active ? '#fff' : '#888',
-        border: `2px solid ${active ? (activeColor || '#e67e22') : '#2e3e2e'}`,
-        borderRadius: 20, padding: '9px 16px',
-        boxShadow: '0 3px 0 rgba(0,0,0,0.45)',
+      style={{
+        ...base,
+        fontFamily: '"Press Start 2P"',
+        fontSize: '0.36rem',
+        color: active ? '#fff' : 'rgba(255,255,255,0.5)',
+        height: 28,
+        padding: '0 14px',
+        borderRadius: 14,
         touchAction: 'none',
+        background: active
+          ? `linear-gradient(180deg, ${activeColor}cc, ${activeColor})`
+          : 'linear-gradient(180deg, #2e3145, #1e2235)',
+        boxShadow: active
+          ? `0 3px 0 ${activeColor}88, 0 4px 8px rgba(0,0,0,0.5)`
+          : '0 3px 0 #0d0e18, 0 4px 8px rgba(0,0,0,0.4)',
+        border: `1px solid ${active ? activeColor : '#353850'}`,
       }}
       onPointerDown={e => { e.preventDefault(); onPress(); }}
       onPointerUp={e => e.preventDefault()}
@@ -477,49 +503,73 @@ export default function PizzaGame() {
     >{label}</button>
   );
 
+  // Small oval START button — classic NES/SNES center button style
+  const StartBtn = () => (
+    <button
+      style={{
+        ...base,
+        fontFamily: '"Press Start 2P"',
+        fontSize: '0.4rem',
+        color: 'rgba(255,255,255,0.7)',
+        height: 32,
+        padding: '0 18px',
+        borderRadius: 16,
+        touchAction: 'none',
+        background: 'linear-gradient(180deg, #363a50, #22253a)',
+        boxShadow: [
+          '0 4px 0 #0d0e18',
+          '0 5px 10px rgba(0,0,0,0.55)',
+          'inset 0 1px 0 rgba(255,255,255,0.1)',
+        ].join(', '),
+        border: '1px solid #40435a',
+        letterSpacing: 1,
+      }}
+      onPointerDown={e => { e.preventDefault(); mb('start', true); }}
+      onPointerUp={e => e.preventDefault()}
+      onContextMenu={e => e.preventDefault()}
+    >START</button>
+  );
+
   const MobileControls = () => (
     <div style={{
-      background: GRN,
-      borderTop: `3px solid ${GLD}`,
-      padding: '10px 14px 12px',
-      paddingBottom: 'max(12px, env(safe-area-inset-bottom, 12px))',
-      display: 'flex', flexDirection: 'column', gap: 8,
+      background: 'linear-gradient(180deg, #1a1c28 0%, #13141e 100%)',
+      borderTop: `2px solid #2a2d40`,
+      paddingTop: 10,
+      paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
+      paddingLeft: 16,
+      paddingRight: 16,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 10,
     }}>
-      {/* Utility row */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
-        <PillBtn label={isPaused ? '▶  RESUME' : '⏸  PAUSE'} onPress={handlePause} active={isPaused} activeColor='#e67e22' />
-        <PillBtn label={isMuted ? '🔇  MUTED' : '🔊  MUSIC'} onPress={handleMute} active={isMuted} activeColor='#555' />
+      {/* Utility row — small, centered, like controller menu buttons */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+        <UtilBtn label={isPaused ? '▶ RESUME' : '⏸ PAUSE'} onPress={handlePause} active={isPaused} activeColor='#e67e22' />
+        <UtilBtn label={isMuted  ? '🔇 MUTED' : '🔊 MUSIC'} onPress={handleMute}  active={isMuted}  activeColor='#555566' />
       </div>
 
-      {/* Controls row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/* D-pad */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
+      {/* Main control row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+
+        {/* Left — d-pad style directional pair */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+          <div style={{ display: 'flex', gap: 6 }}>
             <DirBtn label="◀" k="left" />
             <DirBtn label="▶" k="right" />
           </div>
-          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: 'rgba(226,168,32,0.5)' }}>MOVE</span>
+          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.28rem', color: 'rgba(255,255,255,0.2)', letterSpacing: 2 }}>MOVE</span>
         </div>
 
-        {/* START */}
+        {/* Center — START */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <button
-            style={{ ...base, fontSize: '0.48rem', background: '#252525', color: '#ccc',
-              border: '2px solid #4a4a4a', borderRadius: 20, padding: '10px 22px',
-              boxShadow: '0 4px 0 rgba(0,0,0,0.5)', touchAction: 'none',
-            }}
-            onPointerDown={e => { e.preventDefault(); mb('start', true); }}
-            onPointerUp={e => e.preventDefault()}
-            onContextMenu={e => e.preventDefault()}
-          >START</button>
+          <StartBtn />
         </div>
 
-        {/* JUMP */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <ActBtn label={'A\nJUMP'} k="jump" bg="#c0392b" size={100} />
-          <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', color: 'rgba(226,168,32,0.5)' }}>JUMP</span>
+        {/* Right — A (JUMP) face button */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+          <ActBtn k="jump" btnColor='#d63031' shadowColor='#6b0f0f' size={96} />
         </div>
+
       </div>
     </div>
   );
