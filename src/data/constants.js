@@ -58,8 +58,6 @@ export const SOCIAL_LINKS = [
   { label: 'Twitter / X', url: 'https://x.com/weareteamcabin' },
   { label: 'TikTok',    url: 'https://www.tiktok.com/@weareteamcabin' },
   { label: 'YouTube',   url: 'https://youtube.com/@teamcabinmi?si=my2xg-r5hxGNAAsl' },
-  { label: 'Press Kit', url: '#' },
-  { label: 'Mailing List', url: '#' },
 ];
 
 // ── Band Members ──
