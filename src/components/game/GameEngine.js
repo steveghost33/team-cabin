@@ -143,7 +143,7 @@ export class GameEngine {
       y: GROUND - geo.h, w: geo.w, h: geo.h,
       vx: -(speed), at: 0,
       dead: false, deadTimer: 0,
-      hp: type === 'muscledude' || type === 'biker' ? 2 : 1,
+      hp: 1,
     });
   }
 

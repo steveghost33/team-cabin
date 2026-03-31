@@ -314,7 +314,7 @@ function drawInitials(ctx, frame, engine) {
 
   if (Math.floor(frame/25)%2===0) {
     ctx.fillStyle='#4A7A30'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
-    ctx.fillText(initialsPos < 2 ? '[ CONFIRM LETTER → NEXT ]' : '[ PRESS ENTER TO CONTINUE ]', W/2, H/2+100);
+    ctx.fillText(initialsPos < 2 ? '[ CONFIRM LETTER → NEXT ]' : '[ ENTER / START TO CONTINUE ]', W/2, H/2+100);
   }
 }
 
@@ -373,7 +373,7 @@ function drawCharSelect(ctx, frame, selChar) {
     if(sel&&Math.floor(frame/20)%2===0){ctx.fillStyle=GLD;ctx.font='16px serif';ctx.fillText('▼',cx+cW/2,cy-8);}
   });
   ctx.fillStyle=CREAM; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('← → SELECT   ENTER CONFIRM',W/2,H-16);
+  ctx.fillText('← → SELECT   ENTER / START CONFIRM',W/2,H-16);
 }
 
 function drawLevelUp(ctx, frame, lvlIdx, lvl) {
@@ -400,7 +400,7 @@ function drawGameOver(ctx, frame, sc, highSc) {
   ctx.fillStyle=CREAM; ctx.font='12px "Press Start 2P"';
   ctx.fillText('SCORE: '+sc,W/2,H/2-18);
   if(sc>0&&sc>=highSc){ctx.fillStyle=GLD;ctx.fillText('NEW HIGH SCORE!',W/2,H/2+14);}
-  if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('PRESS ENTER TO TRY AGAIN',W/2,H/2+55);}
+  if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('ENTER / START TO TRY AGAIN',W/2,H/2+55);}
 }
 
 function drawWin(ctx, frame, sc, highSc, playerName) {
@@ -415,5 +415,5 @@ function drawWin(ctx, frame, sc, highSc, playerName) {
   ctx.fillText('THE BAND FEASTS TONIGHT',W/2,H/2-50);
   ctx.fillText('SCORE: '+sc,W/2,H/2-18);
   if(sc>0&&sc>=highSc){ctx.fillStyle=GLD;ctx.fillText('✨ NEW HIGH SCORE'+(playerName?' · '+playerName:'')+'! ✨',W/2,H/2+18);}
-  if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('PRESS ENTER TO PLAY AGAIN',W/2,H/2+62);}
+  if(Math.floor(frame/28)%2===0){ctx.fillStyle=GLD;ctx.font='10px "Press Start 2P"';ctx.fillText('ENTER / START TO PLAY AGAIN',W/2,H/2+62);}
 }
