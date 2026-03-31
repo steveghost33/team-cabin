@@ -458,8 +458,7 @@ export default function PizzaGame() {
         >
           {/* bold SVG triangle arrow */}
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <polygon points="18,11 6,3 6,19" fill="rgba(255,255,255,0.85)" />
-            <polygon points="18,11 6,3 6,19" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+            <polygon points="4,11 16,3 16,19" fill="rgba(255,255,255,0.85)" />
           </svg>
         </button>
 
@@ -488,7 +487,7 @@ export default function PizzaGame() {
           onContextMenu={e => e.preventDefault()}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <polygon points="4,11 16,3 16,19" fill="rgba(255,255,255,0.85)" />
+            <polygon points="18,11 6,3 6,19" fill="rgba(255,255,255,0.85)" />
           </svg>
         </button>
 
