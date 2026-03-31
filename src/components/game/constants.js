@@ -63,7 +63,7 @@ export const LEVELS = [
     hasStars: true,
     spawnRate: 75,
     enemySpeed: 2.2,
-    enemyTypes: ['cone','metermaid','muscledude','biker'],
+    enemyTypes: ['cone','metermaid','muscledude','biker','rat'],
     pizzaRate: 68,
     heartRate: 520,
     boss: 'recordexec',
