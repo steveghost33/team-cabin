@@ -77,7 +77,7 @@ export default function Music() {
                   {m.name}
                 </div>
                 <div style={{ fontFamily: '"VT323"', fontSize: '1.3rem', color: C.cream }}>
-                  Listen Now →
+                  {m.label || 'Listen Now →'}
                 </div>
               </div>
             </a>
