@@ -237,63 +237,75 @@ function drawHUD(ctx, engine, lvl) {
   }
 }
 
-// ── GROVE STUDIOS ──────────────────────────────
 // ── YPSILANTI WATER TOWER ──────────────────────
-// Pixel-art version of the Ypsilanti Water Tower: limestone cylinder +
-// wide mushroom dome cap.  Drawn in the far background with parallax.
+// 8-bit Ypsilanti Water Tower: warm brick cylinder + tall rounded bullet
+// dome (dark chocolate brown), decorative collar ring at the junction.
 function drawWaterTower(ctx, scrollX) {
   const bx = Math.round(310 - scrollX * 0.38);
   if (bx < -120 || bx > W + 80) return;
   const by = GROUND;
 
-  const S1 = '#cfc090'; // light limestone
-  const S2 = '#a8986a'; // dark limestone / mortar
-  const DM = '#686868'; // dome gray
-  const DK = '#404040'; // dome shadow
+  const CY1 = '#b86838'; // cylinder light brick
+  const CY2 = '#8a4820'; // cylinder dark / mortar
+  const DM  = '#5e2a0c'; // dome dark chocolate
+  const DML = '#7a3a14'; // dome lighter face
+  const COL = '#3e1c08'; // collar ring
 
-  // ── cylinder body ──────────────────────────
-  // solid fill then pixel mortar grid
-  ctx.fillStyle = S1;
+  // ── cylinder body (brick/terracotta) ─────────
+  ctx.fillStyle = CY1;
   ctx.fillRect(bx - 18, by - 106, 36, 106);
-
-  // horizontal mortar lines
-  ctx.fillStyle = S2;
-  for (let y = 0; y <= 106; y += 8) ctx.fillRect(bx - 18, by - 106 + y, 36, 1);
+  // horizontal brick mortar
+  ctx.fillStyle = CY2;
+  for (let y = 0; y <= 106; y += 9) ctx.fillRect(bx - 18, by - 106 + y, 36, 1);
   // staggered vertical mortar
-  for (let row = 0; row < 14; row++) {
+  for (let row = 0; row < 12; row++) {
     const xOff = (row % 2) * 11;
-    for (let x = xOff; x < 36; x += 22) ctx.fillRect(bx - 18 + x, by - 106 + row * 8, 1, 8);
+    for (let x = xOff; x < 36; x += 22) ctx.fillRect(bx - 18 + x, by - 106 + row * 9, 1, 9);
   }
-  // subtle side shading
-  ctx.fillStyle = 'rgba(0,0,0,0.12)';
-  ctx.fillRect(bx + 10, by - 106, 8, 106);
+  // right-side shading on cylinder
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.fillRect(bx + 9, by - 106, 9, 106);
 
-  // small arched windows on the cylinder
-  ctx.fillStyle = DK;
-  ctx.fillRect(bx - 5, by - 72, 10, 8);
-  ctx.fillRect(bx - 4, by - 75, 8, 3);   // arch top
-  ctx.fillRect(bx - 5, by - 42, 10, 8);
-  ctx.fillRect(bx - 4, by - 45, 8, 3);
+  // small round window (cross inside circle — characteristic detail)
+  ctx.fillStyle = CY2;
+  ctx.fillRect(bx - 6, by - 68, 12, 10);
+  ctx.fillRect(bx - 5, by - 70, 10, 2);   // arch top
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(bx - 4, by - 67, 8, 8);
+  // cross detail inside window
+  ctx.fillStyle = CY2;
+  ctx.fillRect(bx - 1, by - 67, 2, 8);
+  ctx.fillRect(bx - 4, by - 64, 8, 2);
 
-  // ── mushroom dome cap ───────────────────────
-  // Stacked pixel rows — widest at base, narrowing to peak
-  const rows = [
-    [34, 8], [30, 8], [26, 8], [22, 8], [18, 7], [14, 6], [10, 5], [6, 4], [4, 3],
+  // ── decorative collar ring (junction) ────────
+  ctx.fillStyle = COL;
+  ctx.fillRect(bx - 20, by - 110, 40, 5);
+  // rivet-like band detail
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.fillRect(bx - 20, by - 108, 40, 1);
+  ctx.fillRect(bx - 20, by - 106, 40, 1);
+
+  // ── rounded bullet dome ───────────────────────
+  // rows [width, height] from base → tip — bullet/capsule profile:
+  // same width as cylinder at base, curves inward evenly to a rounded top
+  const dRows = [
+    [36, 5], [34, 4], [30, 4], [26, 4], [22, 4],
+    [18, 4], [14, 3], [10, 3], [7,  3], [4,  2], [2, 2],
   ];
-  let ry = by - 106;
-  for (const [rw, rh] of rows) {
+  let dy = by - 110; // start at top of collar
+  for (const [rw, rh] of dRows) {
+    ctx.fillStyle = DML;
+    ctx.fillRect(bx - rw / 2, dy - rh, rw, rh);
+    // right-side shadow for roundness
     ctx.fillStyle = DM;
-    ctx.fillRect(bx - rw / 2, ry - rh, rw, rh);
-    // right-side shadow stripe
-    ctx.fillStyle = DK;
-    ctx.fillRect(bx + rw / 2 - 4, ry - rh, 4, rh);
-    ry -= rh;
+    ctx.fillRect(bx + rw / 2 - Math.max(3, Math.floor(rw * 0.2)), dy - rh,
+                 Math.max(3, Math.floor(rw * 0.2)), rh);
+    dy -= rh;
   }
-  // cap tip + antenna
-  ctx.fillStyle = DK; ctx.fillRect(bx - 2, ry - 2, 4, 2);
-  ctx.fillStyle = '#aaa'; ctx.fillRect(bx - 1, ry - 10, 2, 10);
+  // tiny tip cap
+  ctx.fillStyle = DM; ctx.fillRect(bx - 1, dy - 2, 2, 2);
 
-  // ── base grass mound ────────────────────────
+  // ── base grass mound ─────────────────────────
   ctx.fillStyle = 'rgba(50,110,30,0.45)';
   ctx.fillRect(bx - 30, by - 5, 60, 5);
 }
