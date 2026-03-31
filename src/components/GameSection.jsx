@@ -15,10 +15,10 @@ export default function GameSection() {
           marginBottom: '2rem',
           lineHeight: 1.5,
         }}>
-          Guide the guys through <strong style={{ color: C.gold }}>3 Detroit neighborhoods</strong> hunting for the perfect slice.<br />
+          Guide the guys through <strong style={{ color: C.gold }}>3 Michigan Cities</strong> hunting for the perfect slice.<br />
           <strong style={{ color: C.gold }}>JUMP ON</strong> meter maids, muscle dudes, bikers &amp; rats to defeat them.<br />
           Collect <strong style={{ color: C.gold }}>16 pizza slices</strong> to trigger the boss fight on each level.<br />
-          Beat the <strong style={{ color: '#e74c3c' }}>Landlord → Rat King → Record Exec</strong> to win.
+          Beat the <strong style={{ color: '#e74c3c' }}>Landlord → Record Exec → Rat King </strong> to win.
         </p>
         <PizzaGame />
       </div>
