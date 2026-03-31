@@ -333,6 +333,18 @@ export class GameEngine {
       if (!pl.og && pl.vy > 0) {
         const pb = pl.y + PH;
         if (ox + o.w > pl.x && ox < pl.x + PW && pb >= o.y && pb <= o.y + 16) {
+          if (o.type === 'cone') {
+            // cones are indestructible — bounce player back and deal damage
+            if (pl.inv <= 0) {
+              pl.hp -= 15;
+              pl.inv = 60;
+              this._addParts(ox + o.w/2, o.y, '#FF6600', 8);
+              if (pl.hp <= 0) this._die();
+              this.sync();
+            }
+            pl.vy = -8;   // bounce off
+            return true;
+          }
           o.hp--;
           if (o.hp <= 0) {
             o.dead = true; o.deadTimer = 30;

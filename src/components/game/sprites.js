@@ -384,73 +384,145 @@ function drawLandlord(ctx, ox, oy, hp, maxHp, angry) {
 }
 
 function drawRatKing(ctx, ox, oy, hp, maxHp, angry) {
-  // RAT KING — giant rat with golden crown, purple robe
+  // RAT KING — fully pixel-art (no ellipses), scarier 8-bit design
   const bx = ox, by = oy;
-  // tail
-  ctx.strokeStyle = '#a07050'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(bx+8,by+80); ctx.quadraticCurveTo(bx-40,by+90,bx-50,by+68); ctx.stroke();
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(bx+8,by+80); ctx.quadraticCurveTo(bx-38,by+86,bx-46,by+66); ctx.stroke();
-  // legs
-  ctx.fillStyle = '#6a6060'; ctx.fillRect(bx+5,by+70,16,14); ctx.fillRect(bx+40,by+70,16,14);
-  // claws
-  ctx.fillStyle = '#888'; [0,5,10].forEach(d=>ctx.fillRect(bx+5+d,by+82,3,5));
-  [0,5,10].forEach(d=>ctx.fillRect(bx+40+d,by+82,3,5));
-  // robe — purple
-  ctx.fillStyle = angry ? '#5a0060' : '#6a2a8a';
-  ctx.fillRect(bx+2,by+22,58,50);
-  ctx.fillStyle = angry ? '#7a2080' : '#8a3aaa';
-  ctx.fillRect(bx+6,by+22,50,18);
-  // robe trim — gold
-  ctx.fillStyle = GLD;
-  ctx.fillRect(bx+2,by+20,58,4);
-  ctx.fillRect(bx+2,by+70,58,3);
-  ctx.fillRect(bx+2,by+22,4,50); ctx.fillRect(bx+56,by+22,4,50);
-  // arms
-  ctx.fillStyle = '#6a6060'; ctx.fillRect(bx-12,by+22,16,30); ctx.fillRect(bx+58,by+22,16,30);
-  ctx.fillStyle = '#888'; ctx.fillRect(bx-12,by+50,16,8); ctx.fillRect(bx+58,by+50,16,8);
-  // body / head — big fat rat
-  ctx.fillStyle = '#7a7070'; ctx.beginPath(); ctx.ellipse(bx+31,by+14,28,22,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#9a9090'; ctx.beginPath(); ctx.ellipse(bx+31,by+8,20,16,0,0,Math.PI*2); ctx.fill();
-  // ears
-  ctx.fillStyle = '#c87070'; ctx.beginPath(); ctx.ellipse(bx+12,by-8,10,13,-.3,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#c87070'; ctx.beginPath(); ctx.ellipse(bx+50,by-8,10,13,.3,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#e89090'; ctx.beginPath(); ctx.ellipse(bx+12,by-8,5,8,-.3,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#e89090'; ctx.beginPath(); ctx.ellipse(bx+50,by-8,5,8,.3,0,Math.PI*2); ctx.fill();
-  // eyes — big red
-  ctx.fillStyle = '#cc0000'; ctx.beginPath(); ctx.arc(bx+20,by+6,7,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#cc0000'; ctx.beginPath(); ctx.arc(bx+42,by+6,7,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#330000'; ctx.beginPath(); ctx.arc(bx+20,by+6,4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#330000'; ctx.beginPath(); ctx.arc(bx+42,by+6,4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.fillRect(bx+17,by+3,3,3); ctx.fillRect(bx+39,by+3,3,3);
-  // snout
-  ctx.fillStyle = '#c87070'; ctx.beginPath(); ctx.ellipse(bx+31,by+16,9,6,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#cc0000'; ctx.beginPath(); ctx.arc(bx+31,by+12,3,0,Math.PI*2); ctx.fill();
-  // whiskers
-  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
-  [-1,1].forEach(dir => {
-    [12,17,22].forEach((y,i) => {
-      ctx.beginPath(); ctx.moveTo(bx+31,by+y); ctx.lineTo(bx+31+dir*(22+i*4),by+y-2); ctx.stroke();
-    });
+  const P = 4; // base pixel unit
+
+  // PIXEL TAIL — zig-zag blocks
+  ctx.fillStyle = '#7a5535';
+  [[bx+2,by+78],[bx-4,by+82],[bx-10,by+78],[bx-16,by+82],
+   [bx-22,by+76],[bx-28,by+80],[bx-32,by+72]].forEach(([tx,ty])=>ctx.fillRect(tx,ty,P,P));
+
+  // FEET — wide blocky
+  ctx.fillStyle = '#4a4040';
+  ctx.fillRect(bx+2, by+82, 22, 8);
+  ctx.fillRect(bx+38, by+82, 22, 8);
+  // claws — sharp pixel spikes
+  ctx.fillStyle = '#aaaaaa';
+  [0,6,12,18].forEach(d => {
+    ctx.fillRect(bx+2+d, by+88, 3, 6);
+    ctx.fillRect(bx+38+d, by+88, 3, 6);
   });
-  // CROWN — gold
+
+  // LEGS — thick pixel pillars
+  ctx.fillStyle = '#5a5050';
+  ctx.fillRect(bx+6,  by+68, 16, 18);
+  ctx.fillRect(bx+40, by+68, 16, 18);
+  ctx.fillStyle = '#3a3030';
+  ctx.fillRect(bx+6,  by+78, 16, 4);
+  ctx.fillRect(bx+40, by+78, 16, 4);
+
+  // ROBE — wide pixel body
+  ctx.fillStyle = angry ? '#3a0045' : '#52107a';
+  ctx.fillRect(bx,    by+20, 62, 52);
+  ctx.fillStyle = angry ? '#5a1070' : '#7030a0';
+  ctx.fillRect(bx+4,  by+20, 54, 18);
+  // robe gold trim
   ctx.fillStyle = GLD;
-  ctx.fillRect(bx+8,by-24,46,14);
-  ctx.fillStyle = '#ffe060';
-  // crown points
-  [[bx+8,by-36],[bx+20,by-30],[bx+31,by-40],[bx+42,by-30],[bx+46,by-36]].forEach(([cx,cy])=>{
-    ctx.beginPath(); ctx.moveTo(cx-1,by-24); ctx.lineTo(cx+5,cy); ctx.lineTo(cx+11,by-24); ctx.closePath(); ctx.fill();
+  ctx.fillRect(bx,    by+18, 62, P);  // top hem
+  ctx.fillRect(bx,    by+68, 62, P);  // bottom hem
+  ctx.fillRect(bx,    by+20, P,  48); // left seam
+  ctx.fillRect(bx+58, by+20, P,  48); // right seam
+  // gold cross emblem
+  ctx.fillRect(bx+27, by+32, 8,  22);
+  ctx.fillRect(bx+20, by+39, 22, 8);
+
+  // ARMS — thick blocks
+  ctx.fillStyle = '#5a5050';
+  ctx.fillRect(bx-16, by+20, 18, 32);
+  ctx.fillRect(bx+60, by+20, 18, 32);
+  ctx.fillStyle = '#3a3030';
+  ctx.fillRect(bx-16, by+48, 18, 6);
+  ctx.fillRect(bx+60, by+48, 18, 6);
+  // hand claws
+  ctx.fillStyle = '#aaa';
+  [0,6,12].forEach(d => {
+    ctx.fillRect(bx-16+d, by+52, 3, 6);
+    ctx.fillRect(bx+60+d, by+52, 3, 6);
   });
-  ctx.fillStyle = GLD; ctx.fillRect(bx+8,by-24,46,14);
-  // crown gems
-  ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(bx+19,by-16,4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#3498db'; ctx.beginPath(); ctx.arc(bx+31,by-16,4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#2ecc71'; ctx.beginPath(); ctx.arc(bx+43,by-16,4,0,Math.PI*2); ctx.fill();
+
+  // HEAD — big square pixel head
+  ctx.fillStyle = '#5a5050';
+  ctx.fillRect(bx+2,  by-12, 58, 36);
+  ctx.fillStyle = '#6e6464';
+  ctx.fillRect(bx+6,  by-8,  50, 24);
+
+  // EARS — large pixel rectangles
+  ctx.fillStyle = '#7a5050';
+  ctx.fillRect(bx-2,  by-32, 20, 24);
+  ctx.fillRect(bx+44, by-32, 20, 24);
+  ctx.fillStyle = '#cc6060';
+  ctx.fillRect(bx+1,  by-28, 12, 16);
+  ctx.fillRect(bx+49, by-28, 12, 16);
+  ctx.fillStyle = '#ff8080';
+  ctx.fillRect(bx+3,  by-24, 6,  8);
+  ctx.fillRect(bx+53, by-24, 6,  8);
+
+  // ANGRY BROWS — thick pixel slashes above eyes
   if (angry) {
-    ctx.strokeStyle = '#330000'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(bx+12,by-2); ctx.lineTo(bx+24,by+4); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(bx+50,by-2); ctx.lineTo(bx+38,by+4); ctx.stroke();
+    ctx.fillStyle = '#880000';
+    for (let i = 0; i < 5; i++) { ctx.fillRect(bx+8+i*3,  by-14+i*2, 6, 4); }
+    for (let i = 0; i < 5; i++) { ctx.fillRect(bx+52-i*3, by-14+i*2, 6, 4); }
   }
+
+  // EYES — huge glowing red pixel squares
+  const eyeCol = angry ? '#ff0000' : '#cc0000';
+  if (angry) { ctx.shadowBlur=12; ctx.shadowColor='#ff0000'; }
+  ctx.fillStyle = eyeCol;
+  ctx.fillRect(bx+8,  by-8, 14, 14);
+  ctx.fillRect(bx+40, by-8, 14, 14);
+  ctx.shadowBlur = 0;
+  // pupils
+  ctx.fillStyle = '#1a0000';
+  ctx.fillRect(bx+12, by-4,  8,  8);
+  ctx.fillRect(bx+44, by-4,  8,  8);
+  // glint
+  ctx.fillStyle = '#ff6666';
+  ctx.fillRect(bx+8,  by-8,  4,  4);
+  ctx.fillRect(bx+40, by-8,  4,  4);
+
+  // SNOUT — wide flat pixel block
+  ctx.fillStyle = '#8a5050';
+  ctx.fillRect(bx+12, by+6, 38, 14);
+  ctx.fillStyle = '#aa3030';
+  ctx.fillRect(bx+26, by+6,  10, 6);  // nose
+
+  // TEETH — big scary chompers
+  ctx.fillStyle = '#f0f0e0';
+  ctx.fillRect(bx+14, by+16, 8,  14);
+  ctx.fillRect(bx+24, by+16, 8,  10);
+  ctx.fillRect(bx+34, by+16, 8,  14);
+  ctx.fillRect(bx+44, by+16, 6,  10);
+  // tooth gaps
+  ctx.fillStyle = '#1a0a0a';
+  ctx.fillRect(bx+22, by+16, 2, 14);
+  ctx.fillRect(bx+32, by+16, 2, 14);
+  ctx.fillRect(bx+42, by+16, 2, 10);
+  // gum line
+  ctx.fillStyle = '#6a1a1a';
+  ctx.fillRect(bx+12, by+14, 40, P);
+
+  // PIXEL WHISKERS — rows of small rectangles
+  ctx.fillStyle = '#dddddd';
+  [-1,0,1].forEach(row => {
+    [8,16,24].forEach(d => { ctx.fillRect(bx-4-d, by+8+row*4, 6, 2); });
+    [8,16,24].forEach(d => { ctx.fillRect(bx+62+d, by+8+row*4, 6, 2); });
+  });
+
+  // CROWN — tall imposing pixel crown
+  ctx.fillStyle = GLD;
+  ctx.fillRect(bx+4, by-44, 54, 14);  // crown band
+  // crown points — tall jagged rectangles
+  ctx.fillStyle = '#ffe060';
+  [[bx+4,22],[bx+16,32],[bx+27,22],[bx+39,32],[bx+47,22]].forEach(([cx,h]) => {
+    ctx.fillRect(cx, by-44-h, 10, h+2);
+  });
+  ctx.fillStyle = GLD; ctx.fillRect(bx+4, by-44, 54, 14); // rebake band on top
+  // gems — pixel squares with glint
+  [[bx+10,'#e74c3c'],[bx+28,'#3498db'],[bx+44,'#2ecc71']].forEach(([gx,gc]) => {
+    ctx.fillStyle = gc; ctx.fillRect(gx, by-38, 10, 10);
+    ctx.fillStyle = '#fff'; ctx.fillRect(gx, by-38, 3, 3);
+  });
 }
 
 function drawRecordExec(ctx, ox, oy, hp, maxHp, angry) {

@@ -23,57 +23,34 @@ export const GRN2 = '#2D4A1E';
 export const CREAM = '#F5F0DC';
 
 // ── LEVEL CONFIGS ─────────────────────────────
-// Each level increases enemy speed, spawn rate, more variety
+// Level order: Ypsilanti → Ferndale → Detroit
 export const LEVELS = [
   {
     id: 1,
     name: 'YPSILANTI',
     subtitle: 'Depot Town · 3:00 PM',
-    // Sky: afternoon blue
+    mission: "GET TO GROVE STUDIOS",
     skyTop: '#1a4a8a',
     skyBot: '#4a90cf',
-    groundTop: '#3a7a28',    // grass green
+    groundTop: '#3a7a28',
     groundColor: '#1a3a10',
     laneColor: '#4a8a3a',
     buildingCols: ['#8B4513','#6B3A2A','#9B5523','#7B4010'],
     windowColor: '#FFD700',
     hasSun: true,
     hasClouds: true,
-    // Gameplay — easiest
     spawnRate: 120,
     enemySpeed: 1.4,
-    enemyTypes: ['cone','metermaid','rat'],   // limited enemy variety
+    enemyTypes: ['cone','metermaid','rat'],
     pizzaRate: 80,
-    heartRate: 200,          // hearts spawn often
+    heartRate: 360,
     boss: 'landlord',
   },
   {
     id: 2,
-    name: 'DETROIT',
-    subtitle: 'Downtown · 11:00 PM',
-    // Sky: night
-    skyTop: '#050d03',
-    skyBot: '#112009',
-    groundTop: '#0c0c0c',
-    groundColor: '#111',
-    laneColor: '#E2A820',
-    buildingCols: ['#162b10','#1e3314','#0f2008','#243c17'],
-    windowColor: '#E2A820',
-    hasMoon: true,
-    hasStars: true,
-    // Gameplay — medium
-    spawnRate: 85,
-    enemySpeed: 2.0,
-    enemyTypes: ['cone','metermaid','muscledude','rat'],
-    pizzaRate: 72,
-    heartRate: 280,
-    boss: 'ratking',
-  },
-  {
-    id: 3,
     name: 'FERNDALE',
-    subtitle: 'Nine Mile · 2:00 AM',
-    // Sky: deep night, neon — lightened for visibility
+    subtitle: 'Nine Mile · 10:00 PM',
+    mission: "GET TO THE ROCK SHOW",
     skyTop: '#0d0820',
     skyBot: '#1a1035',
     groundTop: '#1a1a1a',
@@ -84,12 +61,32 @@ export const LEVELS = [
     windowColor2: '#55bbff',
     hasNeon: true,
     hasStars: true,
-    // Gameplay — hardest
-    spawnRate: 55,
+    spawnRate: 75,
+    enemySpeed: 2.2,
+    enemyTypes: ['cone','metermaid','muscledude','biker'],
+    pizzaRate: 68,
+    heartRate: 520,
+    boss: 'recordexec',
+  },
+  {
+    id: 3,
+    name: 'DETROIT',
+    subtitle: 'Downtown · 2:00 AM',
+    mission: "RID THE RATS, SAVE THE CITY",
+    skyTop: '#050d03',
+    skyBot: '#112009',
+    groundTop: '#0c0c0c',
+    groundColor: '#111',
+    laneColor: '#E2A820',
+    buildingCols: ['#162b10','#1e3314','#0f2008','#243c17'],
+    windowColor: '#E2A820',
+    hasMoon: true,
+    hasStars: true,
+    spawnRate: 50,
     enemySpeed: 3.0,
     enemyTypes: ['cone','metermaid','muscledude','rat','biker'],
     pizzaRate: 60,
-    heartRate: 380,          // hearts rare
-    boss: 'recordexec',
+    heartRate: 700,
+    boss: 'ratking',
   },
 ];

@@ -182,30 +182,31 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = '#fff'; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('HP', W/2, 22);
 
-  // level + lives
-  ctx.fillStyle = CREAM; ctx.font = '7px "Press Start 2P"';
-  ctx.fillText(`LVL ${engine.lvlIdx+1} · ${lvl.name} · ${lvl.subtitle}`, W/2, 40);
+  // level name + mission
+  ctx.fillStyle = CREAM; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText(`LVL ${engine.lvlIdx+1} · ${lvl.name}`, W/2, 33);
+  ctx.fillStyle = 'rgba(245,240,220,0.5)'; ctx.font = '6px "Press Start 2P"';
+  ctx.fillText(lvl.mission, W/2, 46);
 
-  // pixel hearts — red when alive, dark when spent
+  // pixel hearts — top-right, red when alive, dark when spent
   for (let i = 0; i < 3; i++) {
-    const hx = W - 14 - (2 - i) * 18;
-    const hy = 20;
+    const hx = W - 14 - (2 - i) * 20;
+    const hy = 7;
     const s = 2;
     ctx.fillStyle = i < lives ? '#e74c3c' : '#2a2a2a';
-    ctx.fillRect(hx+s,   hy,     s, s); ctx.fillRect(hx+2*s, hy,     s, s); // top bumps
+    ctx.fillRect(hx+s,   hy,     s, s); ctx.fillRect(hx+2*s, hy,     s, s);
     ctx.fillRect(hx+4*s, hy,     s, s); ctx.fillRect(hx+5*s, hy,     s, s);
-    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+s,   s, s);         // row 1
-    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+2*s, s, s);         // row 2
-    for (let j = 1; j < 6; j++) ctx.fillRect(hx+j*s, hy+3*s, s, s);         // row 3
-    for (let j = 2; j < 5; j++) ctx.fillRect(hx+j*s, hy+4*s, s, s);         // row 4
-    ctx.fillRect(hx+3*s, hy+5*s, s, s);                                      // tip
+    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+s,   s, s);
+    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+2*s, s, s);
+    for (let j = 1; j < 6; j++) ctx.fillRect(hx+j*s, hy+3*s, s, s);
+    for (let j = 2; j < 5; j++) ctx.fillRect(hx+j*s, hy+4*s, s, s);
+    ctx.fillRect(hx+3*s, hy+5*s, s, s);
   }
 
-  // pizza counter or boss HP
+  // pizza counter or boss HP — boss bar placed BELOW hearts to avoid overlap
   if (!engine.boss) {
     ctx.fillStyle = GLD; ctx.font = '9px "Press Start 2P"'; ctx.textAlign = 'right';
     ctx.fillText(`🍕 ${pc}/16`, W-10, 42);
-    // progress dots
     for (let i = 0; i < 16; i++) {
       ctx.fillStyle = i < pc ? '#FF8C00' : '#1a2a10';
       ctx.fillRect(W-10-16*11+i*11, 44, 9, 7);
@@ -213,14 +214,16 @@ function drawHUD(ctx, engine, lvl) {
   } else {
     const b = engine.boss;
     const bpct = b.hp / b.maxHp;
-    const bW = 200;
-    ctx.fillStyle = '#111'; ctx.fillRect(W-bW-14, 8, bW+4, 16);
+    const bW = 180;
+    // label above the bar, right-aligned — sits just below hearts (y≈22)
+    ctx.fillStyle = '#fff'; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'right';
+    ctx.fillText(b.label, W - 10, 24);
+    // bar at y=27 — below hearts which end at y≈21
+    ctx.fillStyle = '#111'; ctx.fillRect(W - bW - 12, 27, bW + 4, 14);
     ctx.fillStyle = bpct > 0.5 ? '#2ecc71' : bpct > 0.25 ? '#f39c12' : '#e74c3c';
-    ctx.fillRect(W-bW-12, 10, Math.max(0, bW*bpct), 12);
+    ctx.fillRect(W - bW - 10, 29, Math.max(0, bW * bpct), 10);
     ctx.strokeStyle = GLD; ctx.lineWidth = 1;
-    ctx.strokeRect(W-bW-14, 8, bW+4, 16);
-    ctx.fillStyle = '#fff'; ctx.font = '8px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(b.label, W-14, 35);
+    ctx.strokeRect(W - bW - 12, 27, bW + 4, 14);
   }
 }
 
@@ -287,13 +290,45 @@ function drawLevelUp(ctx, frame, lvlIdx, lvl) {
   const bg = ctx.createLinearGradient(0,0,0,H);
   bg.addColorStop(0,lvl.skyTop); bg.addColorStop(1,lvl.skyBot);
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(0,0,0,0.82)'; ctx.fillRect(W/2-220,H/2-90,440,180);
-  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-220,H/2-90,440,180);
+
+  // Grove Studios building — shown when completing level 1 (Ypsilanti)
+  if (lvlIdx === 1) {
+    const bx = W/2-70, by = H-80;
+    // building body
+    ctx.fillStyle='#6B3A2A'; ctx.fillRect(bx,by-100,140,100);
+    ctx.fillStyle='#8B4513'; ctx.fillRect(bx+4,by-96,132,92);
+    // roof
+    ctx.fillStyle='#4a2010'; ctx.fillRect(bx-6,by-103,152,8);
+    // windows — lit warm yellow
+    ctx.fillStyle='#FFD700';
+    [[10,20],[38,20],[66,20],[94,20],[10,50],[66,50],[94,50]].forEach(([wx,wy])=>{
+      ctx.fillRect(bx+wx,by-100+wy,18,14);
+      ctx.fillStyle='rgba(255,220,80,0.3)'; ctx.fillRect(bx+wx-1,by-100+wy-1,20,16);
+      ctx.fillStyle='#FFD700';
+    });
+    // door
+    ctx.fillStyle='#2a1008'; ctx.fillRect(bx+57,by-30,26,30);
+    ctx.fillStyle='#3a1a08'; ctx.fillRect(bx+59,by-28,10,26);
+    // sign
+    ctx.fillStyle='#111'; ctx.fillRect(bx+8,by-75,124,18);
+    ctx.fillStyle=GLD; ctx.font='bold 9px "Press Start 2P"'; ctx.textAlign='center';
+    ctx.fillText('GROVE STUDIOS',W/2,by-62);
+    // neon glow under sign
+    ctx.shadowBlur=10; ctx.shadowColor=GLD;
+    ctx.strokeStyle=GLD; ctx.lineWidth=1; ctx.strokeRect(bx+8,by-75,124,18);
+    ctx.shadowBlur=0;
+  }
+
+  // overlay box
+  ctx.fillStyle='rgba(0,0,0,0.84)'; ctx.fillRect(W/2-230,H/2-110,460,200);
+  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-230,H/2-110,460,200);
   ctx.fillStyle=GLD; ctx.font='14px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('LEVEL '+(lvlIdx+1)+' COMPLETE!',W/2,H/2-40);
-  ctx.fillStyle=CREAM; ctx.font='20px "Press Start 2P"';
-  ctx.fillText('→ '+lvl.name,W/2,H/2+10);
-  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='11px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+55);}
+  ctx.fillText('LEVEL '+lvlIdx+' COMPLETE!',W/2,H/2-62);
+  ctx.fillStyle=CREAM; ctx.font='18px "Press Start 2P"';
+  ctx.fillText('→ '+lvl.name,W/2,H/2-20);
+  ctx.fillStyle='rgba(245,240,220,0.6)'; ctx.font='8px "Press Start 2P"';
+  ctx.fillText(lvl.mission,W/2,H/2+12);
+  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='10px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+55);}
 }
 
 function drawGameOver(ctx, frame, sc, highSc) {
