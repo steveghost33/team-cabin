@@ -10,9 +10,10 @@ import { drawPlayer, drawEnemy, drawPizza, drawHeart, drawBoss, drawCharPreview 
 export function renderFrame(ctx, engine, frame) {
   const gs = engine.gState;
 
-  if (gs === 'title')     { drawTitle(ctx, frame, engine.highSc, engine.initials.join('')); return; }
-  if (gs === 'initials')  { drawInitials(ctx, frame, engine); return; }
-  if (gs === 'charselect'){ drawCharSelect(ctx, frame, engine.selChar); return; }
+  if (gs === 'title')      { drawTitle(ctx, frame, engine.highSc, engine.initials.join('')); return; }
+  if (gs === 'initials')   { drawInitials(ctx, frame, engine); return; }
+  if (gs === 'levelintro') { drawLevelIntro(ctx, frame, engine.lvl, engine.introTimer); return; }
+  if (gs === 'charselect') { drawCharSelect(ctx, frame, engine.selChar); return; }
   if (gs === 'gameover')  { drawGameOver(ctx, frame, engine.sc, engine.highSc); return; }
   if (gs === 'win')       { drawWin(ctx, frame, engine.sc, engine.highSc, engine.initials.join('')); return; }
   if (gs === 'levelup')   { drawLevelUp(ctx, frame, engine.lvlIdx, engine.lvl); return; }
@@ -261,6 +262,75 @@ function drawGroveStudios(ctx) {
 }
 
 // ── OVERLAY SCREENS ────────────────────────────
+function drawLevelIntro(ctx, frame, lvl, introTimer) {
+  // sky background matching the level
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, lvl.skyTop); bg.addColorStop(1, lvl.skyBot);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  // star / atmosphere particles
+  if (lvl.hasStars || lvl.hasSun) {
+    for (let i = 0; i < 30; i++) {
+      const sx = (i * 137 + frame * 0.2) % W;
+      const sy = (i * 73) % (H * 0.6);
+      ctx.fillStyle = Math.sin(frame * 0.05 + i) > 0.3
+        ? (lvl.windowColor || GLD)
+        : 'rgba(200,210,230,0.15)';
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  }
+
+  // slide-in: panels sweep from left the first ~40 frames
+  const slideIn = Math.max(0, 1 - (260 - introTimer) / 40);
+  const panelX = -W * slideIn;
+
+  // dark cinematic letterbox bars
+  ctx.fillStyle = 'rgba(0,0,0,0.72)';
+  ctx.fillRect(panelX, 0, W, H * 0.28);
+  ctx.fillRect(panelX, H * 0.72, W, H * 0.28);
+
+  // accent line top/bottom
+  ctx.fillStyle = GLD;
+  ctx.fillRect(panelX, H * 0.28 - 3, W, 3);
+  ctx.fillRect(panelX, H * 0.72, W, 3);
+
+  // LEVEL NUMBER — small, top-left of the cinematic band
+  ctx.fillStyle = 'rgba(226,168,32,0.55)';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.textAlign = 'left';
+  ctx.fillText('LEVEL ' + (lvl.id), panelX + 28, H * 0.28 - 14);
+
+  // CITY NAME — big centred
+  ctx.fillStyle = GLD;
+  ctx.font = '38px "Press Start 2P"';
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 18; ctx.shadowColor = GLD;
+  ctx.fillText(lvl.name, W / 2 + panelX, H / 2 - 10);
+  ctx.shadowBlur = 0;
+
+  // subtitle (time/place)
+  ctx.fillStyle = CREAM;
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText(lvl.subtitle, W / 2 + panelX, H / 2 + 18);
+
+  // MISSION — golden, below centre
+  ctx.fillStyle = GLD;
+  ctx.font = '9px "Press Start 2P"';
+  ctx.fillText('MISSION: ' + lvl.mission, W / 2 + panelX, H * 0.72 + 26);
+
+  // funny quip line
+  ctx.fillStyle = 'rgba(245,240,220,0.75)';
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText(lvl.introQuip, W / 2 + panelX, H * 0.72 + 50);
+
+  // skip prompt — blinks in bottom letterbox
+  if (Math.floor(frame / 22) % 2 === 0) {
+    ctx.fillStyle = 'rgba(226,168,32,0.5)';
+    ctx.font = '6px "Press Start 2P"';
+    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2 + panelX, H - 18);
+  }
+}
+
 function drawInitials(ctx, frame, engine) {
   const { initials, initialsPos } = engine;
   ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);

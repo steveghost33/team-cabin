@@ -193,7 +193,7 @@ export default function PizzaGame() {
   useEffect(() => {
     const music = musicRef.current;
     if (!music) return;
-    if (['gameover', 'win', 'title', 'charselect', 'initials'].includes(gameState.state)) {
+    if (['gameover', 'win', 'title', 'charselect', 'initials', 'levelintro'].includes(gameState.state)) {
       music.pause();
       music.currentTime = 0;
       pausedRef.current = false;
@@ -257,8 +257,10 @@ export default function PizzaGame() {
     if (key === 'jump') {
       if (down && st === 'playing') engine.jump();
       else if (down && st === 'initials') engine.handleKey('Enter', true);
+      else if (down && st === 'levelintro') engine.handleKey('Enter', true);
     } else if (key === 'start') {
-      if (st === 'title')           { engine.gState = 'initials'; engine.sync(); }
+      if (st === 'levelintro')      engine.handleKey('Enter', true);
+      else if (st === 'title')      { engine.gState = 'initials'; engine.sync(); }
       else if (st === 'initials')   engine.handleKey('Enter', true);
       else if (st === 'charselect') { engine.charIdx = engine.selChar; engine.startGame(); }
       else if (st === 'gameover')   { engine.gState = 'charselect'; engine.sync(); }

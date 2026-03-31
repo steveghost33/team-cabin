@@ -82,7 +82,8 @@ export class GameEngine {
     this.sc = 0; this.lives = MAX_LIVES; this.lvlIdx = 0; this.pc = 0;
     this.charIdx = this.selChar;
     this._resetLevel();
-    this.gState = 'playing';
+    this.gState = 'levelintro';
+    this.introTimer = 260;   // ~4.3 s at 60 Hz
     this.sync();
   }
 
@@ -204,10 +205,21 @@ export class GameEngine {
     this.frame += dt;
     const { pl, lvl } = this;
 
+    // ── LEVEL INTRO TIMER ─────────────────────
+    if (this.gState === 'levelintro') {
+      this.introTimer -= dt;
+      if (this.introTimer <= 0) { this.gState = 'playing'; this.sync(); }
+      return;
+    }
+
     // ── LEVEL UP TIMER ────────────────────────
     if (this.gState === 'levelup') {
       this.nextLvlTimer -= dt;
-      if (this.nextLvlTimer <= 0) { this.gState = 'playing'; this.sync(); }
+      if (this.nextLvlTimer <= 0) {
+        this.gState = 'levelintro';
+        this.introTimer = 260;
+        this.sync();
+      }
       return;
     }
 
@@ -430,6 +442,12 @@ export class GameEngine {
     this.keys[code] = down;
     if (!down) return;
     if (code === 'Space' && this.gState === 'playing') { this.jump(); return; }
+
+    // ── SKIP LEVEL INTRO ──────────────────────────
+    if (this.gState === 'levelintro') {
+      this.introTimer = 0;
+      return;
+    }
 
     // ── INITIALS ENTRY ────────────────────────────
     if (this.gState === 'initials') {
