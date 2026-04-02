@@ -270,23 +270,27 @@ function drawWaterTower(ctx, scrollX) {
   ctx.fillRect(bx - 1, by - 67, 2, 8);
   ctx.fillRect(bx - 4, by - 64, 8, 2);
 
+  // ── horizontal band rings on cylinder (visible in the sticker) ───────
+  ctx.fillStyle = COL;
+  ctx.fillRect(bx - 19, by - 38, 38, 4);
+  ctx.fillRect(bx - 19, by - 68, 38, 4);
+  ctx.fillRect(bx - 19, by - 98, 38, 4);
+
   // ── decorative collar ring (junction) ────────
   ctx.fillStyle = COL;
-  ctx.fillRect(bx - 26, by - 110, 52, 5);
-  // rivet-like band detail
+  ctx.fillRect(bx - 21, by - 110, 42, 6);
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.fillRect(bx - 26, by - 108, 52, 1);
-  ctx.fillRect(bx - 26, by - 106, 52, 1);
+  ctx.fillRect(bx - 21, by - 108, 42, 1);
+  ctx.fillRect(bx - 21, by - 105, 42, 1);
 
   // ── rounded dome — wide hemisphere matching the real tower ──────────
   // The tank is nearly 2× the cylinder width, bulbous and round like the photo.
   // Rows from bottom (collar) to top; wide in the middle, curving to blunt top.
+  // Bullet/capsule shape — same width as cylinder, tall, smooth rounded top
   const dRows = [
-    [52, 4], [62, 4], [68, 4],
-    [70, 4], [70, 4], [70, 4],        // wide equatorial band
-    [68, 4], [64, 4], [58, 4], [50, 4],
-    [42, 3], [34, 2], [26, 2],        // gradual taper
-    [18, 2], [12, 1], [7, 1], [4, 1], [2, 1], // smooth round top
+    [38, 4], [40, 4], [40, 4], [40, 4], [40, 4], // slight overhang, stays consistent
+    [40, 4], [40, 4], [38, 4], [36, 4], [32, 3], // holds width then begins rounding
+    [26, 3], [20, 2], [14, 2], [8, 1], [4, 1], [2, 1], // smooth round top
   ];
   let dy = by - 110; // start at top of collar
   for (const [rw, rh] of dRows) {
