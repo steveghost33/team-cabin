@@ -35,11 +35,11 @@ export function renderFrame(ctx, engine, frame) {
 
   // ── YPSILANTI LANDMARKS (drawn after buildings so they're in front) ──
   if (engine.lvlIdx === 0) {
-    const mrpbx = 600 - scrollX;
+    const mrpbx = 500 - scrollX;
     if (mrpbx > -200 && mrpbx < W + 20) drawMrPizza(ctx, mrpbx);
-    const hbx = 1400 - scrollX;
+    const hbx = 2200 - scrollX;
     if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
-    const bbx = 2200 - scrollX;
+    const bbx = 4000 - scrollX;
     if (bbx > -220 && bbx < W + 20) drawTheBomber(ctx, bbx);
   }
 
