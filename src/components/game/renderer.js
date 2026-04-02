@@ -27,14 +27,14 @@ export function renderFrame(ctx, engine, frame) {
   // ── YPSILANTI WATER TOWER (far background) ───
   if (engine.lvlIdx === 0) drawWaterTower(ctx, scrollX);
 
-  // ── HYPERION COFFEE (mid-level landmark, Ypsilanti) ───
+  // ── BUILDINGS ────────────────────────────────
+  engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
+
+  // ── HYPERION COFFEE (drawn after buildings so it's in front) ───
   if (engine.lvlIdx === 0) {
     const hbx = 2200 - scrollX;
     if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
   }
-
-  // ── BUILDINGS ────────────────────────────────
-  engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
   // ── GROUND ───────────────────────────────────
   drawGround(ctx, lvl, scrollX);
