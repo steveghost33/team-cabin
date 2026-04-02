@@ -6,10 +6,23 @@ import { PW, PH, GLD, GRN } from './constants.js';
 
 // ── PLAYER ────────────────────────────────────
 export function drawPlayer(ctx, pl, charIdx, frame) {
-  if (pl.inv > 0 && Math.floor(pl.inv / 5) % 2 === 0) return;
+  if (!pl.dying && pl.inv > 0 && Math.floor(pl.inv / 5) % 2 === 0) return;
   const { x: px, y: py, face } = pl;
   ctx.save();
-  if (face === -1) { ctx.translate(px + PW, 0); ctx.scale(-1, 1); ctx.translate(-px, 0); }
+  if (pl.dying) {
+    // dying transform — scale up during freeze phase, spin during launch phase
+    const cx = px + PW / 2, cy = py + PH / 2;
+    ctx.translate(cx, cy);
+    if (!pl.dyingLaunched) {
+      const t = Math.min(1, (120 - pl.dyingTimer) / 40);
+      ctx.scale(1 + t * 0.8, 1 + t * 0.8);
+    } else {
+      ctx.rotate(Math.max(0, 80 - pl.dyingTimer) * 0.18);
+    }
+    ctx.translate(-cx, -cy);
+  } else {
+    if (face === -1) { ctx.translate(px + PW, 0); ctx.scale(-1, 1); ctx.translate(-px, 0); }
+  }
 
   // walk cycle — legs alternate when moving on ground, freeze when airborne
   const isMoving = Math.abs(pl.vx) > 0.1 && pl.og;
@@ -76,6 +89,18 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
     ctx.strokeStyle = '#6B4C2A'; ctx.lineWidth = 1;
     ctx.strokeRect(px+5,py-7,5,5); ctx.strokeRect(px+12,py-7,5,5);
     ctx.fillStyle = '#6B4C2A'; ctx.fillRect(px+10,py-5,2,1);
+  }
+  // X eyes on death
+  if (pl.dying) {
+    ctx.fillStyle = '#ff2020';
+    // left eye X
+    ctx.fillRect(px+6,py-6,1,1); ctx.fillRect(px+8,py-6,1,1);
+    ctx.fillRect(px+7,py-5,1,1);
+    ctx.fillRect(px+6,py-4,1,1); ctx.fillRect(px+8,py-4,1,1);
+    // right eye X
+    ctx.fillRect(px+13,py-6,1,1); ctx.fillRect(px+15,py-6,1,1);
+    ctx.fillRect(px+14,py-5,1,1);
+    ctx.fillRect(px+13,py-4,1,1); ctx.fillRect(px+15,py-4,1,1);
   }
   ctx.restore();
 }

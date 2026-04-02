@@ -55,6 +55,7 @@ export class GameEngine {
       hp: MAX_HP,
       dying: false,
       dyingTimer: 0,
+      dyingLaunched: false,
     };
   }
 
@@ -92,7 +93,7 @@ export class GameEngine {
     this.pl.x = 80; this.pl.y = GROUND - PH;
     this.pl.vx = 0; this.pl.vy = 0;
     this.pl.og = true; this.pl.inv = 180;
-    this.pl.dying = false; this.pl.dyingTimer = 0;
+    this.pl.dying = false; this.pl.dyingTimer = 0; this.pl.dyingLaunched = false;
     this.charIdx = this.selChar;
     this.gState = 'playing';
     this.sync();
@@ -103,7 +104,7 @@ export class GameEngine {
     pl.x = 80; pl.y = GROUND - PH;
     pl.vx = 0; pl.vy = 0;
     pl.og = true; pl.inv = 60; pl.hp = MAX_HP;
-    pl.dying = false; pl.dyingTimer = 0;
+    pl.dying = false; pl.dyingTimer = 0; pl.dyingLaunched = false;
     this.obs = []; this.pizzas = []; this.hearts = [];
     this.parts = []; this.blds = [];
     this.boss = null;
@@ -226,10 +227,19 @@ export class GameEngine {
     if (this.gState !== 'playing') return;
 
     // ── DYING animation ───────────────────────
+    // Phase 1 (dyingTimer 120→80): freeze in place, scale up
+    // Phase 2 (dyingTimer 80→0):  launch upward, spin, fall
     if (pl.dying) {
-      pl.vy += GRAVITY * 0.6 * dt;
-      pl.y  += pl.vy * dt;
       pl.dyingTimer -= dt;
+      if (!pl.dyingLaunched && pl.dyingTimer <= 80) {
+        pl.dyingLaunched = true;
+        pl.vx = 0;
+        pl.vy = -14;
+      }
+      if (pl.dyingLaunched) {
+        pl.vy += GRAVITY * dt;
+        pl.y  += pl.vy * dt;
+      }
       if (pl.dyingTimer <= 0) {
         this.lives--;
         if (this.lives <= 0) {
@@ -434,8 +444,10 @@ export class GameEngine {
   _die() {
     const pl = this.pl;
     pl.dying = true;
-    pl.dyingTimer = 80;
-    pl.vy = JUMP_POWER * 0.7;
+    pl.dyingTimer = 120;   // 40 frames freeze + 80 frames launch
+    pl.dyingLaunched = false;
+    pl.vx = 0;
+    pl.vy = 0;
   }
 
   handleKey(code, down) {

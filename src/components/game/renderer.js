@@ -198,19 +198,13 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = 'rgba(245,240,220,0.5)'; ctx.font = '6px "Press Start 2P"';
   ctx.fillText(lvl.mission, W/2, 46);
 
-  // pixel hearts — top-right, red when alive, dark when spent
+  // character life icons — top-right, 3 tiny versions of current player
   for (let i = 0; i < 3; i++) {
-    const hx = W - 14 - (2 - i) * 20;
-    const hy = 7;
-    const s = 2;
-    ctx.fillStyle = i < lives ? '#e74c3c' : '#2a2a2a';
-    ctx.fillRect(hx+s,   hy,     s, s); ctx.fillRect(hx+2*s, hy,     s, s);
-    ctx.fillRect(hx+4*s, hy,     s, s); ctx.fillRect(hx+5*s, hy,     s, s);
-    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+s,   s, s);
-    for (let j = 0; j < 7; j++) ctx.fillRect(hx+j*s, hy+2*s, s, s);
-    for (let j = 1; j < 6; j++) ctx.fillRect(hx+j*s, hy+3*s, s, s);
-    for (let j = 2; j < 5; j++) ctx.fillRect(hx+j*s, hy+4*s, s, s);
-    ctx.fillRect(hx+3*s, hy+5*s, s, s);
+    const iconX = W - 20 - (2 - i) * 26;
+    const iconY = 22;
+    if (i >= lives) ctx.globalAlpha = 0.13;
+    drawCharPreview(ctx, engine.charIdx, iconX, iconY, 0.52);
+    ctx.globalAlpha = 1;
   }
 
   // pizza counter or boss HP — boss bar placed BELOW hearts to avoid overlap
@@ -285,25 +279,25 @@ function drawWaterTower(ctx, scrollX) {
   ctx.fillRect(bx - 20, by - 108, 40, 1);
   ctx.fillRect(bx - 20, by - 106, 40, 1);
 
-  // ── rounded bullet dome ───────────────────────
-  // rows [width, height] from base → tip — bullet/capsule profile:
-  // same width as cylinder at base, curves inward evenly to a rounded top
+  // ── rounded dome — half-circle profile ──────────
+  // Rows stay wide for longer then curve sharply at top for dome shape.
+  // Width follows approx sqrt(r²-(h-r)²)*2 for r=18 over 38px height.
   const dRows = [
-    [36, 5], [34, 4], [30, 4], [26, 4], [22, 4],
-    [18, 4], [14, 3], [10, 3], [7,  3], [4,  2], [2, 2],
+    [36, 5], [36, 4], [35, 4], [33, 4], [30, 4],
+    [26, 4], [22, 4], [17, 3], [12, 3], [8, 3], [5, 2], [3, 2], [2, 1],
   ];
   let dy = by - 110; // start at top of collar
   for (const [rw, rh] of dRows) {
     ctx.fillStyle = DML;
     ctx.fillRect(bx - rw / 2, dy - rh, rw, rh);
     // right-side shadow for roundness
+    const sh = Math.max(2, Math.floor(rw * 0.18));
     ctx.fillStyle = DM;
-    ctx.fillRect(bx + rw / 2 - Math.max(3, Math.floor(rw * 0.2)), dy - rh,
-                 Math.max(3, Math.floor(rw * 0.2)), rh);
+    ctx.fillRect(bx + rw / 2 - sh, dy - rh, sh, rh);
     dy -= rh;
   }
-  // tiny tip cap
-  ctx.fillStyle = DM; ctx.fillRect(bx - 1, dy - 2, 2, 2);
+  // flat round tip
+  ctx.fillStyle = DM; ctx.fillRect(bx - 1, dy - 1, 2, 1);
 
   // ── base grass mound ─────────────────────────
   ctx.fillStyle = 'rgba(50,110,30,0.45)';
@@ -418,71 +412,44 @@ function drawGroveStudios(ctx) {
 
 // ── OVERLAY SCREENS ────────────────────────────
 function drawLevelIntro(ctx, frame, lvl, introTimer) {
-  // sky background matching the level
+  // full-screen sky for this level
   const bg = ctx.createLinearGradient(0, 0, 0, H);
   bg.addColorStop(0, lvl.skyTop); bg.addColorStop(1, lvl.skyBot);
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-  // star / atmosphere particles
-  if (lvl.hasStars || lvl.hasSun) {
-    for (let i = 0; i < 30; i++) {
-      const sx = (i * 137 + frame * 0.2) % W;
-      const sy = (i * 73) % (H * 0.6);
-      ctx.fillStyle = Math.sin(frame * 0.05 + i) > 0.3
-        ? (lvl.windowColor || GLD)
-        : 'rgba(200,210,230,0.15)';
-      ctx.fillRect(sx, sy, 2, 2);
-    }
-  }
+  // dark overlay panel
+  ctx.fillStyle = 'rgba(0,0,0,0.78)';
+  ctx.fillRect(0, 0, W, H);
 
-  // slide-in: panels sweep from left the first ~40 frames
-  const slideIn = Math.max(0, 1 - (260 - introTimer) / 40);
-  const panelX = -W * slideIn;
-
-  // dark cinematic letterbox bars
-  ctx.fillStyle = 'rgba(0,0,0,0.72)';
-  ctx.fillRect(panelX, 0, W, H * 0.28);
-  ctx.fillRect(panelX, H * 0.72, W, H * 0.28);
-
-  // accent line top/bottom
+  // gold accent bars
   ctx.fillStyle = GLD;
-  ctx.fillRect(panelX, H * 0.28 - 3, W, 3);
-  ctx.fillRect(panelX, H * 0.72, W, 3);
+  ctx.fillRect(0, H / 2 - 110, W, 3);
+  ctx.fillRect(0, H / 2 + 90,  W, 3);
 
-  // LEVEL NUMBER — small, top-left of the cinematic band
-  ctx.fillStyle = 'rgba(226,168,32,0.55)';
-  ctx.font = '8px "Press Start 2P"';
-  ctx.textAlign = 'left';
-  ctx.fillText('LEVEL ' + (lvl.id), panelX + 28, H * 0.28 - 14);
-
-  // CITY NAME — big centred
-  ctx.fillStyle = GLD;
-  ctx.font = '38px "Press Start 2P"';
   ctx.textAlign = 'center';
-  ctx.shadowBlur = 18; ctx.shadowColor = GLD;
-  ctx.fillText(lvl.name, W / 2 + panelX, H / 2 - 10);
+
+  // CITY NAME — very large
+  ctx.fillStyle = GLD;
+  ctx.font = '52px "Press Start 2P"';
+  ctx.shadowBlur = 22; ctx.shadowColor = GLD;
+  ctx.fillText(lvl.name, W / 2, H / 2 - 18);
   ctx.shadowBlur = 0;
 
-  // subtitle (time/place)
+  // Subtitle (location · time)
   ctx.fillStyle = CREAM;
-  ctx.font = '8px "Press Start 2P"';
-  ctx.fillText(lvl.subtitle, W / 2 + panelX, H / 2 + 18);
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 22);
 
-  // MISSION — golden, below centre
+  // Mission — gold, below
   ctx.fillStyle = GLD;
-  ctx.font = '9px "Press Start 2P"';
-  ctx.fillText('MISSION: ' + lvl.mission, W / 2 + panelX, H * 0.72 + 26);
+  ctx.font = '11px "Press Start 2P"';
+  ctx.fillText(lvl.mission, W / 2, H / 2 + 60);
 
-  // funny quip line
-  ctx.fillStyle = 'rgba(245,240,220,0.75)';
-  ctx.font = '7px "Press Start 2P"';
-  ctx.fillText(lvl.introQuip, W / 2 + panelX, H * 0.72 + 50);
-
-  // skip prompt — blinks in bottom letterbox
+  // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
-    ctx.fillStyle = 'rgba(226,168,32,0.5)';
-    ctx.font = '6px "Press Start 2P"';
-    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2 + panelX, H - 18);
+    ctx.fillStyle = 'rgba(226,168,32,0.45)';
+    ctx.font = '7px "Press Start 2P"';
+    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2, H - 22);
   }
 }
 
