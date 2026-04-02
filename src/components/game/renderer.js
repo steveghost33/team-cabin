@@ -27,13 +27,20 @@ export function renderFrame(ctx, engine, frame) {
   // ── YPSILANTI WATER TOWER (far background) ───
   if (engine.lvlIdx === 0) drawWaterTower(ctx, scrollX);
 
+  // ── YPSILANTI PLANES (sky layer, before buildings) ───────────
+  if (engine.lvlIdx === 0) drawYpsiPlanes(ctx, frame);
+
   // ── BUILDINGS ────────────────────────────────
   engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
-  // ── HYPERION COFFEE (drawn after buildings so it's in front) ───
+  // ── YPSILANTI LANDMARKS (drawn after buildings so they're in front) ──
   if (engine.lvlIdx === 0) {
-    const hbx = 2200 - scrollX;
+    const mrpbx = 600 - scrollX;
+    if (mrpbx > -200 && mrpbx < W + 20) drawMrPizza(ctx, mrpbx);
+    const hbx = 1400 - scrollX;
     if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
+    const bbx = 2200 - scrollX;
+    if (bbx > -220 && bbx < W + 20) drawTheBomber(ctx, bbx);
   }
 
   // ── GROUND ───────────────────────────────────
@@ -319,7 +326,7 @@ function drawWaterTower(ctx, scrollX) {
 // 8-bit Hyperion Coffee Co. (Ypsilanti): red brick two-story building,
 // dark storefront with two large door openings, hanging sign.
 function drawHyperionCoffee(ctx, bx) {
-  const bw = 240, bh = 170, storeH = 60;
+  const bw = 210, bh = 148, storeH = 54;
   const by = GROUND;
   const upperH = bh - storeH; // 110px
 
@@ -413,6 +420,180 @@ function drawHyperionCoffee(ctx, bx) {
   // ── roof cap ─────────────────────────────────
   ctx.fillStyle = '#1a1a1a';
   ctx.fillRect(bx - 3, by - bh - 6, bw + 6, 7);
+}
+
+// ── SMALL PLANES flying through Ypsilanti sky ──────────────────
+function drawYpsiPlanes(ctx, frame) {
+  for (let i = 0; i < 3; i++) {
+    const period = W + 280;
+    const px = W + 140 - ((frame * 0.55 + i * Math.floor(period / 3)) % period);
+    const py = 30 + i * 26;
+    if (px < -50 || px > W + 50) continue;
+    // fuselage
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillRect(px, py, 30, 6);
+    // nose cone
+    ctx.fillStyle = '#666';
+    ctx.fillRect(px - 5, py + 1, 6, 4);
+    // cockpit
+    ctx.fillStyle = '#7ac8e0';
+    ctx.fillRect(px + 4, py - 4, 9, 5);
+    // wings
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(px + 6, py + 5, 18, 4);
+    // tail fin (vertical)
+    ctx.fillStyle = '#888';
+    ctx.fillRect(px + 25, py - 5, 5, 6);
+    // tail horizontal
+    ctx.fillRect(px + 23, py + 5, 9, 3);
+    // propeller
+    ctx.fillStyle = '#444';
+    ctx.fillRect(px - 6, py - 1, 2, 8);
+  }
+}
+
+// ── MR. PIZZA (Ypsilanti ~25% through level) ───────────────────
+function drawMrPizza(ctx, bx) {
+  const bw = 178, bh = 98, storeH = 50;
+  const by = GROUND;
+
+  // dark charcoal upper facade
+  ctx.fillStyle = '#2e2e2e';
+  ctx.fillRect(bx, by - bh, bw, bh - storeH);
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  for (let y = 8; y < bh - storeH; y += 10) ctx.fillRect(bx, by - bh + y, bw, 1);
+
+  // BIG illuminated sign — full width, 34px tall
+  const sy = by - bh + 3, sw = bw - 6, sx = bx + 3;
+  // glow halo
+  ctx.fillStyle = 'rgba(255,220,100,0.12)';
+  ctx.fillRect(sx - 4, sy - 4, sw + 8, 42);
+  // sign body
+  ctx.fillStyle = '#f8f4e0';
+  ctx.fillRect(sx, sy, sw, 34);
+  ctx.strokeStyle = '#cc8800'; ctx.lineWidth = 2;
+  ctx.strokeRect(sx + 1, sy + 1, sw - 2, 32);
+  // "Mr." smaller
+  ctx.fillStyle = '#d04000';
+  ctx.font = '8px "Press Start 2P"'; ctx.textAlign = 'left';
+  ctx.fillText('Mr.', sx + 6, sy + 15);
+  // "PIZZA" huge
+  ctx.fillStyle = '#e05500';
+  ctx.font = '17px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('PIZZA', sx + sw / 2 + 16, sy + 28);
+
+  // red storefront
+  ctx.fillStyle = '#b81010';
+  ctx.fillRect(bx, by - storeH, bw, storeH);
+
+  // string lights strip
+  ctx.fillStyle = '#ccc';
+  ctx.fillRect(bx, by - storeH, bw, 3);
+  for (let lx = bx + 5; lx < bx + bw - 4; lx += 10) {
+    ctx.fillStyle = (Math.floor(lx / 10) % 2 === 0) ? '#fff6aa' : '#aaffaa';
+    ctx.fillRect(lx, by - storeH, 5, 5);
+  }
+
+  // two large windows
+  [6, bw - 64].forEach(wx => {
+    ctx.fillStyle = '#162838';
+    ctx.fillRect(bx + wx, by - storeH + 6, 54, 38);
+    ctx.fillStyle = 'rgba(100,180,220,0.3)';
+    ctx.fillRect(bx + wx + 2, by - storeH + 8, 50, 34);
+    ctx.fillStyle = 'rgba(200,20,20,0.2)';
+    ctx.fillRect(bx + wx + 2, by - storeH + 8, 50, 34);
+    // string lights inside window
+    for (let li = 0; li < 5; li++) {
+      ctx.fillStyle = 'rgba(255,255,180,0.75)';
+      ctx.fillRect(bx + wx + 5 + li * 9, by - storeH + 10, 4, 3);
+    }
+    ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx + wx, by - storeH + 6, 54, 38);
+  });
+
+  // center glass door
+  const dx = Math.floor((bw - 36) / 2);
+  ctx.fillStyle = '#162838';
+  ctx.fillRect(bx + dx, by - storeH + 10, 36, 40);
+  ctx.fillStyle = 'rgba(100,180,220,0.35)';
+  ctx.fillRect(bx + dx + 2, by - storeH + 12, 15, 36);
+  ctx.fillRect(bx + dx + 19, by - storeH + 12, 15, 36);
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx + dx, by - storeH + 10, 36, 40);
+
+  // roof cap
+  ctx.fillStyle = '#111';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+}
+
+// ── THE BOMBER (Ypsilanti ~75% through level) ──────────────────
+function drawTheBomber(ctx, bx) {
+  const bw = 200, bh = 110, lowerH = 46;
+  const by = GROUND;
+  const upperH = bh - lowerH;
+
+  // bright yellow upper wall
+  ctx.fillStyle = '#f2b800';
+  ctx.fillRect(bx, by - bh, bw, upperH);
+  // top stripe
+  ctx.fillStyle = '#c99a00';
+  ctx.fillRect(bx, by - bh, bw, 5);
+
+  // sign box outline on yellow
+  const sw = 180, sx = bx + 10, sy2 = by - bh + 8;
+  ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2;
+  ctx.strokeRect(sx, sy2, sw, upperH - 12);
+
+  // pixel plane silhouette
+  const pcx = sx + sw / 2, pcy = sy2 + 20;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(pcx - 20, pcy - 3, 40, 6);   // fuselage
+  ctx.fillRect(pcx - 26, pcy + 1, 52, 4);   // wings
+  ctx.fillRect(pcx + 18, pcy - 3, 7, 4);   // nose
+  ctx.fillRect(pcx - 28, pcy - 8, 8, 10);  // tail fin
+
+  // text
+  ctx.fillStyle = '#111';
+  ctx.font = '9px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('THE BOMBER', sx + sw / 2, sy2 + 38);
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('RESTAURANT', sx + sw / 2, sy2 + 50);
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('306', sx + sw / 2, sy2 + 60);
+
+  // yellow band dividing upper/lower
+  ctx.fillStyle = '#f2b800';
+  ctx.fillRect(bx, by - lowerH - 3, bw, 6);
+
+  // red brick lower section
+  ctx.fillStyle = '#8B1010';
+  ctx.fillRect(bx, by - lowerH, bw, lowerH);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  for (let y = 8; y < lowerH; y += 10) ctx.fillRect(bx, by - lowerH + y, bw, 1);
+  for (let row = 0; row < Math.floor(lowerH / 10); row++) {
+    const xOff = (row % 2) * 18;
+    for (let x = xOff; x < bw; x += 36) ctx.fillRect(bx + x, by - lowerH + row * 10, 1, 10);
+  }
+
+  // two windows lower left
+  [8, 72].forEach(wx => {
+    ctx.fillStyle = '#2a4a6a';
+    ctx.fillRect(bx + wx, by - lowerH + 6, 54, 30);
+    ctx.fillStyle = 'rgba(160,210,255,0.3)';
+    ctx.fillRect(bx + wx + 2, by - lowerH + 8, 50, 26);
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx + wx, by - lowerH + 6, 54, 30);
+  });
+
+  // door right side
+  ctx.fillStyle = '#1a2a3a';
+  ctx.fillRect(bx + 145, by - lowerH + 8, 30, 38);
+  ctx.fillStyle = 'rgba(160,210,255,0.3)';
+  ctx.fillRect(bx + 147, by - lowerH + 10, 26, 34);
+
+  // roof cap
+  ctx.fillStyle = '#c99a00';
+  ctx.fillRect(bx - 2, by - bh - 5, bw + 4, 6);
 }
 
 // ── GROVE STUDIOS ──────────────────────────────

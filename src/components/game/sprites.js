@@ -181,8 +181,9 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     return;
   }
 
-  const walk = Math.sin((o.at || 0) * 0.2) * 3;
-  if (o.at !== undefined) o.at++;
+  o.at = (o.at || 0) + 1;
+  const walk = Math.sin(o.at * 0.2) * 3;
+  const lL = Math.round(walk), lR = -lL;
 
   if (o.type === 'cone') {
     ctx.fillStyle = '#FF6600';
@@ -194,9 +195,9 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     ctx.fillStyle = '#333'; ctx.fillRect(ox-4,oy+24,26,4);
 
   } else if (o.type === 'metermaid') {
-    // legs
-    ctx.fillStyle = '#1a4a1a'; ctx.fillRect(ox+3,oy+22,7,10+walk); ctx.fillRect(ox+14,oy+22,7,10-walk);
-    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30,9,4); ctx.fillRect(ox+13,oy+30,9,4);
+    // legs — Y-offset walk cycle (matches player)
+    ctx.fillStyle = '#1a4a1a'; ctx.fillRect(ox+3,oy+22+lL,7,10); ctx.fillRect(ox+14,oy+22+lR,7,10);
+    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30+lL,9,4); ctx.fillRect(ox+13,oy+30+lR,9,4);
     // body
     ctx.fillStyle = '#1a6a1a'; ctx.fillRect(ox+1,oy+9,22,14);
     ctx.fillStyle = '#2a7a2a'; ctx.fillRect(ox+3,oy+9,18,7);
@@ -220,9 +221,9 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ox+9,oy+3,3,3); ctx.fillRect(ox+14,oy+3,3,3);
 
   } else if (o.type === 'muscledude') {
-    // legs
-    ctx.fillStyle = '#222'; ctx.fillRect(ox+3,oy+22,8,10+walk); ctx.fillRect(ox+13,oy+22,8,10-walk);
-    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30,10,4); ctx.fillRect(ox+13,oy+30,10,4);
+    // legs — Y-offset walk cycle
+    ctx.fillStyle = '#222'; ctx.fillRect(ox+3,oy+22+lL,8,10); ctx.fillRect(ox+13,oy+22+lR,8,10);
+    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30+lL,10,4); ctx.fillRect(ox+13,oy+30+lR,10,4);
     // body — red NO PKG shirt
     ctx.fillStyle = '#8B0000'; ctx.fillRect(ox,oy+9,24,14);
     ctx.fillStyle = '#aa1010'; ctx.fillRect(ox+2,oy+9,20,7);
@@ -270,9 +271,9 @@ export function drawEnemy(ctx, o, scrollX, frame) {
     ctx.restore();
 
   } else if (o.type === 'biker') {
-    // legs
-    ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ox+3,oy+22,8,10+walk); ctx.fillRect(ox+13,oy+22,8,10-walk);
-    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30,10,4); ctx.fillRect(ox+13,oy+30,10,4);
+    // legs — Y-offset walk cycle
+    ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ox+3,oy+22+lL,8,10); ctx.fillRect(ox+13,oy+22+lR,8,10);
+    ctx.fillStyle = '#111'; ctx.fillRect(ox+2,oy+30+lL,10,4); ctx.fillRect(ox+13,oy+30+lR,10,4);
     // leather jacket
     ctx.fillStyle = '#1a1a1a'; ctx.fillRect(ox,oy+9,24,14);
     ctx.fillStyle = '#2a2a2a'; ctx.fillRect(ox+2,oy+9,20,7);
