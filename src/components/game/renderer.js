@@ -27,6 +27,12 @@ export function renderFrame(ctx, engine, frame) {
   // ── YPSILANTI WATER TOWER (far background) ───
   if (engine.lvlIdx === 0) drawWaterTower(ctx, scrollX);
 
+  // ── HYPERION COFFEE (mid-level landmark, Ypsilanti) ───
+  if (engine.lvlIdx === 0) {
+    const hbx = 2200 - scrollX;
+    if (hbx > -220 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
+  }
+
   // ── BUILDINGS ────────────────────────────────
   engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
@@ -220,13 +226,14 @@ function drawHUD(ctx, engine, lvl) {
     const b = engine.boss;
     const bpct = b.hp / b.maxHp;
     const bW = 180;
+    // boss bar sits BELOW the life icons (which end ~y=35)
     ctx.fillStyle = '#fff'; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(b.label, W - 10, 24);
-    ctx.fillStyle = '#111'; ctx.fillRect(W - bW - 12, 27, bW + 4, 14);
+    ctx.fillText(b.label, W - 10, 36);
+    ctx.fillStyle = '#111'; ctx.fillRect(W - bW - 12, 38, bW + 4, 12);
     ctx.fillStyle = bpct > 0.5 ? '#2ecc71' : bpct > 0.25 ? '#f39c12' : '#e74c3c';
-    ctx.fillRect(W - bW - 10, 29, Math.max(0, bW * bpct), 10);
+    ctx.fillRect(W - bW - 10, 40, Math.max(0, bW * bpct), 8);
     ctx.strokeStyle = GLD; ctx.lineWidth = 1;
-    ctx.strokeRect(W - bW - 12, 27, bW + 4, 14);
+    ctx.strokeRect(W - bW - 12, 38, bW + 4, 12);
   }
 }
 
@@ -306,6 +313,83 @@ function drawWaterTower(ctx, scrollX) {
   // ── base grass mound ─────────────────────────
   ctx.fillStyle = 'rgba(50,110,30,0.45)';
   ctx.fillRect(bx - 30, by - 5, 60, 5);
+}
+
+// ── HYPERION COFFEE ────────────────────────────
+// 8-bit Hyperion Coffee Co. (Ypsilanti): red brick two-story building,
+// dark storefront with two large door openings, hanging sign.
+function drawHyperionCoffee(ctx, bx) {
+  const bw = 190, bh = 108;
+  const by = GROUND;
+
+  // ── upper brick wall ─────────────────────────
+  ctx.fillStyle = '#7a3018';
+  ctx.fillRect(bx, by - bh, bw, bh - 40);
+  // horizontal mortar lines
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let y = 7; y < bh - 40; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
+  // staggered vertical mortar
+  ctx.fillStyle = 'rgba(0,0,0,0.10)';
+  for (let row = 0; row < Math.floor((bh - 40) / 9); row++) {
+    const xOff = (row % 2) * 14;
+    for (let x = xOff; x < bw; x += 28) ctx.fillRect(bx + x, by - bh + row * 9, 1, 9);
+  }
+
+  // ── three tall upper windows ──────────────────
+  [14, 78, 142].forEach(wx => {
+    const wy = by - bh + 8;
+    // dark frame
+    ctx.fillStyle = '#111';
+    ctx.fillRect(bx + wx, wy, 34, 44);
+    // glass panes (2 cols, light sky tint)
+    ctx.fillStyle = 'rgba(180,210,240,0.28)';
+    ctx.fillRect(bx + wx + 2, wy + 2, 14, 40);
+    ctx.fillRect(bx + wx + 18, wy + 2, 14, 40);
+    // white window frame lines
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillRect(bx + wx + 16, wy + 2, 2, 40); // center divider
+    ctx.fillRect(bx + wx + 2, wy + 21, 30, 1); // mid rail
+    // subtle highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(bx + wx + 2, wy + 2, 14, 6);
+    ctx.fillRect(bx + wx + 18, wy + 2, 14, 6);
+  });
+
+  // ── dark lower storefront ─────────────────────
+  ctx.fillStyle = '#181818';
+  ctx.fillRect(bx, by - 40, bw, 40);
+
+  // ── two large dark doorways ───────────────────
+  [10, 108].forEach(dx => {
+    ctx.fillStyle = '#090909';
+    ctx.fillRect(bx + dx, by - 38, 68, 38);
+    // door frame
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(bx + dx, by - 38, 2, 38);
+    ctx.fillRect(bx + dx + 66, by - 38, 2, 38);
+    ctx.fillRect(bx + dx, by - 38, 68, 2);
+  });
+
+  // ── hanging sign board ────────────────────────
+  const sx = bx + 32, sy = by - bh + 58;
+  ctx.fillStyle = '#f0ece0';
+  ctx.fillRect(sx, sy, 126, 20);
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
+  ctx.strokeRect(sx, sy, 126, 20);
+  // hanging wire/chain
+  ctx.fillStyle = '#888';
+  ctx.fillRect(sx + 18, sy - 5, 1, 6);
+  ctx.fillRect(sx + 106, sy - 5, 1, 6);
+  // sign text
+  ctx.fillStyle = '#1a1a1a';
+  ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('HYPERION', bx + 95, sy + 10);
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('COFFEE CO.', bx + 95, sy + 17);
+
+  // ── roof cap ─────────────────────────────────
+  ctx.fillStyle = '#3a3a3a';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
 }
 
 // ── GROVE STUDIOS ──────────────────────────────

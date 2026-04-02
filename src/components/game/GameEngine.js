@@ -154,9 +154,13 @@ export class GameEngine {
 
   _spawnPizza() {
     if (this.boss) return;
+    // prevent clustering: skip if last pizza is within 280 world-px
+    const spawnX = this.scrollX + W + 80;
+    const last = this.pizzas[this.pizzas.length - 1];
+    if (last && spawnX - last.x < 280) return;
     const fly = Math.random() < 0.38;
     this.pizzas.push({
-      x: this.scrollX + W + 80,
+      x: spawnX,
       y: fly ? GROUND - PH - 48 - Math.random() * 55 : GROUND - PH - 4,
       bob: Math.random() * Math.PI * 2,
       collected: false,
