@@ -425,20 +425,25 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
 
   // gold accent bars
   ctx.fillStyle = GLD;
-  ctx.fillRect(0, H / 2 - 98, W, 3);
-  ctx.fillRect(0, H / 2 + 72, W, 3);
+  ctx.fillRect(0, H / 2 - 106, W, 3);
+  ctx.fillRect(0, H / 2 + 80,  W, 3);
 
   // CITY NAME
   ctx.fillStyle = GLD;
   ctx.font = '64px "Press Start 2P"';
   ctx.shadowBlur = 26; ctx.shadowColor = GLD;
-  ctx.fillText(lvl.name, W / 2, H / 2 - 20);
+  ctx.fillText(lvl.name, W / 2, H / 2 - 28);
   ctx.shadowBlur = 0;
 
-  // Quip — the one punchy line, big and readable
+  // Mission
+  ctx.fillStyle = GLD;
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText(lvl.mission, W / 2, H / 2 + 18);
+
+  // Quip
   ctx.fillStyle = CREAM;
-  ctx.font = '15px "Press Start 2P"';
-  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 50);
+  ctx.font = '13px "Press Start 2P"';
+  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 52);
 
   // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
