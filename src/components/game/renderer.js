@@ -173,13 +173,12 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = 'rgba(0,0,0,0.78)';
   ctx.fillRect(0, 0, W, 52);
 
-  // score — inset 82px from left so it survives mobile 120vw clip
-  const lx = 82;
+  // score
   ctx.fillStyle = GLD; ctx.font = '11px "Press Start 2P"'; ctx.textAlign = 'left';
-  ctx.fillText('SCORE:' + sc, lx, 18);
+  ctx.fillText('SCORE:' + sc, 10, 18);
   if (engine.highSc > 0) {
     ctx.fillStyle = 'rgba(226,168,32,0.55)'; ctx.font = '8px "Press Start 2P"';
-    ctx.fillText('BEST:' + engine.highSc, lx, 34);
+    ctx.fillText('BEST:' + engine.highSc, 10, 34);
   }
 
   // HP bar
@@ -199,8 +198,8 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = 'rgba(245,240,220,0.5)'; ctx.font = '6px "Press Start 2P"';
   ctx.fillText(lvl.mission, W/2, 46);
 
-  // character life icons — inset 95px from right for mobile safe zone
-  const rx = W - 95;
+  // character life icons — top-right
+  const rx = W - 20;
   for (let i = 0; i < 3; i++) {
     const iconX = rx - (2 - i) * 26;
     const iconY = 22;
@@ -209,25 +208,25 @@ function drawHUD(ctx, engine, lvl) {
     ctx.globalAlpha = 1;
   }
 
-  // pizza counter or boss HP — all right-anchored at rx for mobile safe zone
+  // pizza counter or boss HP
   if (!engine.boss) {
     ctx.fillStyle = GLD; ctx.font = '9px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(`🍕 ${pc}/16`, rx, 42);
+    ctx.fillText(`🍕 ${pc}/16`, W-10, 42);
     for (let i = 0; i < 16; i++) {
       ctx.fillStyle = i < pc ? '#FF8C00' : '#1a2a10';
-      ctx.fillRect(rx - 16*11 + i*11, 44, 9, 7);
+      ctx.fillRect(W-10-16*11+i*11, 44, 9, 7);
     }
   } else {
     const b = engine.boss;
     const bpct = b.hp / b.maxHp;
     const bW = 180;
     ctx.fillStyle = '#fff'; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(b.label, rx, 24);
-    ctx.fillStyle = '#111'; ctx.fillRect(rx - bW, 27, bW + 4, 14);
+    ctx.fillText(b.label, W - 10, 24);
+    ctx.fillStyle = '#111'; ctx.fillRect(W - bW - 12, 27, bW + 4, 14);
     ctx.fillStyle = bpct > 0.5 ? '#2ecc71' : bpct > 0.25 ? '#f39c12' : '#e74c3c';
-    ctx.fillRect(rx - bW + 2, 29, Math.max(0, bW * bpct), 10);
+    ctx.fillRect(W - bW - 10, 29, Math.max(0, bW * bpct), 10);
     ctx.strokeStyle = GLD; ctx.lineWidth = 1;
-    ctx.strokeRect(rx - bW, 27, bW + 4, 14);
+    ctx.strokeRect(W - bW - 12, 27, bW + 4, 14);
   }
 }
 

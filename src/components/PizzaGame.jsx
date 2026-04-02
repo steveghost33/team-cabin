@@ -659,28 +659,12 @@ export default function PizzaGame() {
   }
 
   // ── NORMAL LAYOUT ───────────────────────────
-  // On mobile: the canvas wrapper is 120vw wide (overflows 10vw each side)
-  // and the outer div clips it. This makes the game 20% larger without
-  // changing the internal canvas resolution — characters are visibly bigger.
-  // HUD elements are shifted 82–95 px inward to stay in the visible safe zone.
   return (
-    <div style={{
-      display: 'flex', flexDirection: 'column', alignItems: 'stretch',
-      overflow: isMobile ? 'hidden' : 'visible',
-    }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
       <div style={{
         position: 'relative',
-        background: '#000',
-        ...(isMobile ? {
-          width: '120vw',
-          marginLeft: '-10vw',
-        } : {
-          border: `4px solid ${GLD}`,
-          boxShadow: `4px 4px 0 #000`,
-          width: '100%',
-          maxWidth: 780,
-          alignSelf: 'center',
-        }),
+        border: `4px solid ${GLD}`, boxShadow: `4px 4px 0 #000`,
+        background: '#000', width: '100%', maxWidth: 780, alignSelf: 'center',
       }}>
         <canvas
           ref={canvasRef}
