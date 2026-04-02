@@ -33,13 +33,23 @@ export function renderFrame(ctx, engine, frame) {
   // ── BUILDINGS ────────────────────────────────
   engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
+  // ── FERNDALE LANDMARKS ───────────────────────
+  if (engine.lvlIdx === 1) {
+    const fsbx = 500 - scrollX;
+    if (fsbx > -220 && fsbx < W + 20) drawFoundSound(ctx, fsbx);
+    const combx = 2200 - scrollX;
+    if (combx > -240 && combx < W + 20) drawComos(ctx, combx);
+    const dibx = 4200 - scrollX;
+    if (dibx > -200 && dibx < W + 20) drawDannys(ctx, dibx);
+  }
+
   // ── YPSILANTI LANDMARKS (drawn after buildings so they're in front) ──
   if (engine.lvlIdx === 0) {
-    const mrpbx = 500 - scrollX;
+    const mrpbx = 400 - scrollX;
     if (mrpbx > -200 && mrpbx < W + 20) drawMrPizza(ctx, mrpbx);
-    const hbx = 2200 - scrollX;
+    const hbx = 2800 - scrollX;
     if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
-    const bbx = 4000 - scrollX;
+    const bbx = 5500 - scrollX;
     if (bbx > -220 && bbx < W + 20) drawTheBomber(ctx, bbx);
   }
 
@@ -49,6 +59,9 @@ export function renderFrame(ctx, engine, frame) {
   // ── PICKUPS ──────────────────────────────────
   engine.hearts.forEach(h => drawHeart(ctx, h, scrollX, frame));
   engine.pizzas.forEach(pz => drawPizza(ctx, pz, scrollX, frame));
+
+  // ── FERNDALE CARS ────────────────────────────
+  if (engine.cars) engine.cars.forEach(car => drawFerndaleCar(ctx, car, scrollX, frame));
 
   // ── ENEMIES ──────────────────────────────────
   engine.obs.forEach(o => drawEnemy(ctx, o, scrollX, frame));
@@ -427,7 +440,7 @@ function drawYpsiPlanes(ctx, frame) {
   for (let i = 0; i < 3; i++) {
     const period = W + 280;
     const px = W + 140 - ((frame * 0.55 + i * Math.floor(period / 3)) % period);
-    const py = 30 + i * 26;
+    const py = 80 + i * 32;
     if (px < -50 || px > W + 50) continue;
     // fuselage
     ctx.fillStyle = '#8a8a8a';
@@ -596,6 +609,247 @@ function drawTheBomber(ctx, bx) {
   ctx.fillRect(bx - 2, by - bh - 5, bw + 4, 6);
 }
 
+// ── FOUND SOUND RECORDS (Ferndale ~25%) ────────────────────────
+function drawFoundSound(ctx, bx) {
+  const bw = 195, bh = 95, awningH = 38;
+  const by = GROUND;
+
+  // brick upper facade — dark red-brown
+  ctx.fillStyle = '#5a2218';
+  ctx.fillRect(bx, by - bh, bw, bh - awningH);
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
+  for (let y = 8; y < bh - awningH; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
+  for (let row = 0; row < Math.floor((bh - awningH) / 9); row++) {
+    const xOff = (row % 2) * 16;
+    for (let x = xOff; x < bw; x += 32) ctx.fillRect(bx + x, by - bh + row * 9, 1, 9);
+  }
+
+  // two upper windows
+  [18, 130].forEach(wx => {
+    ctx.fillStyle = '#0a1020';
+    ctx.fillRect(bx + wx, by - bh + 6, 44, 40);
+    ctx.fillStyle = 'rgba(80,140,200,0.25)';
+    ctx.fillRect(bx + wx + 2, by - bh + 8, 40, 36);
+    ctx.strokeStyle = '#3a2010'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx + wx, by - bh + 6, 44, 40);
+  });
+
+  // BLACK awning — full width, dominant
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(bx, by - awningH, bw, awningH);
+  // awning bottom edge stripe
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx, by - 3, bw, 3);
+
+  // "FOUND SOUND" on awning — big white text
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '12px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('FOUND SOUND', bx + bw / 2, by - awningH + 18);
+  // small "records" subtitle
+  ctx.fillStyle = '#aaaaaa';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('RECORDS', bx + bw / 2, by - awningH + 30);
+
+  // record icon on sign (small pixel vinyl)
+  const rix = bx + bw / 2 - 80, riy = by - awningH + 10;
+  ctx.fillStyle = '#333';
+  ctx.beginPath(); ctx.arc(rix, riy, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#666';
+  ctx.beginPath(); ctx.arc(rix, riy, 4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#222';
+  ctx.beginPath(); ctx.arc(rix, riy, 2, 0, Math.PI * 2); ctx.fill();
+
+  // large display window
+  ctx.fillStyle = '#0e0e0e';
+  ctx.fillRect(bx + 8, by - awningH + 2, bw - 16, awningH - 4);
+  ctx.fillStyle = 'rgba(60,80,120,0.2)';
+  ctx.fillRect(bx + 10, by - awningH + 4, bw - 20, awningH - 8);
+
+  // roof cap
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+}
+
+// ── COMO'S PIZZA (Ferndale ~50%) ───────────────────────────────
+function drawComos(ctx, bx) {
+  const bw = 225, bh = 120, storeH = 42;
+  const by = GROUND;
+  const upperH = bh - storeH;
+
+  // orange-red brick upper wall
+  ctx.fillStyle = '#c04418';
+  ctx.fillRect(bx, by - bh, bw, upperH);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  for (let y = 8; y < upperH; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
+  for (let row = 0; row < Math.floor(upperH / 9); row++) {
+    const xOff = (row % 2) * 16;
+    for (let x = xOff; x < bw; x += 32) ctx.fillRect(bx + x, by - bh + row * 9, 1, 9);
+  }
+  // "COMOS" raised letter effect (big embossed letters on brick)
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  ctx.font = 'bold 22px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('COMOS', bx + bw / 2, by - storeH - 12);
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillText('COMOS', bx + bw / 2 - 1, by - storeH - 13);
+
+  // neon sign on a pole — "Como's" in a yellow box with red star
+  const signX = bx + bw / 2 - 55, signY = by - bh - 52;
+  // pole
+  ctx.fillStyle = '#555';
+  ctx.fillRect(bx + bw / 2 - 2, signY + 10, 4, bh + 52);
+  // sign frame — yellow
+  ctx.fillStyle = '#d4a800';
+  ctx.fillRect(signX, signY, 110, 52);
+  ctx.fillStyle = '#f0c000';
+  ctx.fillRect(signX + 2, signY + 2, 106, 48);
+  // red star at top
+  ctx.fillStyle = '#cc1111';
+  ctx.fillRect(signX + 47, signY - 10, 16, 14);
+  ctx.fillRect(signX + 43, signY - 6, 24, 6);
+  // "Como's" script-ish text
+  ctx.fillStyle = '#cc2244';
+  ctx.font = '11px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText("Como's", signX + 55, signY + 24);
+  ctx.fillStyle = '#1a1a88';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('Restaurant', signX + 55, signY + 36);
+  // yellow sign border lines
+  ctx.strokeStyle = '#888800'; ctx.lineWidth = 1;
+  ctx.strokeRect(signX + 4, signY + 4, 102, 44);
+
+  // lower storefront — warm tan/wood
+  ctx.fillStyle = '#8b5a20';
+  ctx.fillRect(bx, by - storeH, bw, storeH);
+  // wood panel texture
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  for (let y = 10; y < storeH; y += 10) ctx.fillRect(bx, by - storeH + y, bw, 1);
+
+  // three windows + center door (ground level)
+  [8, 76, 152].forEach((wx, i) => {
+    const iw = i === 1 ? 32 : 56;
+    ctx.fillStyle = i === 1 ? '#3a2010' : '#0a1820';
+    ctx.fillRect(bx + wx, by - storeH + 4, iw, storeH - 4);
+    ctx.fillStyle = i === 1 ? 'rgba(180,100,30,0.3)' : 'rgba(80,140,200,0.2)';
+    ctx.fillRect(bx + wx + 2, by - storeH + 6, iw - 4, storeH - 8);
+    ctx.strokeStyle = '#5a3a10'; ctx.lineWidth = 1;
+    ctx.strokeRect(bx + wx, by - storeH + 4, iw, storeH - 4);
+  });
+
+  // roof cap
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+}
+
+// ── DANNY'S IRISH PUB (Ferndale ~75%) ──────────────────────────
+function drawDannys(ctx, bx) {
+  const bw = 185, bh = 100, storeH = 44;
+  const by = GROUND;
+
+  // stone/rock facade — gray with variation
+  ctx.fillStyle = '#6a6a6a';
+  ctx.fillRect(bx, by - bh, bw, bh - storeH);
+  // stone block texture
+  const stoneColors = ['#787878','#6a6a6a','#727272','#686868'];
+  for (let row = 0; row < 6; row++) {
+    for (let col = 0; col < 5; col++) {
+      const xOff = (row % 2) * 18;
+      ctx.fillStyle = stoneColors[(row + col) % stoneColors.length];
+      ctx.fillRect(bx + col * 37 + xOff, by - bh + row * 10, 35, 9);
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      ctx.fillRect(bx + col * 37 + xOff, by - bh + row * 10 + 8, 35, 1);
+      ctx.fillRect(bx + col * 37 + xOff + 35, by - bh + row * 10, 1, 10);
+    }
+  }
+
+  // GREEN sign — "Danny's Irish Pub"
+  const sy = by - bh + 4, sw = bw - 10, sx2 = bx + 5;
+  ctx.fillStyle = '#0a3a0a';
+  ctx.fillRect(sx2, sy, sw, 30);
+  ctx.shadowBlur = 6; ctx.shadowColor = '#00cc00';
+  ctx.strokeStyle = '#0a8a0a'; ctx.lineWidth = 2;
+  ctx.strokeRect(sx2 + 1, sy + 1, sw - 2, 28);
+  ctx.shadowBlur = 0;
+  // shamrock pixel art
+  ctx.fillStyle = '#00aa00';
+  [[0,1],[1,0],[1,2],[2,1],[1,1]].forEach(([px,py]) => ctx.fillRect(sx2 + 8 + px * 4, sy + 8 + py * 4, 4, 4));
+  ctx.fillRect(sx2 + 12, sy + 20, 4, 8);
+  // text
+  ctx.fillStyle = '#00ee00';
+  ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText("Danny's", sx2 + sw / 2 + 8, sy + 14);
+  ctx.fillStyle = '#00aa00';
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('IRISH PUB', sx2 + sw / 2 + 8, sy + 24);
+
+  // storefront — dark
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx, by - storeH, bw, storeH);
+
+  // rainbow flag in window (left window)
+  const fw = 40, fh = 24, fx = bx + 12, fy = by - storeH + 10;
+  const rainbowCols = ['#e40303','#ff8c00','#ffed00','#008026','#004dff','#750787'];
+  rainbowCols.forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(fx, fy + i * 4, fw, 4);
+  });
+  ctx.strokeStyle = '#444'; ctx.lineWidth = 1;
+  ctx.strokeRect(fx, fy, fw, fh);
+
+  // right window
+  ctx.fillStyle = '#0a1020';
+  ctx.fillRect(bx + bw - 58, by - storeH + 8, 50, 28);
+  ctx.fillStyle = 'rgba(80,140,200,0.2)';
+  ctx.fillRect(bx + bw - 56, by - storeH + 10, 46, 24);
+
+  // center door
+  const dx = Math.floor((bw - 32) / 2);
+  ctx.fillStyle = '#1a3a10';
+  ctx.fillRect(bx + dx, by - storeH + 6, 32, 38);
+  ctx.strokeStyle = '#0a5a0a'; ctx.lineWidth = 2;
+  ctx.strokeRect(bx + dx + 2, by - storeH + 8, 28, 34);
+
+  // roof cap
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+}
+
+// ── FERNDALE CAR (obstacle) ────────────────────────────────────
+function drawFerndaleCar(ctx, car, scrollX, frame) {
+  const cx = car.x - scrollX;
+  if (cx > W + 80 || cx + car.w < -80) return;
+  const cy = car.y;
+
+  // car body — dark purple/pink neon Ferndale aesthetic
+  ctx.fillStyle = '#2a0a3a';
+  ctx.fillRect(cx, cy + 6, car.w, car.h - 6);
+  // roof
+  ctx.fillStyle = '#3a1050';
+  ctx.fillRect(cx + 10, cy, car.w - 20, 10);
+  // neon undercarriage glow
+  ctx.fillStyle = 'rgba(200,50,255,0.25)';
+  ctx.fillRect(cx + 4, cy + car.h - 2, car.w - 8, 4);
+  // windshields
+  ctx.fillStyle = '#7ac8e0';
+  ctx.fillRect(cx + 12, cy + 2, 16, 7);
+  ctx.fillRect(cx + car.w - 28, cy + 2, 16, 7);
+  // headlights (front = left, going left)
+  ctx.fillStyle = '#ffffc0';
+  ctx.fillRect(cx, cy + 9, 5, 5);
+  // tail lights
+  ctx.fillStyle = '#ff2222';
+  ctx.fillRect(cx + car.w - 5, cy + 9, 5, 5);
+  // neon stripe along side
+  ctx.fillStyle = 'rgba(180,40,255,0.7)';
+  ctx.fillRect(cx + 4, cy + 14, car.w - 8, 2);
+  // wheels
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(cx + 6, cy + car.h - 7, 14, 8);
+  ctx.fillRect(cx + car.w - 20, cy + car.h - 7, 14, 8);
+  ctx.fillStyle = '#555';
+  ctx.fillRect(cx + 9, cy + car.h - 6, 8, 6);
+  ctx.fillRect(cx + car.w - 17, cy + car.h - 6, 8, 6);
+}
+
 // ── GROVE STUDIOS ──────────────────────────────
 // 8-bit version of the real Grove Studios building (Ypsilanti):
 //   dark charcoal upper wall · vivid green lower band · dark-red roof
@@ -675,31 +929,29 @@ function drawGroveStudios(ctx, bx) {
   // ── sign board (upper-left, dark bg) ──────────
   const sx = bx + 4, sy = by - bh + 4;
   ctx.fillStyle = '#060a06';
-  ctx.fillRect(sx, sy, 78, 26);
-  ctx.shadowBlur = 7; ctx.shadowColor = '#20dd20';
+  ctx.fillRect(sx, sy, 112, 36);
+  ctx.shadowBlur = 9; ctx.shadowColor = '#20dd20';
   ctx.strokeStyle = '#189a18'; ctx.lineWidth = 1;
-  ctx.strokeRect(sx, sy, 78, 26);
+  ctx.strokeRect(sx, sy, 112, 36);
   ctx.shadowBlur = 0;
 
   // pixel circle logo (left of text)
   ctx.fillStyle = '#20cc20';
-  // outer ring
   [[3,1],[2,1],[1,2],[1,3],[1,4],[2,5],[3,5],[4,5],[5,4],[5,3],[5,2],[4,1]].forEach(([px,py]) => {
-    ctx.fillRect(sx + 6 + px * 2, sy + 6 + py * 2, 2, 2);
+    ctx.fillRect(sx + 6 + px * 2, sy + 8 + py * 2, 2, 2);
   });
-  // inner wave squiggle (3 pixels)
-  ctx.fillRect(sx + 11, sy + 12, 4, 2);
-  ctx.fillRect(sx + 15, sy + 10, 4, 2);
-  ctx.fillRect(sx + 19, sy + 12, 2, 2);
+  ctx.fillRect(sx + 11, sy + 18, 4, 2);
+  ctx.fillRect(sx + 15, sy + 16, 4, 2);
+  ctx.fillRect(sx + 19, sy + 18, 2, 2);
 
-  // "GROVE" text
+  // "GROVE" text — bigger
   ctx.fillStyle = '#22dd22';
-  ctx.font = 'bold 8px "Press Start 2P"'; ctx.textAlign = 'left';
-  ctx.fillText('GROVE', sx + 28, sy + 14);
+  ctx.font = 'bold 11px "Press Start 2P"'; ctx.textAlign = 'left';
+  ctx.fillText('GROVE', sx + 30, sy + 20);
   // "STUDIOS" sub-text
   ctx.fillStyle = '#18a018';
-  ctx.font = '5px "Press Start 2P"';
-  ctx.fillText('STUDIOS', sx + 28, sy + 22);
+  ctx.font = '7px "Press Start 2P"';
+  ctx.fillText('STUDIOS', sx + 30, sy + 30);
 }
 
 // ── OVERLAY SCREENS ────────────────────────────

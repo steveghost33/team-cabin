@@ -35,6 +35,8 @@ export class GameEngine {
     this.hearts = [];
     this.parts = [];
     this.blds = [];
+    this.cars = [];
+    this.carT = 0;
     this.boss = null;
     this.bossDeadTimer = 0;
     this.nextLvlTimer = 0;
@@ -108,7 +110,7 @@ export class GameEngine {
     pl.og = true; pl.inv = 60; pl.hp = MAX_HP;
     pl.dying = false; pl.dyingTimer = 0; pl.dyingLaunched = false;
     this.obs = []; this.pizzas = []; this.hearts = [];
-    this.parts = []; this.blds = [];
+    this.parts = []; this.blds = []; this.cars = []; this.carT = 0;
     this.boss = null;
     this.groveX = 0; this.walkingIn = false;
     this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
@@ -302,6 +304,14 @@ export class GameEngine {
       if (this.piT >= lvl.pizzaRate) { this._spawnPizza(); this.piT = 0; }
       this.hpT += dt;
       if (this.hpT >= lvl.heartRate) { this._spawnHeart(); this.hpT = 0; }
+      // Ferndale cars — spawn periodically on level 2
+      if (this.lvlIdx === 1) {
+        this.carT += dt;
+        if (this.carT >= 320) {
+          this.cars.push({ x: this.scrollX + W + 80, y: GROUND - 26, w: 64, h: 26, vx: -5.5 });
+          this.carT = 0;
+        }
+      }
     }
 
     if (this.pc >= PIZZA_TO_BOSS && !this.boss) this._triggerBoss();
@@ -418,6 +428,27 @@ export class GameEngine {
         this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 8);
         if (pl.hp <= 0) this._die();
         this.sync();
+      }
+      return true;
+    });
+
+    // ── FERNDALE CARS ─────────────────────────
+    this.cars = this.cars.filter(car => {
+      const cx = car.x - this.scrollX;
+      if (cx < -90) return false;
+      car.x += car.vx * dt;
+      if (pl.inv <= 0 && cx + car.w > pl.x && cx < pl.x + PW &&
+          car.y + car.h > pl.y && car.y < pl.y + PH) {
+        const pb = pl.y + PH;
+        const clearing = pb <= car.y + 5 && pl.vy >= 0;
+        if (!clearing) {
+          pl.hp -= 22;
+          pl.inv = 90;
+          pl.vx = (pl.x < cx + car.w / 2 ? -1 : 1) * 5;
+          this._addParts(pl.x + PW / 2, pl.y + PH / 2, '#e74c3c', 12);
+          if (pl.hp <= 0) this._die();
+          this.sync();
+        }
       }
       return true;
     });
