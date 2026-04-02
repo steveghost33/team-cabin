@@ -30,7 +30,7 @@ export function renderFrame(ctx, engine, frame) {
   // ── HYPERION COFFEE (mid-level landmark, Ypsilanti) ───
   if (engine.lvlIdx === 0) {
     const hbx = 2200 - scrollX;
-    if (hbx > -220 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
+    if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
   }
 
   // ── BUILDINGS ────────────────────────────────
@@ -319,77 +319,100 @@ function drawWaterTower(ctx, scrollX) {
 // 8-bit Hyperion Coffee Co. (Ypsilanti): red brick two-story building,
 // dark storefront with two large door openings, hanging sign.
 function drawHyperionCoffee(ctx, bx) {
-  const bw = 190, bh = 108;
+  const bw = 240, bh = 170, storeH = 60;
   const by = GROUND;
+  const upperH = bh - storeH; // 110px
 
   // ── upper brick wall ─────────────────────────
   ctx.fillStyle = '#7a3018';
-  ctx.fillRect(bx, by - bh, bw, bh - 40);
-  // horizontal mortar lines
+  ctx.fillRect(bx, by - bh, bw, upperH);
   ctx.fillStyle = 'rgba(0,0,0,0.18)';
-  for (let y = 7; y < bh - 40; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
-  // staggered vertical mortar
+  for (let y = 7; y < upperH; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
   ctx.fillStyle = 'rgba(0,0,0,0.10)';
-  for (let row = 0; row < Math.floor((bh - 40) / 9); row++) {
+  for (let row = 0; row < Math.floor(upperH / 9); row++) {
     const xOff = (row % 2) * 14;
     for (let x = xOff; x < bw; x += 28) ctx.fillRect(bx + x, by - bh + row * 9, 1, 9);
   }
 
-  // ── three tall upper windows ──────────────────
-  [14, 78, 142].forEach(wx => {
-    const wy = by - bh + 8;
-    // dark frame
-    ctx.fillStyle = '#111';
-    ctx.fillRect(bx + wx, wy, 34, 44);
-    // glass panes (2 cols, light sky tint)
-    ctx.fillStyle = 'rgba(180,210,240,0.28)';
-    ctx.fillRect(bx + wx + 2, wy + 2, 14, 40);
-    ctx.fillRect(bx + wx + 18, wy + 2, 14, 40);
-    // white window frame lines
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fillRect(bx + wx + 16, wy + 2, 2, 40); // center divider
-    ctx.fillRect(bx + wx + 2, wy + 21, 30, 1); // mid rail
-    // subtle highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    ctx.fillRect(bx + wx + 2, wy + 2, 14, 6);
-    ctx.fillRect(bx + wx + 18, wy + 2, 14, 6);
-  });
+  // ── GIANT sign — nearly full building width, 100px tall ──
+  const sw = 228, sh = 100, sx = bx + 6, sy = by - bh + 5;
+  // drop shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(sx + 4, sy + 4, sw, sh);
+  // sign cream body
+  ctx.fillStyle = '#f5f0e0';
+  ctx.fillRect(sx, sy, sw, sh);
+  // thick border
+  ctx.strokeStyle = '#5a4020'; ctx.lineWidth = 3;
+  ctx.strokeRect(sx + 1, sy + 1, sw - 2, sh - 2);
+  // inner thin border
+  ctx.strokeStyle = '#8b6535'; ctx.lineWidth = 1;
+  ctx.strokeRect(sx + 5, sy + 5, sw - 10, sh - 10);
+
+  // ── Planet/Saturn logo — centered at top of sign ──
+  const pcx = sx + sw / 2, pcy = sy + 38, pr = 20;
+  // planet body
+  ctx.fillStyle = '#1a1a1a';
+  ctx.beginPath(); ctx.arc(pcx, pcy, pr, 0, Math.PI * 2); ctx.fill();
+  // planet highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.arc(pcx - 6, pcy - 6, 8, 0, Math.PI * 2); ctx.fill();
+  // ring (ellipse behind + front) — tilt like the real logo
+  ctx.save();
+  ctx.translate(pcx, pcy);
+  ctx.rotate(-0.3);
+  // back arc of ring (clipped behind planet)
+  ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.ellipse(0, 0, pr * 1.9, pr * 0.52, 0, Math.PI, Math.PI * 2); ctx.stroke();
+  // front arc of ring
+  ctx.beginPath(); ctx.ellipse(0, 0, pr * 1.9, pr * 0.52, 0, 0, Math.PI); ctx.stroke();
+  ctx.restore();
+
+  // ── HYPERION text — large, below planet ───────
+  ctx.fillStyle = '#111111';
+  ctx.textAlign = 'center';
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText('HYPERION', sx + sw / 2, sy + 72);
+  // COFFEE CO. small
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillStyle = '#444';
+  ctx.fillText('COFFEE  CO.', sx + sw / 2, sy + 86);
+
+  // hanging wire brackets
+  ctx.fillStyle = '#777';
+  ctx.fillRect(sx + 24, sy - 8, 3, 9);
+  ctx.fillRect(sx + sw - 27, sy - 8, 3, 9);
 
   // ── dark lower storefront ─────────────────────
-  ctx.fillStyle = '#181818';
-  ctx.fillRect(bx, by - 40, bw, 40);
+  ctx.fillStyle = '#0a0f0a';
+  ctx.fillRect(bx, by - storeH, bw, storeH);
 
-  // ── two large dark doorways ───────────────────
-  [10, 108].forEach(dx => {
-    ctx.fillStyle = '#090909';
-    ctx.fillRect(bx + dx, by - 38, 68, 38);
-    // door frame
-    ctx.fillStyle = '#2a2a2a';
-    ctx.fillRect(bx + dx, by - 38, 2, 38);
-    ctx.fillRect(bx + dx + 66, by - 38, 2, 38);
-    ctx.fillRect(bx + dx, by - 38, 68, 2);
+  // ── two DOMINANT green doors ──────────────────
+  [4, 122].forEach(dx => {
+    const dw = 112, dh = storeH - 4;
+    const dy = by - storeH + 4;
+    // door fill — dark forest green
+    ctx.fillStyle = '#091809';
+    ctx.fillRect(bx + dx, dy, dw, dh);
+    // bold green frame — 4px
+    ctx.strokeStyle = '#2d602d'; ctx.lineWidth = 4;
+    ctx.strokeRect(bx + dx + 2, dy + 2, dw - 4, dh - 2);
+    // horizontal panel slats
+    ctx.strokeStyle = '#1a3d1a'; ctx.lineWidth = 1;
+    for (let py2 = dy + 14; py2 < dy + dh - 4; py2 += 14) {
+      ctx.beginPath(); ctx.moveTo(bx + dx + 7, py2); ctx.lineTo(bx + dx + dw - 7, py2); ctx.stroke();
+    }
+    // center vertical split
+    ctx.strokeStyle = '#2d602d'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bx + dx + Math.floor(dw / 2), dy + 5);
+    ctx.lineTo(bx + dx + Math.floor(dw / 2), dy + dh - 2);
+    ctx.stroke();
   });
 
-  // ── hanging sign board ────────────────────────
-  const sx = bx + 32, sy = by - bh + 58;
-  ctx.fillStyle = '#f0ece0';
-  ctx.fillRect(sx, sy, 126, 20);
-  ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
-  ctx.strokeRect(sx, sy, 126, 20);
-  // hanging wire/chain
-  ctx.fillStyle = '#888';
-  ctx.fillRect(sx + 18, sy - 5, 1, 6);
-  ctx.fillRect(sx + 106, sy - 5, 1, 6);
-  // sign text
-  ctx.fillStyle = '#1a1a1a';
-  ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
-  ctx.fillText('HYPERION', bx + 95, sy + 10);
-  ctx.font = '5px "Press Start 2P"';
-  ctx.fillText('COFFEE CO.', bx + 95, sy + 17);
-
   // ── roof cap ─────────────────────────────────
-  ctx.fillStyle = '#3a3a3a';
-  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx - 3, by - bh - 6, bw + 6, 7);
 }
 
 // ── GROVE STUDIOS ──────────────────────────────
@@ -600,33 +623,32 @@ function drawInitials(ctx, frame, engine) {
 
 function drawTitle(ctx, frame, highSc, playerName) {
   ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
-  // star field
   for (let i=0;i<40;i++) {
     const sx=(i*131+frame*0.3)%W, sy=(i*71)%(H*0.55);
     ctx.fillStyle = Math.sin(frame*0.04+i)>0.4 ? GLD : 'rgba(226,168,32,0.08)';
     ctx.fillRect(sx,sy,2,2);
   }
-  ctx.fillStyle='rgba(0,0,0,0.88)'; ctx.fillRect(W/2-290,H/2-210,580,420);
-  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-290,H/2-210,580,420);
-  ctx.fillStyle=GLD; ctx.font='19px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('DETROIT PIZZA QUEST',W/2,H/2-165);
-  ctx.fillStyle='rgba(226,168,32,0.6)'; ctx.font='10px "Press Start 2P"';
-  ctx.fillText('— Team Cabin Edition —',W/2,H/2-138);
-  ctx.fillStyle=CREAM; ctx.font='9px "Press Start 2P"';
-  const lines=[
-    '3 LEVELS · 3 BOSSES · 1 CITY',
-    '← → MOVE   SPACE / A JUMP',
-    'JUMP ON ENEMIES TO DEFEAT THEM',
-    'COLLECT 16 SLICES → BOSS FIGHT',
-    '❤ GRAB HEARTS TO RESTORE HP',
-    '❤❤❤  3 LIVES · FULL HP EACH LIFE',
-  ];
-  lines.forEach((l,i)=>ctx.fillText(l,W/2,H/2-105+i*24));
+  ctx.fillStyle='rgba(0,0,0,0.92)'; ctx.fillRect(W/2-270,H/2-180,540,360);
+  ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-270,H/2-180,540,360);
+
+  // title
+  ctx.fillStyle=GLD; ctx.font='22px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('DETROIT PIZZA QUEST',W/2,H/2-118);
+  ctx.fillStyle='rgba(226,168,32,0.55)'; ctx.font='10px "Press Start 2P"';
+  ctx.fillText('— Team Cabin Edition —',W/2,H/2-90);
+
+  // big simple instructions
+  ctx.fillStyle=CREAM; ctx.font='15px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('MOVE:  ← →',       W/2, H/2 - 36);
+  ctx.fillText('JUMP:  SPACE / A',  W/2, H/2 + 6);
+  ctx.fillText('STOMP ENEMIES',     W/2, H/2 + 48);
+
+  // press start
   if (Math.floor(frame/25)%2===0) {
-    ctx.fillStyle='#4A7A30'; ctx.font='11px "Press Start 2P"';
-    ctx.fillText('[ PRESS ENTER OR START ]',W/2,H/2+65);
+    ctx.fillStyle=GLD; ctx.font='14px "Press Start 2P"';
+    ctx.fillText('PRESS ENTER / START',W/2,H/2+110);
   }
-  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.55)';ctx.font='9px "Press Start 2P"';ctx.fillText('HIGH SCORE: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+95);}
+  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+140);}
 }
 
 function drawCharSelect(ctx, frame, selChar) {
