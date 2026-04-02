@@ -282,13 +282,11 @@ function drawWaterTower(ctx, scrollX) {
   // The tank is nearly 2× the cylinder width, bulbous and round like the photo.
   // Rows from bottom (collar) to top; wide in the middle, curving to blunt top.
   const dRows = [
-    [52, 4], // bottom — already well wider than the 36px cylinder
-    [62, 4], // widens quickly
-    [68, 4], // near max
-    [70, 4], // widest band — about 2× cylinder width
-    [70, 4], [70, 4], // stays wide through the equator
-    [68, 4], [64, 4], [58, 4], [50, 4], // curving over the top
-    [40, 3], [28, 3], [16, 2], [7, 2], [3, 1], // narrowing to blunt top
+    [52, 4], [62, 4], [68, 4],
+    [70, 4], [70, 4], [70, 4],        // wide equatorial band
+    [68, 4], [64, 4], [58, 4], [50, 4],
+    [42, 3], [34, 2], [26, 2],        // gradual taper
+    [18, 2], [12, 1], [7, 1], [4, 1], [2, 1], // smooth round top
   ];
   let dy = by - 110; // start at top of collar
   for (const [rw, rh] of dRows) {
@@ -423,40 +421,30 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
   ctx.fillStyle = 'rgba(0,0,0,0.78)';
   ctx.fillRect(0, 0, W, H);
 
-  // gold accent bars
-  ctx.fillStyle = GLD;
-  ctx.fillRect(0, H / 2 - 122, W, 3);
-  ctx.fillRect(0, H / 2 + 102, W, 3);
-
   ctx.textAlign = 'center';
 
-  // CITY NAME — very large
+  // gold accent bars
   ctx.fillStyle = GLD;
-  ctx.font = '58px "Press Start 2P"';
-  ctx.shadowBlur = 24; ctx.shadowColor = GLD;
-  ctx.fillText(lvl.name, W / 2, H / 2 - 36);
+  ctx.fillRect(0, H / 2 - 98, W, 3);
+  ctx.fillRect(0, H / 2 + 72, W, 3);
+
+  // CITY NAME
+  ctx.fillStyle = GLD;
+  ctx.font = '64px "Press Start 2P"';
+  ctx.shadowBlur = 26; ctx.shadowColor = GLD;
+  ctx.fillText(lvl.name, W / 2, H / 2 - 20);
   ctx.shadowBlur = 0;
 
-  // Subtitle
+  // Quip — the one punchy line, big and readable
   ctx.fillStyle = CREAM;
-  ctx.font = '17px "Press Start 2P"';
-  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 16);
-
-  // Mission — gold
-  ctx.fillStyle = GLD;
-  ctx.font = '14px "Press Start 2P"';
-  ctx.fillText(lvl.mission, W / 2, H / 2 + 50);
-
-  // Quip — cream, noticeably readable
-  ctx.fillStyle = 'rgba(245,240,220,0.82)';
-  ctx.font = '12px "Press Start 2P"';
-  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 84);
+  ctx.font = '15px "Press Start 2P"';
+  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 50);
 
   // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
-    ctx.fillStyle = 'rgba(226,168,32,0.45)';
+    ctx.fillStyle = 'rgba(226,168,32,0.4)';
     ctx.font = '8px "Press Start 2P"';
-    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2, H - 20);
+    ctx.fillText('TAP TO SKIP', W / 2, H - 22);
   }
 }
 
