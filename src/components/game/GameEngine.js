@@ -38,6 +38,8 @@ export class GameEngine {
     this.boss = null;
     this.bossDeadTimer = 0;
     this.nextLvlTimer = 0;
+    this.groveX = 0;
+    this.walkingIn = false;
     this.keys = {};
     this.charIdx = 0;
     this.selChar = 0;
@@ -108,6 +110,7 @@ export class GameEngine {
     this.obs = []; this.pizzas = []; this.hearts = [];
     this.parts = []; this.blds = [];
     this.boss = null;
+    this.groveX = 0; this.walkingIn = false;
     this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
     for (let i = 0; i < 26; i++) this.blds.push(this._mkBld(i * 165 + 200));
   }
@@ -264,6 +267,9 @@ export class GameEngine {
       if (Math.abs(pl.vx) < 0.05) pl.vx = 0;
     }
 
+    // auto-walk into Grove Studios — override player input
+    if (this.walkingIn) { pl.vx = MOVE_SPEED * 0.9; pl.face = 1; }
+
     if ((this.keys['ArrowUp'] || this.keys['Space'] || this.keys['KeyW']) && !this.jumpPressed) {
       this.jumpPressed = true;
       this.jump();
@@ -318,7 +324,17 @@ export class GameEngine {
         pl.vy = -12;            // impulse — no dt, keep horizontal momentum
         this.sc += 500;
         this._addParts(bOx + b.w/2, b.y, GLD, 18);
-        if (b.hp <= 0) { b.dead = true; this.bossDeadTimer = 120; this.sc += 2000; }
+        if (b.hp <= 0) {
+          b.dead = true; this.sc += 2000;
+          if (this.lvlIdx === 0) {
+            // place Grove Studios ahead and auto-walk player in
+            this.groveX = this.scrollX + W + 60;
+            this.walkingIn = true;
+            this.bossDeadTimer = 600; // long timeout — walk-in will trigger transition early
+          } else {
+            this.bossDeadTimer = 120;
+          }
+        }
         this.sync();
       } else if (pl.inv <= 0 && overlapX && pl.y < b.y + b.h && pl.y + PH > b.y && !stomping) {
         pl.hp -= 18;
@@ -330,6 +346,15 @@ export class GameEngine {
     }
 
     if (this.boss && this.boss.dead) {
+      // level 0: check if player has reached the Grove Studios door
+      if (this.walkingIn && this.groveX > 0) {
+        const doorScreenX = this.groveX - this.scrollX + 12;
+        if (doorScreenX <= pl.x + PW) {
+          this.walkingIn = false;
+          this.bossDeadTimer = 0;
+        }
+      }
+
       this.bossDeadTimer -= dt;
       if (this.bossDeadTimer <= 0) {
         if (this.lvlIdx < LEVELS.length - 1) {

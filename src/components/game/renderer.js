@@ -43,11 +43,6 @@ export function renderFrame(ctx, engine, frame) {
   // ── BOSS ─────────────────────────────────────
   if (engine.boss) drawBoss(ctx, engine.boss, scrollX, frame);
 
-  // ── GROVE STUDIOS (level 1 boss defeated) ───
-  if (engine.lvlIdx === 0 && engine.boss && engine.boss.dead) {
-    drawGroveStudios(ctx);
-  }
-
   // ── PARTICLES ────────────────────────────────
   engine.parts.forEach(p => {
     ctx.globalAlpha = p.life / p.ml;
@@ -58,6 +53,11 @@ export function renderFrame(ctx, engine, frame) {
 
   // ── PLAYER ───────────────────────────────────
   drawPlayer(ctx, engine.pl, engine.charIdx, frame);
+
+  // ── GROVE STUDIOS (drawn after player so building covers walk-in) ───
+  if (engine.lvlIdx === 0 && engine.groveX > 0) {
+    drawGroveStudios(ctx, engine.groveX - engine.scrollX);
+  }
 
   // ── HUD ──────────────────────────────────────
   drawHUD(ctx, engine, lvl);
@@ -308,9 +308,9 @@ function drawWaterTower(ctx, scrollX) {
 // 8-bit version of the real Grove Studios building (Ypsilanti):
 //   dark charcoal upper wall · vivid green lower band · dark-red roof
 //   trim · steel door far-left · three glass-block windows · sign w/ logo
-function drawGroveStudios(ctx) {
+function drawGroveStudios(ctx, bx) {
   const bw = 250, bh = 88;
-  const bx = W / 2 - bw / 2, by = GROUND;
+  const by = GROUND;
   const green = 36; // height of vivid green lower band
 
   // ── thin dark-red roof trim ───────────────────
@@ -432,18 +432,23 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
   ctx.fillStyle = GLD;
   ctx.font = '52px "Press Start 2P"';
   ctx.shadowBlur = 22; ctx.shadowColor = GLD;
-  ctx.fillText(lvl.name, W / 2, H / 2 - 18);
+  ctx.fillText(lvl.name, W / 2, H / 2 - 30);
   ctx.shadowBlur = 0;
 
   // Subtitle (location · time)
   ctx.fillStyle = CREAM;
   ctx.font = '14px "Press Start 2P"';
-  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 22);
+  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 14);
 
-  // Mission — gold, below
+  // Mission — gold
   ctx.fillStyle = GLD;
   ctx.font = '11px "Press Start 2P"';
-  ctx.fillText(lvl.mission, W / 2, H / 2 + 60);
+  ctx.fillText(lvl.mission, W / 2, H / 2 + 46);
+
+  // Quip — small italic cream
+  ctx.fillStyle = 'rgba(245,240,220,0.72)';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 76);
 
   // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
