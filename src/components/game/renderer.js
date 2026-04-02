@@ -173,12 +173,13 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = 'rgba(0,0,0,0.78)';
   ctx.fillRect(0, 0, W, 52);
 
-  // score
+  // score — inset 82px from left so it survives mobile 120vw clip
+  const lx = 82;
   ctx.fillStyle = GLD; ctx.font = '11px "Press Start 2P"'; ctx.textAlign = 'left';
-  ctx.fillText('SCORE:' + sc, 10, 18);
+  ctx.fillText('SCORE:' + sc, lx, 18);
   if (engine.highSc > 0) {
     ctx.fillStyle = 'rgba(226,168,32,0.55)'; ctx.font = '8px "Press Start 2P"';
-    ctx.fillText('BEST:' + engine.highSc, 10, 34);
+    ctx.fillText('BEST:' + engine.highSc, lx, 34);
   }
 
   // HP bar
@@ -198,36 +199,35 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = 'rgba(245,240,220,0.5)'; ctx.font = '6px "Press Start 2P"';
   ctx.fillText(lvl.mission, W/2, 46);
 
-  // character life icons — top-right, 3 tiny versions of current player
+  // character life icons — inset 95px from right for mobile safe zone
+  const rx = W - 95;
   for (let i = 0; i < 3; i++) {
-    const iconX = W - 20 - (2 - i) * 26;
+    const iconX = rx - (2 - i) * 26;
     const iconY = 22;
     if (i >= lives) ctx.globalAlpha = 0.13;
     drawCharPreview(ctx, engine.charIdx, iconX, iconY, 0.52);
     ctx.globalAlpha = 1;
   }
 
-  // pizza counter or boss HP — boss bar placed BELOW hearts to avoid overlap
+  // pizza counter or boss HP — all right-anchored at rx for mobile safe zone
   if (!engine.boss) {
     ctx.fillStyle = GLD; ctx.font = '9px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(`🍕 ${pc}/16`, W-10, 42);
+    ctx.fillText(`🍕 ${pc}/16`, rx, 42);
     for (let i = 0; i < 16; i++) {
       ctx.fillStyle = i < pc ? '#FF8C00' : '#1a2a10';
-      ctx.fillRect(W-10-16*11+i*11, 44, 9, 7);
+      ctx.fillRect(rx - 16*11 + i*11, 44, 9, 7);
     }
   } else {
     const b = engine.boss;
     const bpct = b.hp / b.maxHp;
     const bW = 180;
-    // label above the bar, right-aligned — sits just below hearts (y≈22)
     ctx.fillStyle = '#fff'; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'right';
-    ctx.fillText(b.label, W - 10, 24);
-    // bar at y=27 — below hearts which end at y≈21
-    ctx.fillStyle = '#111'; ctx.fillRect(W - bW - 12, 27, bW + 4, 14);
+    ctx.fillText(b.label, rx, 24);
+    ctx.fillStyle = '#111'; ctx.fillRect(rx - bW, 27, bW + 4, 14);
     ctx.fillStyle = bpct > 0.5 ? '#2ecc71' : bpct > 0.25 ? '#f39c12' : '#e74c3c';
-    ctx.fillRect(W - bW - 10, 29, Math.max(0, bW * bpct), 10);
+    ctx.fillRect(rx - bW + 2, 29, Math.max(0, bW * bpct), 10);
     ctx.strokeStyle = GLD; ctx.lineWidth = 1;
-    ctx.strokeRect(W - bW - 12, 27, bW + 4, 14);
+    ctx.strokeRect(rx - bW, 27, bW + 4, 14);
   }
 }
 
@@ -273,18 +273,23 @@ function drawWaterTower(ctx, scrollX) {
 
   // ── decorative collar ring (junction) ────────
   ctx.fillStyle = COL;
-  ctx.fillRect(bx - 20, by - 110, 40, 5);
+  ctx.fillRect(bx - 26, by - 110, 52, 5);
   // rivet-like band detail
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.fillRect(bx - 20, by - 108, 40, 1);
-  ctx.fillRect(bx - 20, by - 106, 40, 1);
+  ctx.fillRect(bx - 26, by - 108, 52, 1);
+  ctx.fillRect(bx - 26, by - 106, 52, 1);
 
-  // ── rounded dome — half-circle profile ──────────
-  // Rows stay wide for longer then curve sharply at top for dome shape.
-  // Width follows approx sqrt(r²-(h-r)²)*2 for r=18 over 38px height.
+  // ── rounded dome — wide hemisphere matching the real tower ──────────
+  // The tank is nearly 2× the cylinder width, bulbous and round like the photo.
+  // Rows from bottom (collar) to top; wide in the middle, curving to blunt top.
   const dRows = [
-    [36, 5], [36, 4], [35, 4], [33, 4], [30, 4],
-    [26, 4], [22, 4], [17, 3], [12, 3], [8, 3], [5, 2], [3, 2], [2, 1],
+    [52, 4], // bottom — already well wider than the 36px cylinder
+    [62, 4], // widens quickly
+    [68, 4], // near max
+    [70, 4], // widest band — about 2× cylinder width
+    [70, 4], [70, 4], // stays wide through the equator
+    [68, 4], [64, 4], [58, 4], [50, 4], // curving over the top
+    [40, 3], [28, 3], [16, 2], [7, 2], [3, 1], // narrowing to blunt top
   ];
   let dy = by - 110; // start at top of collar
   for (const [rw, rh] of dRows) {
@@ -296,8 +301,6 @@ function drawWaterTower(ctx, scrollX) {
     ctx.fillRect(bx + rw / 2 - sh, dy - rh, sh, rh);
     dy -= rh;
   }
-  // flat round tip
-  ctx.fillStyle = DM; ctx.fillRect(bx - 1, dy - 1, 2, 1);
 
   // ── base grass mound ─────────────────────────
   ctx.fillStyle = 'rgba(50,110,30,0.45)';
@@ -423,38 +426,38 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
 
   // gold accent bars
   ctx.fillStyle = GLD;
-  ctx.fillRect(0, H / 2 - 110, W, 3);
-  ctx.fillRect(0, H / 2 + 90,  W, 3);
+  ctx.fillRect(0, H / 2 - 122, W, 3);
+  ctx.fillRect(0, H / 2 + 102, W, 3);
 
   ctx.textAlign = 'center';
 
   // CITY NAME — very large
   ctx.fillStyle = GLD;
-  ctx.font = '52px "Press Start 2P"';
-  ctx.shadowBlur = 22; ctx.shadowColor = GLD;
-  ctx.fillText(lvl.name, W / 2, H / 2 - 30);
+  ctx.font = '58px "Press Start 2P"';
+  ctx.shadowBlur = 24; ctx.shadowColor = GLD;
+  ctx.fillText(lvl.name, W / 2, H / 2 - 36);
   ctx.shadowBlur = 0;
 
-  // Subtitle (location · time)
+  // Subtitle
   ctx.fillStyle = CREAM;
-  ctx.font = '14px "Press Start 2P"';
-  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 14);
+  ctx.font = '17px "Press Start 2P"';
+  ctx.fillText(lvl.subtitle, W / 2, H / 2 + 16);
 
   // Mission — gold
   ctx.fillStyle = GLD;
-  ctx.font = '11px "Press Start 2P"';
-  ctx.fillText(lvl.mission, W / 2, H / 2 + 46);
+  ctx.font = '14px "Press Start 2P"';
+  ctx.fillText(lvl.mission, W / 2, H / 2 + 50);
 
-  // Quip — small italic cream
-  ctx.fillStyle = 'rgba(245,240,220,0.72)';
-  ctx.font = '8px "Press Start 2P"';
-  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 76);
+  // Quip — cream, noticeably readable
+  ctx.fillStyle = 'rgba(245,240,220,0.82)';
+  ctx.font = '12px "Press Start 2P"';
+  ctx.fillText(lvl.introQuip, W / 2, H / 2 + 84);
 
   // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
     ctx.fillStyle = 'rgba(226,168,32,0.45)';
-    ctx.font = '7px "Press Start 2P"';
-    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2, H - 22);
+    ctx.font = '8px "Press Start 2P"';
+    ctx.fillText('TAP ANY BUTTON TO SKIP', W / 2, H - 20);
   }
 }
 

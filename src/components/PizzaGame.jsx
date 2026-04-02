@@ -10,13 +10,17 @@ import { renderFrame } from './game/renderer.js';
 import { GLD, GRN, GRN2, CREAM } from './game/constants.js';
 
 export default function PizzaGame() {
-  const canvasRef  = useRef(null);
-  const engineRef  = useRef(null);
-  const rafRef     = useRef(null);
-  const frameRef   = useRef(0);
-  const musicRef   = useRef(null);
-  const pausedRef  = useRef(false);   // ref so game loop closure reads live value
-  const mutedRef   = useRef(false);
+  const canvasRef          = useRef(null);
+  const engineRef          = useRef(null);
+  const rafRef             = useRef(null);
+  const frameRef           = useRef(0);
+  const musicRef           = useRef(null);
+  const pausedRef          = useRef(false);   // ref so game loop closure reads live value
+  const mutedRef           = useRef(false);
+  // Tracks which pointer IDs are currently held on direction buttons.
+  // When React re-renders, button elements remount and lose setPointerCapture —
+  // the global listener below catches the stray pointerup and clears the key.
+  const activeDirPointers  = useRef({});
 
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -143,12 +147,22 @@ export default function PizzaGame() {
     requestAnimationFrame(loop);
 
     // ── DIRECTION-KEY SAFETY NET ──────────────────
-    // Only fires on touchcancel (OS interrupt — notification, call, etc.).
-    // We do NOT hook pointerup/touchend globally because those fire for the
-    // JUMP button too, which would wipe ArrowRight mid-air.
-    // setPointerCapture on each DirBtn already guarantees pointerup reaches
-    // the correct button element, so no global pointerup hook is needed.
+    // React re-renders recreate button elements, losing setPointerCapture.
+    // We track every direction-button pointer ID in activeDirPointers so that
+    // even if the element remounts between pointerdown and pointerup, the global
+    // listener here catches the orphaned pointerup and releases the key.
+    const onGlobalPointerEnd = (e) => {
+      if (activeDirPointers.current[e.pointerId] !== undefined) {
+        delete activeDirPointers.current[e.pointerId];
+        engine.keys['ArrowLeft']  = false;
+        engine.keys['ArrowRight'] = false;
+      }
+    };
+    window.addEventListener('pointerup',     onGlobalPointerEnd, { passive: true });
+    window.addEventListener('pointercancel', onGlobalPointerEnd, { passive: true });
+    // Also keep touchcancel for OS interrupts (call screen, notification, etc.)
     const clearDirKeys = () => {
+      activeDirPointers.current = {};
       engine.keys['ArrowLeft']  = false;
       engine.keys['ArrowRight'] = false;
     };
@@ -182,6 +196,8 @@ export default function PizzaGame() {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
+      window.removeEventListener('pointerup',     onGlobalPointerEnd);
+      window.removeEventListener('pointercancel', onGlobalPointerEnd);
       window.removeEventListener('touchcancel', clearDirKeys);
       document.removeEventListener('visibilitychange', onVisibility);
       observer.disconnect();
@@ -457,9 +473,9 @@ export default function PizzaGame() {
             justifyContent: 'flex-start',
             paddingLeft: 14,
           }}
-          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb('left', true); }}
-          onPointerUp={e => { e.preventDefault(); mb('left', false); }}
-          onPointerCancel={e => { e.preventDefault(); mb('left', false); }}
+          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'left'; mb('left', true); }}
+          onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
+          onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
           onContextMenu={e => e.preventDefault()}
         >
           {/* bold SVG triangle arrow */}
@@ -487,9 +503,9 @@ export default function PizzaGame() {
             justifyContent: 'flex-end',
             paddingRight: 14,
           }}
-          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb('right', true); }}
-          onPointerUp={e => { e.preventDefault(); mb('right', false); }}
-          onPointerCancel={e => { e.preventDefault(); mb('right', false); }}
+          onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'right'; mb('right', true); }}
+          onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
+          onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
           onContextMenu={e => e.preventDefault()}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -643,12 +659,28 @@ export default function PizzaGame() {
   }
 
   // ── NORMAL LAYOUT ───────────────────────────
+  // On mobile: the canvas wrapper is 120vw wide (overflows 10vw each side)
+  // and the outer div clips it. This makes the game 20% larger without
+  // changing the internal canvas resolution — characters are visibly bigger.
+  // HUD elements are shifted 82–95 px inward to stay in the visible safe zone.
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'stretch',
+      overflow: isMobile ? 'hidden' : 'visible',
+    }}>
       <div style={{
         position: 'relative',
-        border: `4px solid ${GLD}`, boxShadow: `4px 4px 0 #000`,
-        background: '#000', width: '100%', maxWidth: 780, alignSelf: 'center',
+        background: '#000',
+        ...(isMobile ? {
+          width: '120vw',
+          marginLeft: '-10vw',
+        } : {
+          border: `4px solid ${GLD}`,
+          boxShadow: `4px 4px 0 #000`,
+          width: '100%',
+          maxWidth: 780,
+          alignSelf: 'center',
+        }),
       }}>
         <canvas
           ref={canvasRef}
