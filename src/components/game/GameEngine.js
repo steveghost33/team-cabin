@@ -345,6 +345,8 @@ export class GameEngine {
             this.groveX = this.scrollX + W + 60;
             this.walkingIn = true;
             this.bossDeadTimer = 600; // long timeout — walk-in will trigger transition early
+          } else if (this.lvlIdx === 1) {
+            this.bossDeadTimer = 360; // Ferndale: hold for PugFest celebration
           } else {
             this.bossDeadTimer = 120;
           }
