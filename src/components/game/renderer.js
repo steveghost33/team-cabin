@@ -39,16 +39,13 @@ export function renderFrame(ctx, engine, frame) {
 
   // ── FERNDALE LANDMARKS ───────────────────────
   if (engine.lvlIdx === 1) {
-    if (engine.boss) {
-      // Boss fight and post-boss: draw PugFest centered as fixed backdrop
+    // PugFest only appears as fixed boss-fight backdrop — never as a world landmark
+    if (engine.boss && !engine.boss.dead) {
       drawPugFest(ctx, W / 2 - 140);
-    } else {
-      const fsbx = 500 - scrollX;
-      if (fsbx > -280 && fsbx < W + 20) drawPugFest(ctx, fsbx);
     }
-    const combx = 2200 - scrollX;
+    const combx = 700 - scrollX;
     if (combx > -240 && combx < W + 20) drawComos(ctx, combx);
-    const dibx = 4200 - scrollX;
+    const dibx = 2000 - scrollX;
     if (dibx > -200 && dibx < W + 20) drawDannys(ctx, dibx);
   }
 
@@ -627,9 +624,9 @@ function drawTheBomber(ctx, bx) {
 
 // ── PUG FEST BOSS-DEAD CELEBRATION ────────────────────────────
 function drawPugFestCelebration(ctx, engine, frame) {
-  const stageBX = W / 2 - 140;
-  const stageH = 30;
-  const scale = 2.0;
+  const stageH = 44;
+  const stageY = GROUND - stageH;
+  const scale = 3.2;
 
   // Night sky
   const sg = ctx.createLinearGradient(0, 0, 0, H);
@@ -639,7 +636,7 @@ function drawPugFestCelebration(ctx, engine, frame) {
   // Stars
   for (let i = 0; i < 70; i++) {
     const sx = (i * 137 + 50) % W;
-    const sy = (i * 89) % (GROUND - 60);
+    const sy = (i * 89) % (GROUND - 80);
     const blink = Math.sin(frame * 0.05 + i * 0.8) * 0.5 + 0.5;
     ctx.globalAlpha = 0.3 + blink * 0.7;
     ctx.fillStyle = '#ffffff';
@@ -647,175 +644,286 @@ function drawPugFestCelebration(ctx, engine, frame) {
   }
   ctx.globalAlpha = 1;
 
-  // Colored sweeping spotlights from sky
-  const beamCols = ['rgba(255,80,255,0.07)', 'rgba(80,220,255,0.07)', 'rgba(255,220,40,0.06)'];
+  // Sweeping spotlights from sky
+  const beamCols = ['rgba(255,80,255,0.07)','rgba(80,220,255,0.07)','rgba(255,220,40,0.06)','rgba(100,255,150,0.06)'];
   beamCols.forEach((col, i) => {
-    const angle = Math.sin(frame * 0.015 + i * 1.2) * 0.4;
-    const bx2 = W / 2 + Math.sin(frame * 0.02 + i * 2) * 180;
-    ctx.save();
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = col;
+    const bx2 = W / 2 + Math.sin(frame * 0.018 + i * 1.6) * 260;
+    ctx.save(); ctx.globalAlpha = 1; ctx.fillStyle = col;
     ctx.beginPath();
     ctx.moveTo(bx2, 0);
-    ctx.lineTo(bx2 - 60 + angle * 80, GROUND);
-    ctx.lineTo(bx2 + 60 + angle * 80, GROUND);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
+    ctx.lineTo(bx2 - 70, GROUND); ctx.lineTo(bx2 + 70, GROUND);
+    ctx.closePath(); ctx.fill(); ctx.restore();
   });
 
   // Ground
   ctx.fillStyle = '#120824'; ctx.fillRect(0, GROUND, W, H - GROUND);
   ctx.fillStyle = '#1e0f38'; ctx.fillRect(0, GROUND - 3, W, 3);
 
-  // Draw stage
-  drawPugFest(ctx, stageBX);
+  // ── Full-width stage platform ──
+  ctx.fillStyle = '#1e0f2e';
+  ctx.fillRect(0, stageY, W, stageH);
+  ctx.fillStyle = '#2e1a48';
+  ctx.fillRect(0, stageY + 2, W, stageH - 6);
+  ctx.fillStyle = '#0e0018';
+  ctx.fillRect(0, stageY + stageH - 4, W, 4);
 
-  // Characters on stage — feet at GROUND - stageH = GROUND - 30
-  // drawCharPreview feet at screen y: (cy - 6*scale) + 30*scale = cy + 24*scale
-  // So cy = (GROUND - stageH) - 24*scale
-  const charY = GROUND - stageH - 24 * scale;
-  const stageLeft = stageBX;
+  // Stage edge neon strip
+  const neonGrad = ctx.createLinearGradient(0, 0, W, 0);
+  neonGrad.addColorStop(0, '#ff44ff'); neonGrad.addColorStop(0.5, '#44aaff'); neonGrad.addColorStop(1, '#ff44ff');
+  ctx.fillStyle = neonGrad;
+  ctx.fillRect(0, stageY, W, 3);
 
-  // --- Steve on bass (left side, charIdx=0) ---
-  const steveCX = stageLeft + 70;
-  // Bounce bob animation
-  const steveY = charY + Math.sin(frame * 0.12) * 3;
-  drawCharPreview(ctx, 0, steveCX, steveY, scale);
-  // Bass guitar — long body angled toward crowd
-  drawBassGuitar(ctx, steveCX + 2, steveY + 24 * scale - 14);
+  // ── Left scaffold tower ──
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(8, 20, 14, stageY - 20);
+  ctx.fillRect(26, 20, 14, stageY - 20);
+  ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 2;
+  for (let y = 20; y < stageY; y += 24) {
+    ctx.beginPath(); ctx.moveTo(8, y); ctx.lineTo(40, y + 24); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(8, y + 24); ctx.stroke();
+  }
+  // Light bar left
+  ctx.fillStyle = '#111'; ctx.fillRect(4, 14, 40, 10);
+  ['#ff44ff','#44ffff','#ffff44','#ff4488','#44ff88'].forEach((c, i) => {
+    ctx.fillStyle = c; ctx.fillRect(6 + i * 7, 15, 5, 8);
+    ctx.save(); ctx.globalAlpha = 0.14; ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.moveTo(8 + i * 7, 23); ctx.lineTo(8 + i * 7 - 40, stageY); ctx.lineTo(8 + i * 7 + 30, stageY);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  });
 
-  // --- Kyle on guitar (center, charIdx=2) ---
-  const kyleCX = stageLeft + 148;
-  const kyleY = charY + Math.sin(frame * 0.12 + 1.0) * 3;
-  drawCharPreview(ctx, 2, kyleCX, kyleY, scale);
-  // Electric guitar
-  drawElectricGuitar(ctx, kyleCX + 2, kyleY + 24 * scale - 14);
+  // ── Right scaffold tower ──
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(W - 40, 20, 14, stageY - 20);
+  ctx.fillRect(W - 22, 20, 14, stageY - 20);
+  ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 2;
+  for (let y = 20; y < stageY; y += 24) {
+    ctx.beginPath(); ctx.moveTo(W - 40, y); ctx.lineTo(W - 8, y + 24); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W - 8, y); ctx.lineTo(W - 40, y + 24); ctx.stroke();
+  }
+  ctx.fillStyle = '#111'; ctx.fillRect(W - 44, 14, 40, 10);
+  ['#44ffff','#ff44ff','#ff8800','#44ff88','#aa44ff'].forEach((c, i) => {
+    ctx.fillStyle = c; ctx.fillRect(W - 42 + i * 7, 15, 5, 8);
+    ctx.save(); ctx.globalAlpha = 0.14; ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.moveTo(W - 40 + i * 7, 23); ctx.lineTo(W - 40 + i * 7 - 30, stageY); ctx.lineTo(W - 40 + i * 7 + 40, stageY);
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  });
 
-  // --- Mike on drums (right side, charIdx=1) ---
-  const mikeCX = stageLeft + 222;
-  drawDrumKit(ctx, mikeCX - 18, GROUND - stageH - 2, frame);
-  // Mike sits slightly higher (on drum stool)
-  const mikeY = charY - 10 + Math.sin(frame * 0.18) * 2;
-  drawCharPreview(ctx, 1, mikeCX, mikeY, scale);
-
-  // Drum sticks animation (Mike)
-  const stickAngle = Math.sin(frame * 0.25) * 0.7;
-  ctx.save();
-  ctx.strokeStyle = '#d4a870'; ctx.lineWidth = 2;
-  // left stick
-  ctx.save();
-  ctx.translate(mikeCX - 12, mikeY + 18 * scale);
-  ctx.rotate(-0.5 + stickAngle);
-  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 18); ctx.stroke();
-  ctx.restore();
-  // right stick
-  ctx.save();
-  ctx.translate(mikeCX + 8, mikeY + 18 * scale);
-  ctx.rotate(0.5 - stickAngle);
-  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 18); ctx.stroke();
-  ctx.restore();
-  ctx.restore();
-
-  // ── "LEVEL CLEAR!" banner ──
-  const flash = Math.floor(frame / 16) % 2 === 0;
-  ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(0,0,0,0.55)';
-  ctx.fillRect(W / 2 - 170, 18, 340, 36);
-  ctx.strokeStyle = GLD; ctx.lineWidth = 2;
-  ctx.strokeRect(W / 2 - 170, 18, 340, 36);
-  if (flash) {
-    ctx.fillStyle = GLD;
-    ctx.font = '14px "Press Start 2P"';
-    ctx.fillText('RECORD EXEC DEFEATED!', W / 2, 42);
+  // ── Top truss connecting towers ──
+  ctx.fillStyle = '#111'; ctx.fillRect(48, 18, W - 96, 8);
+  ctx.strokeStyle = '#222'; ctx.lineWidth = 1;
+  for (let x = 0; x < W - 96; x += 14) {
+    ctx.beginPath(); ctx.moveTo(48 + x, 18); ctx.lineTo(48 + x + 7, 26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(48 + x + 7, 18); ctx.lineTo(48 + x, 26); ctx.stroke();
   }
 
-  // Floating musical notes
+  // ── BIG PugFest banner behind band ──
+  const bannerW = 380, bannerH = 190;
+  const bannerX = W / 2 - bannerW / 2;
+  const bannerTop = stageY - bannerH - 8;
+  const textStripH = 30;
+  const imgAreaH = bannerH - textStripH;
+
+  // Banner frame
+  ctx.fillStyle = '#0a000e';
+  ctx.fillRect(bannerX - 4, bannerTop - 4, bannerW + 8, bannerH + 8);
+  ctx.fillStyle = '#111';
+  ctx.fillRect(bannerX, bannerTop, bannerW, bannerH);
+
+  // Image
+  if (_pugImg.complete && _pugImg.naturalWidth > 0) {
+    const aspect = _pugImg.naturalWidth / _pugImg.naturalHeight;
+    let dw = bannerW, dh = bannerW / aspect;
+    if (dh > imgAreaH) { dh = imgAreaH; dw = imgAreaH * aspect; }
+    const dx = bannerX + (bannerW - dw) / 2;
+    const dy = bannerTop + (imgAreaH - dh) / 2;
+    ctx.drawImage(_pugImg, dx, dy, dw, dh);
+  }
+
+  // Text strip
+  const textY = bannerTop + imgAreaH;
+  ctx.fillStyle = '#f5e050';
+  ctx.fillRect(bannerX, textY, bannerW, textStripH);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#7a3a00'; ctx.font = 'bold 17px Arial Black, Arial';
+  ctx.fillText('PUG FEST', W / 2 + 1, textY + textStripH - 7);
+  ctx.fillStyle = '#44ccee';
+  ctx.fillText('PUG FEST', W / 2, textY + textStripH - 8);
+
+  // Banner border & bulb lights
+  ctx.strokeStyle = '#aa8800'; ctx.lineWidth = 2;
+  ctx.strokeRect(bannerX, bannerTop, bannerW, bannerH);
+  const bulbCols = ['#ff4444','#ffcc00','#44ff88','#44aaff','#ff44ff'];
+  for (let i = 0; i <= 12; i++) {
+    const bx2 = bannerX + i * (bannerW / 12);
+    ctx.fillStyle = bulbCols[i % bulbCols.length];
+    ctx.beginPath(); ctx.arc(bx2, bannerTop, 3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bx2, bannerTop + bannerH, 3, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Character feet land on stage surface
+  // drawCharPreview: feet at cy + 24*scale
+  // Want feet at stageY → cy = stageY - 24*scale
+  const charY = stageY - 24 * scale;
+
+  // ── Amps behind Steve (left/stage-right) and Kyle (right/stage-left) ──
+  // Drawn first so chars appear in front
+  drawAmp(ctx, 60, stageY - 52, 38, 52);   // amp behind Steve (left)
+  drawAmp(ctx, W - 100, stageY - 52, 38, 52); // amp behind Kyle (right)
+
+  // ── Mike center-back on drums ──
+  const mikeCX = W / 2;
+  // Mike slightly elevated (drum stool)
+  const mikeY = charY - 12 + Math.sin(frame * 0.15) * 2;
+  drawDrumKit(ctx, mikeCX - 30, stageY, frame);
+  drawCharPreview(ctx, 1, mikeCX, mikeY, scale);
+  // Drum sticks
+  const stickA = Math.sin(frame * 0.28) * 0.8;
+  ctx.strokeStyle = '#c8a060'; ctx.lineWidth = 3;
+  ctx.save(); ctx.translate(mikeCX - 14, mikeY + 14 * scale);
+  ctx.rotate(-0.5 + stickA);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 22); ctx.stroke();
+  ctx.restore();
+  ctx.save(); ctx.translate(mikeCX + 10, mikeY + 14 * scale);
+  ctx.rotate(0.5 - stickA);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 22); ctx.stroke();
+  ctx.restore();
+
+  // ── Steve stage-right (left of screen, charIdx=0) on bass ──
+  const steveCX = 115;
+  const steveY = charY + Math.sin(frame * 0.12) * 3;
+  drawCharPreview(ctx, 0, steveCX, steveY, scale);
+  drawBassGuitar(ctx, steveCX - 2, steveY + 20 * scale, scale);
+
+  // ── Kyle stage-left (right of screen, charIdx=2) on guitar ──
+  const kyleCX = W - 115;
+  const kyleY = charY + Math.sin(frame * 0.12 + 1.1) * 3;
+  drawCharPreview(ctx, 2, kyleCX, kyleY, scale);
+  drawElectricGuitar(ctx, kyleCX - 2, kyleY + 20 * scale, scale);
+
+  // ── Floating musical notes ──
   const notes = ['♪', '♫', '♩', '♬'];
-  for (let i = 0; i < 6; i++) {
-    const nx = stageBX + 30 + i * 40 + Math.sin(frame * 0.04 + i) * 12;
-    const ny = GROUND - stageH - 60 - ((frame * 0.8 + i * 25) % 80);
-    ctx.globalAlpha = 0.7 - ((frame * 0.8 + i * 25) % 80) / 80 * 0.7;
-    ctx.fillStyle = ['#ff88ff', '#88ffff', GLD, '#ff88ff', '#88ffff', GLD][i];
-    ctx.font = '14px serif';
+  for (let i = 0; i < 8; i++) {
+    const nx = 80 + i * 90 + Math.sin(frame * 0.04 + i) * 14;
+    const ny = stageY - 70 - ((frame * 0.7 + i * 30) % 100);
+    ctx.globalAlpha = 0.8 - ((frame * 0.7 + i * 30) % 100) / 100 * 0.8;
+    ctx.fillStyle = ['#ff88ff','#88ffff',GLD,'#88ff88'][i % 4];
+    ctx.font = '16px serif'; ctx.textAlign = 'center';
     ctx.fillText(notes[i % notes.length], nx, ny);
   }
   ctx.globalAlpha = 1;
+
+  // ── "RECORD EXEC DEFEATED!" flash banner ──
+  if (Math.floor(frame / 18) % 2 === 0) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(W / 2 - 190, 10, 380, 38);
+    ctx.strokeStyle = GLD; ctx.lineWidth = 2;
+    ctx.strokeRect(W / 2 - 190, 10, 380, 38);
+    ctx.fillStyle = GLD; ctx.font = '13px "Press Start 2P"'; ctx.textAlign = 'center';
+    ctx.fillText('RECORD EXEC DEFEATED!', W / 2, 35);
+  }
 }
 
 // Instrument drawing helpers
-function drawBassGuitar(ctx, x, y) {
-  // Body (horizontal, pointing left)
+function drawBassGuitar(ctx, x, y, sc) {
+  const s = sc || 1;
+  // Body
   ctx.fillStyle = '#8B1a1a';
-  ctx.fillRect(x - 20, y - 5, 28, 10);
+  ctx.fillRect(x - 20*s, y - 5*s, 28*s, 10*s);
   ctx.fillStyle = '#aa2222';
-  ctx.fillRect(x - 19, y - 4, 26, 3);
-  // Neck (going upper-left)
+  ctx.fillRect(x - 19*s, y - 4*s, 26*s, 3*s);
+  // Neck
   ctx.fillStyle = '#6B4C2A';
-  ctx.fillRect(x - 42, y - 3, 24, 5);
+  ctx.fillRect(x - 42*s, y - 3*s, 24*s, 5*s);
   // Headstock
   ctx.fillStyle = '#5a3a18';
-  ctx.fillRect(x - 48, y - 5, 8, 8);
+  ctx.fillRect(x - 48*s, y - 5*s, 8*s, 8*s);
   // Strings
-  ctx.strokeStyle = '#cccccc'; ctx.lineWidth = 0.5;
+  ctx.strokeStyle = '#cccccc'; ctx.lineWidth = Math.max(0.5, s * 0.5);
   [0, 2, 4].forEach(oy => {
-    ctx.beginPath(); ctx.moveTo(x - 48, y - 2 + oy); ctx.lineTo(x + 8, y - 2 + oy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 48*s, y - 2*s + oy*s); ctx.lineTo(x + 8*s, y - 2*s + oy*s); ctx.stroke();
   });
-  // Pickup
-  ctx.fillStyle = '#111';
-  ctx.fillRect(x - 8, y - 4, 8, 8);
+  ctx.fillStyle = '#111'; ctx.fillRect(x - 8*s, y - 4*s, 8*s, 8*s);
 }
 
-function drawElectricGuitar(ctx, x, y) {
-  // Body (angled)
+function drawElectricGuitar(ctx, x, y, sc) {
+  const s = sc || 1;
+  // Body
   ctx.fillStyle = '#1a3a6B';
-  ctx.fillRect(x - 16, y - 6, 24, 12);
+  ctx.fillRect(x - 16*s, y - 6*s, 24*s, 12*s);
   ctx.fillStyle = '#2244aa';
-  ctx.fillRect(x - 15, y - 5, 22, 4);
+  ctx.fillRect(x - 15*s, y - 5*s, 22*s, 4*s);
   // Neck
   ctx.fillStyle = '#8B6914';
-  ctx.fillRect(x - 36, y - 3, 22, 5);
-  // Headstock
+  ctx.fillRect(x - 36*s, y - 3*s, 22*s, 5*s);
   ctx.fillStyle = '#6B4C2A';
-  ctx.fillRect(x - 42, y - 5, 8, 8);
+  ctx.fillRect(x - 42*s, y - 5*s, 8*s, 8*s);
   // Strings
-  ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 0.5;
+  ctx.strokeStyle = '#dddddd'; ctx.lineWidth = Math.max(0.5, s * 0.5);
   [0, 2, 4].forEach(oy => {
-    ctx.beginPath(); ctx.moveTo(x - 42, y - 1 + oy); ctx.lineTo(x + 8, y - 1 + oy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 42*s, y - 1*s + oy*s); ctx.lineTo(x + 8*s, y - 1*s + oy*s); ctx.stroke();
   });
-  // Pickups
+  ctx.fillStyle = '#111'; ctx.fillRect(x - 6*s, y - 4*s, 6*s, 8*s);
+}
+
+function drawAmp(ctx, x, y, w, h) {
+  // Amp cabinet
   ctx.fillStyle = '#111';
-  ctx.fillRect(x - 6, y - 4, 6, 8);
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = '#1e1e1e';
+  ctx.fillRect(x + 2, y + 2, w - 4, h - 4);
+  // Speaker grille
+  ctx.fillStyle = '#161616';
+  ctx.fillRect(x + 4, y + 4, w - 8, h - 16);
+  ctx.strokeStyle = '#252525'; ctx.lineWidth = 1;
+  for (let gy = 0; gy < h - 16; gy += 5) ctx.strokeRect(x + 4, y + 4 + gy, w - 8, 3);
+  // Speaker cone
+  ctx.fillStyle = '#2a2a2a';
+  ctx.beginPath(); ctx.ellipse(x + w/2, y + (h-16)/2 + 4, (w-12)/2, (h-24)/2, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.ellipse(x + w/2, y + (h-16)/2 + 4, (w-22)/2, (h-36)/2, 0, 0, Math.PI*2); ctx.fill();
+  // Control knobs at bottom
+  ctx.fillStyle = '#333';
+  ctx.fillRect(x + 4, y + h - 10, w - 8, 6);
+  [0.25, 0.5, 0.75].forEach(t => {
+    ctx.fillStyle = '#555';
+    ctx.beginPath(); ctx.arc(x + w * t, y + h - 7, 2, 0, Math.PI*2); ctx.fill();
+  });
 }
 
 function drawDrumKit(ctx, x, y, frame) {
+  const s = 1.4;
   // Kick drum
   ctx.fillStyle = '#1a1a2a';
-  ctx.beginPath(); ctx.ellipse(x + 20, y - 14, 20, 14, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 20*s, 14*s, 0, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#8844cc'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.ellipse(x + 20, y - 14, 20, 14, 0, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 20*s, 14*s, 0, 0, Math.PI * 2); ctx.stroke();
   ctx.fillStyle = '#2a2a3a';
-  ctx.beginPath(); ctx.ellipse(x + 20, y - 14, 14, 10, 0, 0, Math.PI * 2); ctx.fill();
-  // Snare drum
+  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 13*s, 9*s, 0, 0, Math.PI * 2); ctx.fill();
+  // Floor tom
+  ctx.fillStyle = '#221133';
+  ctx.beginPath(); ctx.ellipse(x + 46*s, y - 10*s, 11*s, 8*s, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#6633aa'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(x + 46*s, y - 10*s, 11*s, 8*s, 0, 0, Math.PI * 2); ctx.stroke();
+  // Snare
   ctx.fillStyle = '#2a1a1a';
-  ctx.fillRect(x - 2, y - 34, 18, 8);
+  ctx.fillRect(x - 4*s, y - 36*s, 18*s, 8*s);
   ctx.strokeStyle = '#cc4444'; ctx.lineWidth = 1;
-  ctx.strokeRect(x - 2, y - 34, 18, 8);
-  // Hi-hat cymbal
+  ctx.strokeRect(x - 4*s, y - 36*s, 18*s, 8*s);
+  // Hi-hat
   ctx.fillStyle = GLD;
-  ctx.fillRect(x - 8, y - 44, 20, 2);
-  ctx.fillRect(x - 8, y - 42, 20, 2);
-  // Crash cymbal (right)
-  const cymbalTilt = Math.sin(frame * 0.2) * 0.1;
-  ctx.save();
-  ctx.translate(x + 38, y - 40);
-  ctx.rotate(cymbalTilt);
-  ctx.fillStyle = '#c8a000';
-  ctx.fillRect(-14, -1, 28, 2);
+  ctx.fillRect(x - 12*s, y - 50*s, 22*s, 2*s);
+  ctx.fillRect(x - 12*s, y - 47*s, 22*s, 2*s);
+  // Crash cymbal
+  const ct = Math.sin((frame||0) * 0.2) * 0.12;
+  ctx.save(); ctx.translate(x + 50*s, y - 46*s); ctx.rotate(ct);
+  ctx.fillStyle = '#c8a000'; ctx.fillRect(-16*s, -1*s, 32*s, 2*s);
   ctx.restore();
-  // Kick drum pedal legs
+  // Bass pedal legs
   ctx.fillStyle = '#444';
-  ctx.fillRect(x + 6, y - 2, 4, 4);
-  ctx.fillRect(x + 26, y - 2, 4, 4);
+  ctx.fillRect(x + 8*s, y - 2*s, 4*s, 4*s);
+  ctx.fillRect(x + 28*s, y - 2*s, 4*s, 4*s);
 }
 
 // ── PUG FEST CONCERT STAGE (Ferndale ~25%) ─────────────────────
