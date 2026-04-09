@@ -43,9 +43,9 @@ export function renderFrame(ctx, engine, frame) {
     if (engine.boss && !engine.boss.dead) {
       drawPugFest(ctx, W / 2 - 140);
     }
-    const combx = 700 - scrollX;
+    const combx = 900 - scrollX;
     if (combx > -240 && combx < W + 20) drawComos(ctx, combx);
-    const dibx = 2000 - scrollX;
+    const dibx = 3200 - scrollX;
     if (dibx > -200 && dibx < W + 20) drawDannys(ctx, dibx);
   }
 
@@ -274,7 +274,7 @@ function drawHUD(ctx, engine, lvl) {
 // 8-bit Ypsilanti Water Tower: warm brick cylinder + tall rounded bullet
 // dome (dark chocolate brown), decorative collar ring at the junction.
 function drawWaterTower(ctx, scrollX) {
-  const bx = Math.round(310 - scrollX * 0.38);
+  const bx = Math.round(260 - scrollX * 0.10);
   if (bx < -120 || bx > W + 80) return;
   const by = GROUND;
 
@@ -774,20 +774,23 @@ function drawPugFestCelebration(ctx, engine, frame) {
 
   // ── Mike center-back on drums ──
   const mikeCX = W / 2;
-  // Mike slightly elevated (drum stool)
-  const mikeY = charY - 12 + Math.sin(frame * 0.15) * 2;
-  drawDrumKit(ctx, mikeCX - 30, stageY, frame);
+  const kitS = 2.0; // drum kit scale for celebration
+  const kitX = mikeCX - 44 * kitS; // center the kit around Mike
+  // Draw Mike first (behind drums)
+  const mikeY = charY - 8 + Math.sin(frame * 0.15) * 2;
   drawCharPreview(ctx, 1, mikeCX, mikeY, scale);
-  // Drum sticks
-  const stickA = Math.sin(frame * 0.28) * 0.8;
+  // Draw kit on top so Mike appears seated behind it
+  drawDrumKit(ctx, kitX, stageY, frame, kitS);
+  // Drum sticks (in front of kit)
+  const stickA = Math.sin(frame * 0.28) * 0.9;
   ctx.strokeStyle = '#c8a060'; ctx.lineWidth = 3;
-  ctx.save(); ctx.translate(mikeCX - 14, mikeY + 14 * scale);
-  ctx.rotate(-0.5 + stickA);
-  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 22); ctx.stroke();
+  ctx.save(); ctx.translate(mikeCX - 16, mikeY + 10 * scale);
+  ctx.rotate(-0.6 + stickA);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 26); ctx.stroke();
   ctx.restore();
-  ctx.save(); ctx.translate(mikeCX + 10, mikeY + 14 * scale);
-  ctx.rotate(0.5 - stickA);
-  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 22); ctx.stroke();
+  ctx.save(); ctx.translate(mikeCX + 12, mikeY + 10 * scale);
+  ctx.rotate(0.6 - stickA);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 26); ctx.stroke();
   ctx.restore();
 
   // ── Steve stage-right (left of screen, charIdx=0) on bass ──
@@ -892,38 +895,110 @@ function drawAmp(ctx, x, y, w, h) {
   });
 }
 
-function drawDrumKit(ctx, x, y, frame) {
-  const s = 1.4;
-  // Kick drum
-  ctx.fillStyle = '#1a1a2a';
-  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 20*s, 14*s, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#8844cc'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 20*s, 14*s, 0, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = '#2a2a3a';
-  ctx.beginPath(); ctx.ellipse(x + 20*s, y - 16*s, 13*s, 9*s, 0, 0, Math.PI * 2); ctx.fill();
-  // Floor tom
-  ctx.fillStyle = '#221133';
-  ctx.beginPath(); ctx.ellipse(x + 46*s, y - 10*s, 11*s, 8*s, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#6633aa'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.ellipse(x + 46*s, y - 10*s, 11*s, 8*s, 0, 0, Math.PI * 2); ctx.stroke();
-  // Snare
-  ctx.fillStyle = '#2a1a1a';
-  ctx.fillRect(x - 4*s, y - 36*s, 18*s, 8*s);
-  ctx.strokeStyle = '#cc4444'; ctx.lineWidth = 1;
-  ctx.strokeRect(x - 4*s, y - 36*s, 18*s, 8*s);
-  // Hi-hat
-  ctx.fillStyle = GLD;
-  ctx.fillRect(x - 12*s, y - 50*s, 22*s, 2*s);
-  ctx.fillRect(x - 12*s, y - 47*s, 22*s, 2*s);
-  // Crash cymbal
-  const ct = Math.sin((frame||0) * 0.2) * 0.12;
-  ctx.save(); ctx.translate(x + 50*s, y - 46*s); ctx.rotate(ct);
-  ctx.fillStyle = '#c8a000'; ctx.fillRect(-16*s, -1*s, 32*s, 2*s);
+function drawDrumKit(ctx, x, y, frame, kitScale) {
+  const s = kitScale || 1.4;
+  const f = frame || 0;
+
+  // ── Bass drum (kick) — large round drum lying on its side ──
+  // Sits on stage floor; front face visible
+  ctx.fillStyle = '#1a0830';
+  ctx.beginPath(); ctx.ellipse(x + 22*s, y - 18*s, 22*s, 18*s, 0, 0, Math.PI*2); ctx.fill();
+  // Bass drum shell ring
+  ctx.strokeStyle = '#9944ee'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.ellipse(x + 22*s, y - 18*s, 22*s, 18*s, 0, 0, Math.PI*2); ctx.stroke();
+  // Bass drum head (front face)
+  ctx.fillStyle = '#281040';
+  ctx.beginPath(); ctx.ellipse(x + 22*s, y - 18*s, 17*s, 13*s, 0, 0, Math.PI*2); ctx.fill();
+  // Bass drum logo star detail
+  ctx.fillStyle = '#6633cc';
+  ctx.beginPath(); ctx.arc(x + 22*s, y - 18*s, 5*s, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#8844ff';
+  ctx.beginPath(); ctx.arc(x + 22*s, y - 18*s, 2.5*s, 0, Math.PI*2); ctx.fill();
+  // Bass drum spur legs
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x + 6*s, y - 2*s); ctx.lineTo(x + 4*s, y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x + 38*s, y - 2*s); ctx.lineTo(x + 40*s, y); ctx.stroke();
+
+  // ── Floor tom (right side, lower) ──
+  ctx.fillStyle = '#1a0830';
+  ctx.beginPath(); ctx.ellipse(x + 52*s, y - 14*s, 13*s, 10*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#7733bb'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(x + 52*s, y - 14*s, 13*s, 10*s, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#2a1050';
+  ctx.beginPath(); ctx.ellipse(x + 52*s, y - 14*s, 9*s, 7*s, 0, 0, Math.PI*2); ctx.fill();
+  // Floor tom legs
+  ctx.strokeStyle = '#444'; ctx.lineWidth = 1.5;
+  [[x+44*s, y-6*s, x+43*s, y],[x+60*s, y-6*s, x+61*s, y]].forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+
+  // ── Rack tom (mounted above kick drum) ──
+  ctx.fillStyle = '#1a0830';
+  ctx.beginPath(); ctx.ellipse(x + 10*s, y - 42*s, 11*s, 8*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#8844ee'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(x + 10*s, y - 42*s, 11*s, 8*s, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#28104a';
+  ctx.beginPath(); ctx.ellipse(x + 10*s, y - 42*s, 7.5*s, 5.5*s, 0, 0, Math.PI*2); ctx.fill();
+  // Rack tom mount rod
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x + 10*s, y - 36*s); ctx.lineTo(x + 18*s, y - 28*s); ctx.stroke();
+
+  // ── Snare drum (front-left on stand) ──
+  const snareX = x - 6*s, snareY = y - 38*s;
+  // Stand legs
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(snareX + 7*s, snareY + 7*s); ctx.lineTo(snareX + 3*s, y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(snareX + 7*s, snareY + 7*s); ctx.lineTo(snareX + 11*s, y); ctx.stroke();
+  // Drum body
+  ctx.fillStyle = '#2a1010';
+  ctx.beginPath(); ctx.ellipse(snareX + 8*s, snareY + 4*s, 10*s, 7*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#cc3333'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(snareX + 8*s, snareY + 4*s, 10*s, 7*s, 0, 0, Math.PI*2); ctx.stroke();
+  // Snare head
+  ctx.fillStyle = '#e8e0d0';
+  ctx.beginPath(); ctx.ellipse(snareX + 8*s, snareY, 10*s, 6*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#cc3333'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(snareX + 8*s, snareY, 10*s, 6*s, 0, 0, Math.PI*2); ctx.stroke();
+
+  // ── Hi-hat (left stand) ──
+  const hhX = x - 16*s, hhY = y - 58*s;
+  // Stand pole
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(hhX + 4*s, hhY + 12*s); ctx.lineTo(hhX + 4*s, y); ctx.stroke();
+  // Stand feet
+  ctx.beginPath(); ctx.moveTo(hhX + 4*s, y); ctx.lineTo(hhX - 4*s, y + 2*s); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(hhX + 4*s, y); ctx.lineTo(hhX + 12*s, y + 2*s); ctx.stroke();
+  // Bottom cymbal (thicker)
+  ctx.fillStyle = '#c8a000';
+  ctx.beginPath(); ctx.ellipse(hhX + 4*s, hhY + 10*s, 14*s, 3.5*s, 0, 0, Math.PI*2); ctx.fill();
+  // Top cymbal (thin, slightly open)
+  const hhTilt = Math.sin(f * 0.18) * 0.08;
+  ctx.save(); ctx.translate(hhX + 4*s, hhY + 6*s); ctx.rotate(hhTilt);
+  ctx.fillStyle = '#e0b800';
+  ctx.beginPath(); ctx.ellipse(0, 0, 14*s, 3*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#a08000'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, 0, 14*s, 3*s, 0, 0, Math.PI*2); ctx.stroke();
   ctx.restore();
-  // Bass pedal legs
-  ctx.fillStyle = '#444';
-  ctx.fillRect(x + 8*s, y - 2*s, 4*s, 4*s);
-  ctx.fillRect(x + 28*s, y - 2*s, 4*s, 4*s);
+
+  // ── Crash cymbal (right, angled) ──
+  const crX = x + 62*s, crY = y - 60*s;
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(crX, crY + 14*s); ctx.lineTo(crX, y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(crX, y); ctx.lineTo(crX - 8*s, y + 2*s); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(crX, y); ctx.lineTo(crX + 8*s, y + 2*s); ctx.stroke();
+  const ct = Math.sin(f * 0.2) * 0.15;
+  ctx.save(); ctx.translate(crX, crY + 8*s); ctx.rotate(-0.2 + ct);
+  ctx.fillStyle = '#c8a000';
+  ctx.beginPath(); ctx.ellipse(0, 0, 18*s, 4*s, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#a08000'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, 0, 18*s, 4*s, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+
+  // ── Bass drum pedal ──
+  ctx.fillStyle = '#333';
+  ctx.fillRect(x + 14*s, y - 3*s, 12*s, 4*s);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  ctx.strokeRect(x + 14*s, y - 3*s, 12*s, 4*s);
 }
 
 // ── PUG FEST CONCERT STAGE (Ferndale ~25%) ─────────────────────

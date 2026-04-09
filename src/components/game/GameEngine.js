@@ -293,8 +293,8 @@ export class GameEngine {
     if (pl.x > W - PW - 10) pl.x = W - PW - 10;
     pl.inv = Math.max(0, pl.inv - dt);
 
-    // scroll camera — lock in place during boss fight
-    if (!this.boss && pl.x > W * 0.42) { const d = pl.x - W * 0.42; this.scrollX += d; pl.x = W * 0.42; }
+    // scroll camera — lock during active boss fight, but allow when boss is dead (e.g. Grove walk-in)
+    if (!(this.boss && !this.boss.dead) && pl.x > W * 0.42) { const d = pl.x - W * 0.42; this.scrollX += d; pl.x = W * 0.42; }
 
     // ── SPAWNING ──────────────────────────────
     if (!this.boss) {
