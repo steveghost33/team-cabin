@@ -719,9 +719,9 @@ function drawPugFestCelebration(ctx, engine, frame) {
   }
 
   // ── BIG PugFest banner behind band ──
-  const bannerW = 380, bannerH = 190;
+  const bannerW = 460, bannerH = 220;
   const bannerX = W / 2 - bannerW / 2;
-  const bannerTop = stageY - bannerH - 8;
+  const bannerTop = stageY - bannerH - 6;
   const textStripH = 30;
   const imgAreaH = bannerH - textStripH;
 
@@ -769,8 +769,8 @@ function drawPugFestCelebration(ctx, engine, frame) {
 
   // ── Amps behind Steve (left/stage-right) and Kyle (right/stage-left) ──
   // Drawn first so chars appear in front
-  drawAmp(ctx, 60, stageY - 52, 38, 52);   // amp behind Steve (left)
-  drawAmp(ctx, W - 100, stageY - 52, 38, 52); // amp behind Kyle (right)
+  drawAmp(ctx, 54, stageY - 60, 46, 62);       // amp behind Steve (left)
+  drawAmp(ctx, W - 102, stageY - 60, 46, 62);  // amp behind Kyle (right)
 
   // ── Mike center-back on drums ──
   const mikeCX = W / 2;
@@ -794,16 +794,18 @@ function drawPugFestCelebration(ctx, engine, frame) {
   ctx.restore();
 
   // ── Steve stage-right (left of screen, charIdx=0) on bass ──
-  const steveCX = 115;
+  const steveCX = 120;
   const steveY = charY + Math.sin(frame * 0.12) * 3;
   drawCharPreview(ctx, 0, steveCX, steveY, scale);
-  drawBassGuitar(ctx, steveCX - 2, steveY + 20 * scale, scale);
+  // Bass at mid-body height, fixed instrument scale so neck stays on-screen
+  drawBassGuitar(ctx, steveCX + 38, stageY - 55, 2.2);
 
   // ── Kyle stage-left (right of screen, charIdx=2) on guitar ──
-  const kyleCX = W - 115;
+  const kyleCX = W - 120;
   const kyleY = charY + Math.sin(frame * 0.12 + 1.1) * 3;
   drawCharPreview(ctx, 2, kyleCX, kyleY, scale);
-  drawElectricGuitar(ctx, kyleCX - 2, kyleY + 20 * scale, scale);
+  // Guitar neck points left (toward center), body toward right edge
+  drawElectricGuitar(ctx, kyleCX + 12, stageY - 55, 2.2);
 
   // ── Floating musical notes ──
   const notes = ['♪', '♫', '♩', '♬'];
