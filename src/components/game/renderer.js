@@ -62,6 +62,8 @@ export function renderFrame(ctx, engine, frame) {
     if (mrpbx > -200 && mrpbx < W + 20) drawMrPizza(ctx, mrpbx);
     const hbx = 2800 - scrollX;
     if (hbx > -260 && hbx < W + 20) drawHyperionCoffee(ctx, hbx);
+    const hlbx = 3800 - scrollX;
+    if (hlbx > -340 && hlbx < W + 20) drawHalesKitchen(ctx, hlbx, frame, engine.halesBarks, scrollX);
     const bbx = 5500 - scrollX;
     if (bbx > -220 && bbx < W + 20) drawTheBomber(ctx, bbx);
   }
@@ -620,6 +622,255 @@ function drawTheBomber(ctx, bx) {
   // roof cap
   ctx.fillStyle = '#c99a00';
   ctx.fillRect(bx - 2, by - bh - 5, bw + 4, 6);
+}
+
+// ── HALE'S KITCHEN (Ypsilanti ~halfway through level) ──────────
+function drawHalesKitchen(ctx, bx, frame, halesBarks, scrollX) {
+  const by = GROUND;
+  const garageW = 118;
+  const houseW  = 162;
+  const totalW  = garageW + houseW; // 280
+  const bh = 138;
+
+  // ── YARD GRASS ──────────────────────────────
+  ctx.fillStyle = '#3d8a28';
+  ctx.fillRect(bx - 28, by - 44, totalW + 56, 44);
+
+  // ── DRIVEWAY (in front of garage) ───────────
+  ctx.fillStyle = '#b0a898';
+  ctx.fillRect(bx + 4, by - 44, garageW - 6, 44);
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  for (let lx = bx + 20; lx < bx + garageW - 10; lx += 28) {
+    ctx.fillRect(lx, by - 44, 10, 44); // faint tire marks
+  }
+
+  // ── TREES ───────────────────────────────────
+  _hkTree(ctx, bx - 10, by, 52, '#246a14', '#184e0e');
+  _hkTree(ctx, bx + totalW + 14, by, 48, '#246014', '#185010');
+  _hkTree(ctx, bx + garageW + 100, by, 36, '#226012', '#164010');
+
+  // ── GARAGE WALL (orange-tan siding) ─────────
+  ctx.fillStyle = '#c98828';
+  ctx.fillRect(bx, by - bh, garageW, bh);
+  // siding horizontal lines
+  ctx.fillStyle = 'rgba(0,0,0,0.09)';
+  for (let y = 6; y < bh; y += 8) ctx.fillRect(bx, by - bh + y, garageW, 1);
+
+  // Garage door — large brown panel door
+  const gdx = bx + 5, gdy = by - 78, gdw = garageW - 10, gdh = 78;
+  // frame shadow
+  ctx.fillStyle = '#1a0d04';
+  ctx.fillRect(gdx - 2, gdy - 2, gdw + 4, gdh + 2);
+  // door body
+  ctx.fillStyle = '#7a3d10';
+  ctx.fillRect(gdx, gdy, gdw, gdh);
+  // horizontal recessed panels
+  ctx.fillStyle = '#5c2a08';
+  for (let py = gdy + 14; py < gdy + gdh - 4; py += 16) {
+    ctx.fillRect(gdx + 3, py, gdw - 6, 3);
+  }
+  // door border
+  ctx.strokeStyle = '#3a1a06'; ctx.lineWidth = 2;
+  ctx.strokeRect(gdx, gdy, gdw, gdh);
+
+  // ── HOUSE WALL ──────────────────────────────
+  ctx.fillStyle = '#d49030';
+  ctx.fillRect(bx + garageW, by - bh, houseW, bh);
+  // brick texture
+  ctx.fillStyle = 'rgba(0,0,0,0.11)';
+  for (let y = 8; y < bh; y += 9) ctx.fillRect(bx + garageW, by - bh + y, houseW, 1);
+  for (let row = 0; row < Math.floor(bh / 9); row++) {
+    const xOff = (row % 2) * 14;
+    for (let x = xOff; x < houseW; x += 28) {
+      ctx.fillRect(bx + garageW + x, by - bh + row * 9, 1, 9);
+    }
+  }
+
+  // House windows (2)
+  [18, 82].forEach(wx => {
+    const wbx = bx + garageW + wx, wby = by - bh + 38;
+    ctx.fillStyle = '#18304e';
+    ctx.fillRect(wbx, wby, 30, 26);
+    ctx.fillStyle = 'rgba(150,195,240,0.38)';
+    ctx.fillRect(wbx + 2, wby + 2, 26, 22);
+    // pane dividers
+    ctx.fillStyle = '#18304e';
+    ctx.fillRect(wbx + 14, wby + 2, 2, 22);
+    ctx.fillRect(wbx + 2, wby + 13, 26, 2);
+    ctx.strokeStyle = '#7a5828'; ctx.lineWidth = 1;
+    ctx.strokeRect(wbx, wby, 30, 26);
+  });
+
+  // Front door
+  const dox = bx + garageW + 122, doy = by - 46;
+  ctx.fillStyle = '#1e1008';
+  ctx.fillRect(dox, doy, 24, 46);
+  ctx.fillStyle = 'rgba(140,190,230,0.18)';
+  ctx.fillRect(dox + 2, doy + 2, 20, 18);
+  ctx.strokeStyle = '#5a3610'; ctx.lineWidth = 1;
+  ctx.strokeRect(dox, doy, 24, 46);
+  // door knob
+  ctx.fillStyle = '#d4a020';
+  ctx.fillRect(dox + 18, doy + 26, 3, 3);
+
+  // ── HALE'S KITCHEN SIGN ─────────────────────
+  const sw = 168, sh = 46, sx = bx + garageW + 3, sy2 = by - bh + 3;
+  // drop shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(sx + 4, sy2 + 4, sw, sh);
+  // sign body — dark chalkboard
+  ctx.fillStyle = '#140c02';
+  ctx.fillRect(sx, sy2, sw, sh);
+  // warm orange border
+  ctx.strokeStyle = '#d08820'; ctx.lineWidth = 2;
+  ctx.strokeRect(sx + 2, sy2 + 2, sw - 4, sh - 4);
+  ctx.strokeStyle = '#8b5518'; ctx.lineWidth = 1;
+  ctx.strokeRect(sx + 5, sy2 + 5, sw - 10, sh - 10);
+
+  // Fork (left)
+  ctx.fillStyle = '#e0a040';
+  ctx.fillRect(sx + 10, sy2 + 9, 2, 26);      // handle
+  ctx.fillRect(sx + 8, sy2 + 9, 2, 11);        // left tine
+  ctx.fillRect(sx + 12, sy2 + 9, 2, 11);       // right tine
+  ctx.fillRect(sx + 8, sy2 + 19, 6, 2);        // crossbar
+  // Knife (right)
+  ctx.fillRect(sx + sw - 15, sy2 + 9, 2, 26);  // handle
+  ctx.fillRect(sx + sw - 17, sy2 + 9, 4, 5);   // blade top
+  ctx.fillRect(sx + sw - 16, sy2 + 14, 3, 3);  // blade taper
+
+  // "HALE'S"
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#f5a030';
+  ctx.shadowBlur = 5; ctx.shadowColor = '#c07010';
+  ctx.font = 'bold 11px "Press Start 2P"';
+  ctx.fillText("HALE'S", sx + sw / 2, sy2 + 21);
+  ctx.shadowBlur = 0;
+  // "KITCHEN"
+  ctx.fillStyle = '#e8d8a8';
+  ctx.font = '8px "Press Start 2P"';
+  ctx.fillText('KITCHEN', sx + sw / 2, sy2 + 35);
+
+  // ── ROOF CAP ────────────────────────────────
+  ctx.fillStyle = '#2a1408';
+  ctx.fillRect(bx - 3, by - bh - 5, totalW + 6, 6);
+  // small roofline detail on house section
+  ctx.fillStyle = '#3a1e0a';
+  ctx.fillRect(bx + garageW - 2, by - bh - 11, houseW + 4, 8);
+
+  // ── DOGS IN YARD ────────────────────────────
+  // Two dogs run back and forth inside the yard behind fence
+  const yardL = bx + 16, yardR = bx + totalW - 20;
+  const period = 230;
+  [0, 1].forEach(i => {
+    const phase = i * Math.round(period * 0.52);
+    const t = ((frame + phase) % period) / period;
+    const pp = t < 0.5 ? t * 2 : (1 - t) * 2;
+    const dogX = yardL + pp * (yardR - yardL);
+    const dogFace = t < 0.5 ? 1 : -1;
+    const dogY = by - 42;
+    _hkDog(ctx, dogX, dogY, dogFace, frame + phase * 2);
+  });
+
+  // ── CHAIN-LINK FENCE (front of yard) ────────
+  const fx = bx - 22, fw = totalW + 44, fh = 30, fy = by - fh;
+  // posts
+  ctx.fillStyle = '#9e9e9e';
+  for (let px = 0; px <= fw + 2; px += 26) {
+    ctx.fillRect(fx + px, fy - 4, 3, fh + 4);
+  }
+  // top rail
+  ctx.fillStyle = '#b8b8b8';
+  ctx.fillRect(fx, fy, fw, 3);
+  // diamond chain-link weave
+  ctx.strokeStyle = 'rgba(180,180,180,0.72)'; ctx.lineWidth = 1;
+  for (let x = -8; x < fw + 8; x += 8) {
+    ctx.beginPath(); ctx.moveTo(fx + x, fy);     ctx.lineTo(fx + x + 8, fy + fh); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(fx + x + 8, fy); ctx.lineTo(fx + x, fy + fh);     ctx.stroke();
+  }
+  // bottom rail
+  ctx.fillStyle = '#b8b8b8';
+  ctx.fillRect(fx, fy + fh - 2, fw, 3);
+  // post caps
+  ctx.fillStyle = '#d0d0d0';
+  for (let px = 0; px <= fw + 2; px += 26) {
+    ctx.fillRect(fx + px - 1, fy - 7, 5, 4);
+  }
+
+  // ── BARK PROJECTILES ────────────────────────
+  if (halesBarks) {
+    halesBarks.forEach(b => {
+      const bsx = b.x - scrollX;
+      if (bsx < -30 || bsx > W + 30) return;
+      const alpha = Math.min(1, b.life / 60);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      // concentric arcs (sound waves going left)
+      const dir = b.vx < 0 ? 0 : Math.PI; // open left or right
+      [6, 12, 19].forEach((r, ri) => {
+        ctx.strokeStyle = ri === 0 ? '#FF8C00' : ri === 1 ? '#FFA040' : 'rgba(255,170,60,0.5)';
+        ctx.lineWidth = ri === 0 ? 2 : 1.5;
+        ctx.beginPath();
+        ctx.arc(bsx, b.y + 6, r, dir - Math.PI * 0.55, dir + Math.PI * 0.55);
+        ctx.stroke();
+      });
+      // "WOOF!" tag
+      ctx.fillStyle = '#FF8C00';
+      ctx.font = 'bold 7px "Press Start 2P"';
+      ctx.textAlign = b.vx < 0 ? 'right' : 'left';
+      ctx.fillText('WOOF!', bsx + (b.vx < 0 ? -4 : 4), b.y - 2);
+      ctx.restore();
+    });
+  }
+}
+
+// helper — leafy yard tree
+function _hkTree(ctx, x, by, r, col1, col2) {
+  ctx.fillStyle = '#5a3012';
+  ctx.fillRect(x - 5, by - Math.round(r * 1.7), 10, Math.round(r * 1.6));
+  ctx.fillStyle = col2;
+  ctx.beginPath(); ctx.arc(x, by - Math.round(r * 1.9), Math.round(r * 1.1), 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = col1;
+  ctx.beginPath(); ctx.arc(x - Math.round(r * 0.42), by - Math.round(r * 2.2), Math.round(r * 0.9), 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + Math.round(r * 0.42), by - Math.round(r * 2.1), Math.round(r * 0.85), 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x, by - Math.round(r * 2.6), Math.round(r * 0.75), 0, Math.PI * 2); ctx.fill();
+}
+
+// helper — pixel art dog
+function _hkDog(ctx, x, y, face, at) {
+  const walk = Math.sin(at * 0.22) * 2.5;
+  const lL = Math.round(walk), lR = -lL;
+  ctx.save();
+  if (face === -1) { ctx.translate(x + 28, 0); ctx.scale(-1, 1); ctx.translate(-x, 0); }
+  // body
+  ctx.fillStyle = '#9c6c20';
+  ctx.fillRect(x,      y + 5,  19, 9);
+  ctx.fillRect(x + 16, y + 2,  5,  7); // neck
+  // head
+  ctx.fillStyle = '#a87428';
+  ctx.fillRect(x + 19, y - 2, 10, 9);
+  // snout
+  ctx.fillStyle = '#c89848';
+  ctx.fillRect(x + 26, y + 2, 5, 4);
+  // floppy ear
+  ctx.fillStyle = '#7a4e14';
+  ctx.fillRect(x + 19, y - 6, 5, 5);
+  // eye
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(x + 22, y + 1, 2, 2);
+  // nose
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(x + 29, y + 3, 2, 2);
+  // wagging tail
+  const wag = Math.sin(at * 0.38) * 5;
+  ctx.fillStyle = '#9c6c20';
+  ctx.fillRect(x - 6, y + 5 - Math.round(wag * 0.3), 7, 3);
+  // legs
+  ctx.fillStyle = '#7a4e14';
+  ctx.fillRect(x + 3,  y + 14 + lL, 3, 5);
+  ctx.fillRect(x + 9,  y + 14 + lR, 3, 5);
+  ctx.fillRect(x + 14, y + 14 + lR, 3, 5);
+  ctx.fillRect(x + 19, y + 14 + lL, 3, 5);
+  ctx.restore();
 }
 
 // ── PUG FEST BOSS-DEAD CELEBRATION ────────────────────────────

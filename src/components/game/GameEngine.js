@@ -41,6 +41,8 @@ export class GameEngine {
     this.bossDeadTimer = 0;
     this.nextLvlTimer = 0;
     this.groveX = 0;
+    this.halesBarks = [];
+    this.halesBarkT = 0;
     this.walkingIn = false;
     this.keys = {};
     this.charIdx = 0;
@@ -113,6 +115,7 @@ export class GameEngine {
     this.parts = []; this.blds = []; this.cars = []; this.carT = 0;
     this.boss = null;
     this.groveX = 0; this.walkingIn = false;
+    this.halesBarks = []; this.halesBarkT = 0;
     this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
     for (let i = 0; i < 26; i++) this.blds.push(this._mkBld(i * 165 + 200));
   }
@@ -495,6 +498,55 @@ export class GameEngine {
       p.life -= dt;
       return p.life > 0;
     });
+
+    // ── HALE'S KITCHEN BARKS (Ypsilanti only) ────
+    if (this.lvlIdx === 0) {
+      const HALES_X = 3800; // world x of the property
+      const plWorldX = pl.x + this.scrollX;
+      const distToHales = Math.abs(plWorldX - HALES_X);
+
+      // tick existing barks
+      this.halesBarks = this.halesBarks.filter(b => {
+        b.x += b.vx * dt;
+        b.life -= dt;
+        const bsx = b.x - this.scrollX;
+        if (bsx < -80) return false;
+        // collision with player — bark hitbox
+        if (pl.inv <= 0 &&
+            bsx + b.w > pl.x && bsx < pl.x + PW &&
+            b.y + b.h > pl.y && b.y < pl.y + PH) {
+          pl.hp -= 8;
+          pl.inv = 55;
+          this._addParts(pl.x + PW / 2, pl.y + PH / 2, '#FF8C00', 6);
+          if (pl.hp <= 0) this._die();
+          this.sync();
+          return false;
+        }
+        return b.life > 0;
+      });
+
+      // spawn new barks when player is close and no boss
+      if (distToHales < 400 && !this.boss) {
+        this.halesBarkT -= dt;
+        if (this.halesBarkT <= 0) {
+          this.halesBarkT = 75 + Math.floor(Math.random() * 50);
+          // two dogs at fixed yard positions
+          const dogWorldPositions = [HALES_X + 40, HALES_X + 160];
+          dogWorldPositions.forEach(dogWX => {
+            const dsx = dogWX - this.scrollX;
+            if (dsx > -20 && dsx < W + 20) {
+              this.halesBarks.push({
+                x: dogWX,
+                y: GROUND - 48,
+                vx: plWorldX < dogWX ? -3.8 : 3.8, // bark toward player
+                w: 28, h: 18,
+                life: 180,
+              });
+            }
+          });
+        }
+      }
+    }
 
     // ── BUILDINGS ─────────────────────────────
     if (!this.blds.length || this.blds[this.blds.length-1].x - this.scrollX < W + 300) {
