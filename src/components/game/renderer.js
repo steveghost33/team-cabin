@@ -656,21 +656,46 @@ function drawHalesKitchen(ctx, bx, frame, halesBarks, scrollX) {
   ctx.fillStyle = 'rgba(0,0,0,0.09)';
   for (let y = 6; y < bh; y += 8) ctx.fillRect(bx, by - bh + y, garageW, 1);
 
-  // Garage door — large brown panel door
+  // Garage door — grid panel door (dark olive-green frame, brownish-red panels)
   const gdx = bx + 5, gdy = by - 78, gdw = garageW - 10, gdh = 78;
-  // frame shadow
-  ctx.fillStyle = '#1a0d04';
+  // outer frame shadow
+  ctx.fillStyle = '#080e02';
   ctx.fillRect(gdx - 2, gdy - 2, gdw + 4, gdh + 2);
-  // door body
-  ctx.fillStyle = '#7a3d10';
+  // frame body — dark olive-green (matches reference image)
+  ctx.fillStyle = '#2e3d12';
   ctx.fillRect(gdx, gdy, gdw, gdh);
-  // horizontal recessed panels
-  ctx.fillStyle = '#5c2a08';
-  for (let py = gdy + 14; py < gdy + gdh - 4; py += 16) {
-    ctx.fillRect(gdx + 3, py, gdw - 6, 3);
+  // subtle vertical siding lines on frame
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let lx = gdx + 8; lx < gdx + gdw - 4; lx += 12) {
+    ctx.fillRect(lx, gdy, 1, gdh);
   }
-  // door border
-  ctx.strokeStyle = '#3a1a06'; ctx.lineWidth = 2;
+  // panel grid: 4 cols × 3 rows (recessed brownish-red panels)
+  { const cols = 4, rows = 3, pad = 5, gap = 4;
+    const pw = Math.floor((gdw - pad * 2 - gap * (cols - 1)) / cols);
+    const ph = Math.floor((gdh - pad * 2 - gap * (rows - 1)) / rows);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const px = gdx + pad + col * (pw + gap);
+        const py = gdy + pad + row * (ph + gap);
+        // inset panel shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.fillRect(px - 1, py - 1, pw + 2, ph + 2);
+        // panel body — dark brownish-red
+        ctx.fillStyle = '#6b2d14';
+        ctx.fillRect(px, py, pw, ph);
+        // panel highlight top & left edges
+        ctx.fillStyle = 'rgba(180,85,38,0.5)';
+        ctx.fillRect(px, py, pw, 2);
+        ctx.fillRect(px, py, 2, ph);
+        // panel shadow bottom & right edges
+        ctx.fillStyle = 'rgba(0,0,0,0.42)';
+        ctx.fillRect(px, py + ph - 2, pw, 2);
+        ctx.fillRect(px + pw - 2, py, 2, ph);
+      }
+    }
+  }
+  // door outer border
+  ctx.strokeStyle = '#0f1a06'; ctx.lineWidth = 2;
   ctx.strokeRect(gdx, gdy, gdw, gdh);
 
   // ── HOUSE WALL ──────────────────────────────
@@ -713,42 +738,92 @@ function drawHalesKitchen(ctx, bx, frame, halesBarks, scrollX) {
   ctx.fillStyle = '#d4a020';
   ctx.fillRect(dox + 18, doy + 26, 3, 3);
 
-  // ── HALE'S KITCHEN SIGN ─────────────────────
+  // ── HALE'S KITCHEN SIGN WITH FLAMES ─────────────
   const sw = 168, sh = 46, sx = bx + garageW + 3, sy2 = by - bh + 3;
+
+  // === ANIMATED FLAMES rising above the sign ===
+  ctx.save();
+  const flameCount = 11;
+  for (let fi = 0; fi < flameCount; fi++) {
+    const flameX = sx + 10 + fi * (sw - 20) / (flameCount - 1);
+    const flk1 = Math.sin(frame * 0.17 + fi * 0.88) * 0.5 + 0.5;
+    const flk2 = Math.sin(frame * 0.11 + fi * 1.43) * 0.5 + 0.5;
+    const flameH = 10 + flk1 * 8 + flk2 * 5;
+    const flameW = 4.5 + flk1 * 2.5;
+    const grad = ctx.createLinearGradient(flameX, sy2 - flameH, flameX, sy2 + 3);
+    grad.addColorStop(0,    'rgba(255,30,0,0)');
+    grad.addColorStop(0.22, 'rgba(255,80,0,0.85)');
+    grad.addColorStop(0.6,  'rgba(255,165,0,0.95)');
+    grad.addColorStop(1,    'rgba(255,230,40,1)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(flameX - flameW / 2, sy2 + 3);
+    ctx.quadraticCurveTo(
+      flameX - flameW, sy2 - flameH * 0.32,
+      flameX + flk1 * 4 - 2, sy2 - flameH
+    );
+    ctx.quadraticCurveTo(
+      flameX + flameW, sy2 - flameH * 0.32,
+      flameX + flameW / 2, sy2 + 3
+    );
+    ctx.fill();
+  }
+  ctx.restore();
+
   // drop shadow
   ctx.fillStyle = 'rgba(0,0,0,0.55)';
   ctx.fillRect(sx + 4, sy2 + 4, sw, sh);
-  // sign body — dark chalkboard
-  ctx.fillStyle = '#140c02';
+  // sign body — dark charcoal/chalkboard
+  ctx.fillStyle = '#120a01';
   ctx.fillRect(sx, sy2, sw, sh);
-  // warm orange border
-  ctx.strokeStyle = '#d08820'; ctx.lineWidth = 2;
+  // flame-orange outer border
+  ctx.strokeStyle = '#e05500'; ctx.lineWidth = 2;
   ctx.strokeRect(sx + 2, sy2 + 2, sw - 4, sh - 4);
-  ctx.strokeStyle = '#8b5518'; ctx.lineWidth = 1;
+  // inner accent border
+  ctx.strokeStyle = '#7a2200'; ctx.lineWidth = 1;
   ctx.strokeRect(sx + 5, sy2 + 5, sw - 10, sh - 10);
 
-  // Fork (left)
-  ctx.fillStyle = '#e0a040';
-  ctx.fillRect(sx + 10, sy2 + 9, 2, 26);      // handle
-  ctx.fillRect(sx + 8, sy2 + 9, 2, 11);        // left tine
-  ctx.fillRect(sx + 12, sy2 + 9, 2, 11);       // right tine
-  ctx.fillRect(sx + 8, sy2 + 19, 6, 2);        // crossbar
-  // Knife (right)
-  ctx.fillRect(sx + sw - 15, sy2 + 9, 2, 26);  // handle
-  ctx.fillRect(sx + sw - 17, sy2 + 9, 4, 5);   // blade top
-  ctx.fillRect(sx + sw - 16, sy2 + 14, 3, 3);  // blade taper
+  // === INLINE FLAME ICONS flanking the text ===
+  ctx.save();
+  [[sx + 8, 0], [sx + sw - 22, 1]].forEach(([fx, i]) => {
+    const fy = sy2 + 7;
+    const flk = Math.sin(frame * 0.2 + i * 1.65) * 0.5 + 0.5;
+    // outer flame body
+    const fg = ctx.createLinearGradient(fx + 6, fy, fx + 6, fy + 18);
+    fg.addColorStop(0,   `rgba(255,${50 + (flk * 40) | 0},0,0.88)`);
+    fg.addColorStop(0.5, `rgba(255,${140 + (flk * 45) | 0},0,0.95)`);
+    fg.addColorStop(1,   'rgba(255,225,45,1)');
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.moveTo(fx + 6, fy + 18);
+    ctx.quadraticCurveTo(fx,      fy + 10, fx + 3,  fy + 4);
+    ctx.quadraticCurveTo(fx + 6,  fy + 8,  fx + 8,  fy + 1);
+    ctx.quadraticCurveTo(fx + 13, fy + 8,  fx + 12, fy + 18);
+    ctx.fill();
+    // bright inner core
+    ctx.fillStyle = `rgba(255,240,80,${0.68 + flk * 0.32})`;
+    ctx.beginPath();
+    ctx.moveTo(fx + 6, fy + 15);
+    ctx.quadraticCurveTo(fx + 3, fy + 11, fx + 5, fy + 8);
+    ctx.quadraticCurveTo(fx + 7, fy + 11, fx + 8, fy + 6);
+    ctx.quadraticCurveTo(fx + 10, fy + 11, fx + 9, fy + 15);
+    ctx.fill();
+  });
+  ctx.restore();
 
-  // "HALE'S"
+  // "HALE'S" — hot orange with fire glow
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#f5a030';
-  ctx.shadowBlur = 5; ctx.shadowColor = '#c07010';
+  ctx.fillStyle = '#ff7a00';
+  ctx.shadowBlur = 9; ctx.shadowColor = '#ff3300';
   ctx.font = 'bold 11px "Press Start 2P"';
   ctx.fillText("HALE'S", sx + sw / 2, sy2 + 21);
   ctx.shadowBlur = 0;
-  // "KITCHEN"
-  ctx.fillStyle = '#e8d8a8';
+  // "KITCHEN" — warm cream with subtle glow
+  ctx.fillStyle = '#ffe8a0';
+  ctx.shadowBlur = 4; ctx.shadowColor = '#ff6600';
   ctx.font = '8px "Press Start 2P"';
   ctx.fillText('KITCHEN', sx + sw / 2, sy2 + 35);
+  ctx.shadowBlur = 0;
 
   // ── ROOF CAP ────────────────────────────────
   ctx.fillStyle = '#2a1408';

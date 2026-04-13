@@ -111,7 +111,7 @@ export default function PizzaGame() {
 
     // Clear all held keys when the window loses focus (alt-tab, clicking outside,
     // browser losing focus) — otherwise keyup never fires and movement stays stuck.
-    const onBlur = () => { engine.keys = {}; };
+    const onBlur = () => { engine.keys = {}; activeDirPointers.current = {}; };
     window.addEventListener('blur', onBlur);
 
     // ── DELTA-TIME GAME LOOP ──────────────────────
@@ -302,7 +302,9 @@ export default function PizzaGame() {
           engine.keys['ArrowLeft']  = true;
         }
       } else {
-        if (st !== 'initials') engine.keys['ArrowLeft'] = false;
+        // always release on pointerup regardless of state — prevents keys
+        // staying stuck when state transitions mid-press (e.g. initials → playing)
+        engine.keys['ArrowLeft'] = false;
       }
     } else if (key === 'right') {
       if (down) {
@@ -313,7 +315,8 @@ export default function PizzaGame() {
           engine.keys['ArrowRight'] = true;
         }
       } else {
-        if (st !== 'initials') engine.keys['ArrowRight'] = false;
+        // always release on pointerup regardless of state
+        engine.keys['ArrowRight'] = false;
       }
     }
   }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);
@@ -491,6 +494,7 @@ export default function PizzaGame() {
           onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'left'; mb('left', true); }}
           onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
           onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
+          onLostPointerCapture={e => { delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
           onTouchStart={e => e.preventDefault()}
           onTouchEnd={e => e.preventDefault()}
           onContextMenu={e => e.preventDefault()}
@@ -523,6 +527,7 @@ export default function PizzaGame() {
           onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'right'; mb('right', true); }}
           onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
           onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
+          onLostPointerCapture={e => { delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
           onTouchStart={e => e.preventDefault()}
           onTouchEnd={e => e.preventDefault()}
           onContextMenu={e => e.preventDefault()}
@@ -558,8 +563,8 @@ export default function PizzaGame() {
         border: `1.5px solid ${shadowColor}`,
       }}
       onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
-      onPointerUp={e => e.preventDefault()}
-      onPointerCancel={e => e.preventDefault()}
+      onPointerUp={e => { e.preventDefault(); mb(k, false); }}
+      onPointerCancel={e => { e.preventDefault(); mb(k, false); }}
       onTouchStart={e => e.preventDefault()}
       onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}

@@ -117,6 +117,7 @@ export class GameEngine {
     this.groveX = 0; this.walkingIn = false;
     this.halesBarks = []; this.halesBarkT = 0;
     this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
+    this.keys = {};         // clear any stuck keys from previous screens
     for (let i = 0; i < 26; i++) this.blds.push(this._mkBld(i * 165 + 200));
   }
 
