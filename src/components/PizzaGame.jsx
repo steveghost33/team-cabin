@@ -103,9 +103,16 @@ export default function PizzaGame() {
       }
       if (!pausedRef.current) engine.handleKey(e.code, true);
     };
-    const onUp = (e) => { if (!pausedRef.current) engine.handleKey(e.code, false); };
+    // Always process keyup regardless of pause state — prevents stuck keys when
+    // the player pauses while holding a direction key and then releases it.
+    const onUp = (e) => { engine.handleKey(e.code, false); };
     window.addEventListener('keydown', onDown);
     window.addEventListener('keyup', onUp);
+
+    // Clear all held keys when the window loses focus (alt-tab, clicking outside,
+    // browser losing focus) — otherwise keyup never fires and movement stays stuck.
+    const onBlur = () => { engine.keys = {}; };
+    window.addEventListener('blur', onBlur);
 
     // ── DELTA-TIME GAME LOOP ──────────────────────
     // One physics tick per animation frame, scaled by dt so motion is
@@ -172,6 +179,9 @@ export default function PizzaGame() {
     const onVisibility = () => {
       if (document.hidden) {
         music.pause();
+        // Clear all held keys — tab-switch causes keyup/pointerup to never fire.
+        engine.keys = {};
+        activeDirPointers.current = {};
       } else if (engine.gState === 'playing' && !pausedRef.current && !mutedRef.current) {
         music.play().catch(() => {});
       }
@@ -196,6 +206,7 @@ export default function PizzaGame() {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('keydown', onDown);
       window.removeEventListener('keyup', onUp);
+      window.removeEventListener('blur', onBlur);
       window.removeEventListener('pointerup',     onGlobalPointerEnd);
       window.removeEventListener('pointercancel', onGlobalPointerEnd);
       window.removeEventListener('touchcancel', clearDirKeys);
@@ -313,6 +324,7 @@ export default function PizzaGame() {
     border: 'none', cursor: 'pointer',
     userSelect: 'none', WebkitUserSelect: 'none',
     WebkitTouchCallout: 'none', touchAction: 'none',
+    WebkitTapHighlightColor: 'transparent',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   };
 
@@ -460,7 +472,10 @@ export default function PizzaGame() {
   const dpadH = { ...dpadArm, width: 72, height: 48, borderRadius: 10 };
 
   const DPad = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, touchAction: 'none' }}>
+    <div
+      onContextMenu={e => e.preventDefault()}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, touchAction: 'none', userSelect: 'none', WebkitUserSelect: 'none' }}
+    >
       {/* main row: LEFT  ·  center nub  ·  RIGHT */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
 
@@ -476,6 +491,8 @@ export default function PizzaGame() {
           onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'left'; mb('left', true); }}
           onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
           onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('left', false); }}
+          onTouchStart={e => e.preventDefault()}
+          onTouchEnd={e => e.preventDefault()}
           onContextMenu={e => e.preventDefault()}
         >
           {/* bold SVG triangle arrow */}
@@ -506,6 +523,8 @@ export default function PizzaGame() {
           onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); activeDirPointers.current[e.pointerId] = 'right'; mb('right', true); }}
           onPointerUp={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
           onPointerCancel={e => { e.preventDefault(); delete activeDirPointers.current[e.pointerId]; mb('right', false); }}
+          onTouchStart={e => e.preventDefault()}
+          onTouchEnd={e => e.preventDefault()}
           onContextMenu={e => e.preventDefault()}
         >
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -541,6 +560,8 @@ export default function PizzaGame() {
       onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId); mb(k, true); }}
       onPointerUp={e => e.preventDefault()}
       onPointerCancel={e => e.preventDefault()}
+      onTouchStart={e => e.preventDefault()}
+      onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
     >
       <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', lineHeight: 1 }}>A</span>
@@ -570,6 +591,8 @@ export default function PizzaGame() {
       }}
       onPointerDown={e => { e.preventDefault(); onPress(); }}
       onPointerUp={e => e.preventDefault()}
+      onTouchStart={e => e.preventDefault()}
+      onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
     >{label}</button>
   );
@@ -597,22 +620,31 @@ export default function PizzaGame() {
       }}
       onPointerDown={e => { e.preventDefault(); mb('start', true); }}
       onPointerUp={e => e.preventDefault()}
+      onTouchStart={e => e.preventDefault()}
+      onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
     >START</button>
   );
 
   const MobileControls = () => (
-    <div style={{
-      background: 'linear-gradient(180deg, #1a1c28 0%, #13141e 100%)',
-      borderTop: `2px solid #2a2d40`,
-      paddingTop: 10,
-      paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
-      paddingLeft: 16,
-      paddingRight: 16,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 10,
-    }}>
+    <div
+      onContextMenu={e => e.preventDefault()}
+      style={{
+        background: 'linear-gradient(180deg, #1a1c28 0%, #13141e 100%)',
+        borderTop: `2px solid #2a2d40`,
+        paddingTop: 10,
+        paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
+        paddingLeft: 16,
+        paddingRight: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
       {/* Utility row — small, centered, like controller menu buttons */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
         <UtilBtn label={isPaused ? '▶ RESUME' : '⏸ PAUSE'} onPress={handlePause} active={isPaused} activeColor='#e67e22' />
