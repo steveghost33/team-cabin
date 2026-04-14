@@ -11,6 +11,10 @@ import { drawPlayer, drawEnemy, drawPizza, drawHeart, drawBoss, drawCharPreview 
 const _pugImg = new Image();
 _pugImg.src = '/pugfest-banner.png';
 
+// Preload TC logo banner for Ferndale celebration
+const _tcImg = new Image();
+_tcImg.src = '/tc-banner.png';
+
 export function renderFrame(ctx, engine, frame) {
   const gs = engine.gState;
 
@@ -1057,8 +1061,16 @@ function drawPugFestCelebration(ctx, engine, frame) {
   ctx.fillStyle = '#111';
   ctx.fillRect(bannerX, bannerTop, bannerW, bannerH);
 
-  // Image
-  if (_pugImg.complete && _pugImg.naturalWidth > 0) {
+  // TC logo as main backdrop behind the band
+  if (_tcImg.complete && _tcImg.naturalWidth > 0) {
+    const aspect = _tcImg.naturalWidth / _tcImg.naturalHeight;
+    let dw = bannerW, dh = bannerW / aspect;
+    if (dh > imgAreaH) { dh = imgAreaH; dw = imgAreaH * aspect; }
+    const dx = bannerX + (bannerW - dw) / 2;
+    const dy = bannerTop + (imgAreaH - dh) / 2;
+    ctx.drawImage(_tcImg, dx, dy, dw, dh);
+  } else if (_pugImg.complete && _pugImg.naturalWidth > 0) {
+    // fallback to pugfest banner if TC image not yet loaded
     const aspect = _pugImg.naturalWidth / _pugImg.naturalHeight;
     let dw = bannerW, dh = bannerW / aspect;
     if (dh > imgAreaH) { dh = imgAreaH; dw = imgAreaH * aspect; }
