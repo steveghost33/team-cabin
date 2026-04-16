@@ -38,6 +38,9 @@ export function renderFrame(ctx, engine, frame) {
   // ── YPSILANTI PLANES (sky layer, before buildings) ───────────
   if (engine.lvlIdx === 0) drawYpsiPlanes(ctx, frame);
 
+  // ── DETROIT BACKGROUND (dilapidated + graffiti, parallax layer) ─
+  if (engine.lvlIdx === 2) drawDetroitBackground(ctx, scrollX, frame);
+
   // ── BUILDINGS ────────────────────────────────
   engine.blds.forEach(b => drawBuilding(ctx, b, scrollX, lvl, frame));
 
@@ -70,6 +73,20 @@ export function renderFrame(ctx, engine, frame) {
     if (hlbx > -340 && hlbx < W + 20) drawHalesKitchen(ctx, hlbx, frame, engine.halesBarks, scrollX);
     const bbx = 5500 - scrollX;
     if (bbx > -220 && bbx < W + 20) drawTheBomber(ctx, bbx);
+  }
+
+  // ── DETROIT LANDMARKS ────────────────────────
+  if (engine.lvlIdx === 2) {
+    const piescibx = 500 - scrollX;
+    if (piescibx > -180 && piescibx < W + 20) drawPieSci(ctx, piescibx, frame);
+    const spiritbx = 1800 - scrollX;
+    if (spiritbx > -200 && spiritbx < W + 20) drawSpiritOfDetroit(ctx, spiritbx, frame);
+    const fistbx = 3000 - scrollX;
+    if (fistbx > -200 && fistbx < W + 20) drawJoeLouis(ctx, fistbx, frame);
+    const guardianbx = 4400 - scrollX * 0.7;
+    if (guardianbx > -300 && guardianbx < W + 20) drawGuardianBuilding(ctx, Math.round(guardianbx), frame);
+    const magicbx = 6200 - scrollX;
+    if (magicbx > -280 && magicbx < W + 20) drawMagicStick(ctx, magicbx, frame);
   }
 
   // ── GROUND ───────────────────────────────────
@@ -1788,6 +1805,827 @@ function drawGroveStudios(ctx, bx) {
   ctx.fillStyle = '#18a018';
   ctx.font = '7px "Press Start 2P"';
   ctx.fillText('STUDIOS', sx + 30, sy + 30);
+}
+
+// ══════════════════════════════════════════════
+//  DETROIT LEVEL LANDMARKS & BACKGROUND
+// ══════════════════════════════════════════════
+
+// ── DETROIT BACKGROUND: dilapidated buildings + graffiti murals ──
+function drawDetroitBackground(ctx, scrollX, frame) {
+  const by = GROUND;
+  const bgBuilds = [
+    { wx: 280,  w: 82,  h: 98,  type: 'crumble' },
+    { wx: 750,  w: 128, h: 132, type: 'graffiti', murIdx: 0 },
+    { wx: 1250, w: 74,  h: 88,  type: 'crumble' },
+    { wx: 1850, w: 148, h: 142, type: 'graffiti', murIdx: 1 },
+    { wx: 2450, w: 92,  h: 108, type: 'crumble' },
+    { wx: 3050, w: 158, h: 138, type: 'graffiti', murIdx: 2 },
+    { wx: 3650, w: 78,  h: 93,  type: 'crumble' },
+    { wx: 4250, w: 142, h: 132, type: 'graffiti', murIdx: 3 },
+    { wx: 4850, w: 88,  h: 102, type: 'crumble' },
+    { wx: 5450, w: 152, h: 138, type: 'graffiti', murIdx: 0 },
+    { wx: 6050, w: 96,  h: 110, type: 'crumble' },
+    { wx: 6650, w: 118, h: 122, type: 'graffiti', murIdx: 1 },
+  ];
+
+  bgBuilds.forEach(bg => {
+    const bx = Math.round(bg.wx - scrollX * 0.22);
+    if (bx > W + 220 || bx + bg.w < -220) return;
+    const bh = bg.h, bw = bg.w;
+
+    if (bg.type === 'crumble') {
+      // ── Dilapidated building ──
+      ctx.fillStyle = '#1c1008';
+      ctx.fillRect(bx, by - bh, bw, bh);
+      // brick texture
+      for (let row = 0; row < Math.floor(bh / 8); row++) {
+        const xOff = (row % 2) * 11;
+        for (let col = 0; col < Math.ceil(bw / 22); col++) {
+          const cx = bx + col * 22 + xOff, cy = by - bh + row * 8;
+          if (cx + 20 > bx + bw - 2) continue;
+          ctx.fillStyle = row % 3 === 0 ? '#381e0c' : '#2e1a0a';
+          ctx.fillRect(cx, cy, 20, 7);
+        }
+      }
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      for (let row = 0; row <= bh; row += 8) ctx.fillRect(bx, by - bh + row, bw, 1);
+
+      // broken / dark windows
+      [[0.12,0.2],[0.45,0.22],[0.72,0.2],[0.2,0.52],[0.6,0.5],[0.35,0.75]].forEach(([wx, wy]) => {
+        if (wx * bw + 13 > bw - 3) return;
+        ctx.fillStyle = '#060606';
+        ctx.fillRect(bx + wx * bw, by - bh + wy * bh, 13, 11);
+        ctx.fillStyle = 'rgba(160,190,210,0.07)';
+        ctx.fillRect(bx + wx * bw, by - bh + wy * bh, 7, 6);
+        ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(bx + wx * bw + 7, by - bh + wy * bh);
+        ctx.lineTo(bx + wx * bw + 4, by - bh + wy * bh - 7);
+        ctx.stroke();
+      });
+
+      // jagged crumbling top
+      ctx.fillStyle = '#0a0a0a';
+      const seg = Math.max(6, Math.floor(bw / 6));
+      for (let i = 0; i < 6; i++) {
+        const drop = (i % 3) * 6 + ((i * 7) % 5) * 3;
+        ctx.fillRect(bx + i * seg, by - bh - drop, seg, drop + 3);
+      }
+      // partial collapse — missing section in wall
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(bx + bw * 0.55, by - bh * 0.42, bw * 0.22, bh * 0.42);
+      // rubble chunks at base
+      ctx.fillStyle = '#2a1408';
+      for (let i = 0; i < 6; i++) {
+        ctx.fillRect(bx + bw * 0.50 + i * 9, by - 6 - (i % 3) * 4, 7 + (i % 2) * 4, 6 + (i % 3) * 4);
+      }
+      // exposed rebar
+      ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(bx + bw * 0.58, by - bh * 0.42); ctx.lineTo(bx + bw * 0.60, by - bh * 0.42 - 12); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx + bw * 0.68, by - bh * 0.42); ctx.lineTo(bx + bw * 0.66, by - bh * 0.42 - 18); ctx.stroke();
+
+    } else {
+      // ── Graffiti mural building ──
+      ctx.fillStyle = '#141414';
+      ctx.fillRect(bx, by - bh, bw, bh);
+      ctx.fillStyle = 'rgba(255,255,255,0.025)';
+      for (let y = 18; y < bh; y += 18) ctx.fillRect(bx, by - bh + y, bw, 1);
+
+      drawDetroitGraffiti(ctx, bx, by - bh, bw, bh, bg.murIdx, frame);
+
+      // paint drips
+      ctx.fillStyle = 'rgba(255,80,0,0.28)';
+      ctx.fillRect(bx + bw * 0.22, by - 18, 2, 18);
+      ctx.fillStyle = 'rgba(0,160,255,0.22)';
+      ctx.fillRect(bx + bw * 0.62, by - 24, 2, 24);
+      ctx.fillStyle = 'rgba(220,20,200,0.20)';
+      ctx.fillRect(bx + bw * 0.78, by - 14, 2, 14);
+    }
+
+    // dark roof cap on every bg building
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(bx - 1, by - bh - 3, bw + 2, 4);
+  });
+}
+
+function drawDetroitGraffiti(ctx, x, y, w, h, murIdx, frame) {
+  const murals = [
+    // 0 – Phoenix / Detroit Rises  (orange-red bird motif)
+    (x, y, w, h) => {
+      ctx.fillStyle = '#0a0520'; ctx.fillRect(x, y, w, h);
+      const cx = x + w * 0.5, cy = y + h * 0.45;
+      // body
+      ctx.fillStyle = '#cc3300';
+      ctx.fillRect(cx - w*0.14, cy - h*0.18, w*0.28, h*0.28);
+      // wings
+      ctx.fillStyle = '#ff5500';
+      ctx.fillRect(x + w*0.05, cy - h*0.10, w*0.30, h*0.15);
+      ctx.fillRect(cx + w*0.15, cy - h*0.10, w*0.30, h*0.15);
+      ctx.fillStyle = '#ff8800';
+      ctx.fillRect(x + w*0.02, cy - h*0.18, w*0.15, h*0.10);
+      ctx.fillRect(cx + w*0.33, cy - h*0.18, w*0.15, h*0.10);
+      // tail feathers
+      ctx.fillStyle = '#aa2200';
+      ctx.fillRect(cx - w*0.18, cy + h*0.08, w*0.36, h*0.22);
+      ctx.fillStyle = '#ff4400';
+      ctx.fillRect(cx - w*0.10, cy + h*0.18, w*0.06, h*0.20);
+      ctx.fillRect(cx - w*0.02, cy + h*0.20, w*0.06, h*0.18);
+      ctx.fillRect(cx + w*0.06, cy + h*0.18, w*0.06, h*0.20);
+      // head
+      ctx.fillStyle = '#ff6600';
+      ctx.fillRect(cx - w*0.08, cy - h*0.30, w*0.16, h*0.15);
+      ctx.fillStyle = '#ffee00';
+      ctx.fillRect(cx + w*0.02, cy - h*0.28, w*0.04, h*0.04);
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillRect(cx - w*0.10, cy - h*0.24, w*0.06, h*0.04);
+      // flames below
+      ctx.fillStyle = '#ff2200';
+      ctx.fillRect(cx - w*0.20, cy + h*0.32, w*0.40, h*0.10);
+      ctx.fillStyle = '#ff6600';
+      ctx.fillRect(cx - w*0.12, cy + h*0.28, w*0.10, h*0.08);
+      ctx.fillRect(cx + w*0.02, cy + h*0.26, w*0.10, h*0.10);
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillRect(cx - w*0.04, cy + h*0.22, w*0.14, h*0.08);
+      ctx.fillStyle = '#ff6600';
+      ctx.font = `${Math.floor(w * 0.08)}px "Press Start 2P"`; ctx.textAlign = 'center';
+      ctx.fillText('DETROIT', x + w/2, y + h * 0.96);
+    },
+    // 1 – "MADE IN DETROIT"  geometric bold lettering
+    (x, y, w, h) => {
+      ctx.fillStyle = '#08001a'; ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#4400aa';
+      ctx.fillRect(x, y + h*0.05, w*0.14, h*0.90);
+      ctx.fillStyle = '#0044aa';
+      ctx.fillRect(x + w*0.86, y + h*0.05, w*0.14, h*0.90);
+      ctx.fillStyle = '#002244';
+      ctx.fillRect(x + w*0.10, y + h*0.05, w*0.80, h*0.35);
+      ctx.fillStyle = '#001a33';
+      ctx.fillRect(x + w*0.10, y + h*0.38, w*0.80, h*0.30);
+      // diamonds
+      ctx.fillStyle = '#00aaff';
+      ctx.fillRect(x + w*0.18, y + h*0.10, w*0.09, h*0.09);
+      ctx.fillStyle = '#ff00aa';
+      ctx.fillRect(x + w*0.73, y + h*0.10, w*0.09, h*0.09);
+      // text
+      ctx.fillStyle = '#aaaaff';
+      ctx.font = `${Math.floor(w * 0.07)}px "Press Start 2P"`; ctx.textAlign = 'center';
+      ctx.fillText('MADE IN', x + w/2, y + h*0.32);
+      ctx.fillStyle = '#00ffee';
+      ctx.font = `bold ${Math.floor(w * 0.10)}px "Press Start 2P"`;
+      ctx.fillText('DETROIT', x + w/2, y + h*0.48);
+      ctx.fillStyle = '#ff6600';
+      ctx.font = `${Math.floor(w * 0.065)}px "Press Start 2P"`;
+      ctx.fillText('313', x + w/2, y + h*0.65);
+      // stripes
+      ['#cc3300','#ff6600','#ffcc00'].forEach((c, i) => {
+        ctx.fillStyle = c;
+        ctx.fillRect(x + w*0.10, y + h*(0.74 + i*0.07), w*0.80, h*0.055);
+      });
+    },
+    // 2 – Large face / street-art portrait
+    (x, y, w, h) => {
+      ctx.fillStyle = '#cc0033'; ctx.fillRect(x, y, w * 0.5, h);
+      ctx.fillStyle = '#0033aa'; ctx.fillRect(x + w*0.5, y, w*0.5, h);
+      ctx.fillStyle = '#b86820';
+      ctx.fillRect(x + w*0.22, y + h*0.10, w*0.56, h*0.62);
+      // hair
+      ctx.fillStyle = '#100808';
+      ctx.fillRect(x + w*0.18, y + h*0.04, w*0.64, h*0.20);
+      ctx.fillRect(x + w*0.18, y + h*0.10, w*0.08, h*0.35);
+      ctx.fillRect(x + w*0.74, y + h*0.10, w*0.08, h*0.35);
+      ctx.fillStyle = '#9a5010';
+      ctx.fillRect(x + w*0.64, y + h*0.12, w*0.14, h*0.50);
+      // eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x + w*0.28, y + h*0.30, w*0.16, h*0.10);
+      ctx.fillRect(x + w*0.56, y + h*0.30, w*0.16, h*0.10);
+      ctx.fillStyle = '#1a1060';
+      ctx.fillRect(x + w*0.31, y + h*0.31, w*0.09, h*0.08);
+      ctx.fillRect(x + w*0.59, y + h*0.31, w*0.09, h*0.08);
+      // nose
+      ctx.fillStyle = '#9a5010';
+      ctx.fillRect(x + w*0.42, y + h*0.43, w*0.16, h*0.10);
+      // mouth
+      ctx.fillStyle = '#7a1010';
+      ctx.fillRect(x + w*0.34, y + h*0.57, w*0.32, h*0.06);
+      ctx.fillStyle = '#cc2020';
+      ctx.fillRect(x + w*0.35, y + h*0.575, w*0.30, h*0.025);
+      // dot accents sides
+      ctx.fillStyle = '#ffdd00';
+      for (let i = 0; i < 5; i++) {
+        ctx.fillRect(x + w*0.06, y + h*(0.12 + i*0.16), w*0.08, h*0.09);
+        ctx.fillRect(x + w*0.86, y + h*(0.12 + i*0.16), w*0.08, h*0.09);
+      }
+    },
+    // 3 – Abstract Detroit skyline / geometric night art
+    (x, y, w, h) => {
+      ctx.fillStyle = '#03070a'; ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#061225';
+      ctx.fillRect(x + w*0.05, y + h*0.05, w*0.90, h*0.65);
+      // building silhouettes – amber/gold
+      ctx.fillStyle = '#cc8800';
+      [[0.06,0.50,0.10,0.45],[0.17,0.35,0.12,0.60],[0.30,0.42,0.08,0.53],
+       [0.39,0.28,0.14,0.67],[0.54,0.38,0.09,0.57],[0.64,0.30,0.16,0.65],
+       [0.81,0.44,0.13,0.51]].forEach(([bx2,by2,bw2,bh2]) => {
+        ctx.fillRect(x + w*bx2, y + h*by2, w*bw2, h*bh2);
+      });
+      // lit windows
+      ctx.fillStyle = '#ffe040';
+      [[0.09,0.56],[0.09,0.64],[0.20,0.40],[0.20,0.52],[0.41,0.34],
+       [0.41,0.46],[0.66,0.36],[0.66,0.50],[0.66,0.62]].forEach(([wx2,wy2]) => {
+        ctx.fillRect(x + w*wx2, y + h*wy2, w*0.05, h*0.06);
+      });
+      // river reflection
+      ctx.fillStyle = '#0a1a30';
+      ctx.fillRect(x + w*0.05, y + h*0.70, w*0.90, h*0.20);
+      ctx.fillStyle = '#cc8820';
+      for (let i = 0; i < 5; i++) ctx.fillRect(x + w*(0.15 + i*0.17), y + h*0.73, w*0.06, h*0.02);
+      // stars
+      ctx.fillStyle = '#ffffff';
+      [[0.15,0.08],[0.35,0.12],[0.60,0.07],[0.80,0.13],[0.90,0.09]].forEach(([sx,sy]) => {
+        ctx.fillRect(x + w*sx, y + h*sy, 2, 2);
+      });
+      // crescent moon
+      ctx.fillStyle = '#fffde7';
+      ctx.beginPath(); ctx.arc(x + w*0.88, y + h*0.12, w*0.07, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#061225';
+      ctx.beginPath(); ctx.arc(x + w*0.91, y + h*0.10, w*0.06, 0, Math.PI*2); ctx.fill();
+    },
+  ];
+  const mural = murals[murIdx % murals.length];
+  mural(x, y, w, h);
+}
+
+// ── SPIRIT OF DETROIT STATUE ──────────────────────────────────────
+function drawSpiritOfDetroit(ctx, bx, frame) {
+  const by = GROUND;
+  const pulse = 0.85 + Math.sin(frame * 0.04) * 0.15;
+
+  // plaza base
+  ctx.fillStyle = '#141420';
+  ctx.fillRect(bx, by - 14, 122, 14);
+  ctx.fillStyle = '#1c1c2e';
+  ctx.fillRect(bx + 2, by - 12, 118, 10);
+
+  // lower plinth step
+  ctx.fillStyle = '#1e1e30';
+  ctx.fillRect(bx + 8, by - 42, 106, 28);
+  ctx.fillStyle = '#28283c';
+  ctx.fillRect(bx + 10, by - 40, 102, 24);
+  // upper pedestal block
+  ctx.fillStyle = '#181828';
+  ctx.fillRect(bx + 20, by - 70, 82, 28);
+  ctx.fillStyle = '#222235';
+  ctx.fillRect(bx + 22, by - 68, 78, 24);
+  // stone edge highlights
+  ctx.fillStyle = '#333345';
+  ctx.fillRect(bx + 10, by - 42, 102, 3);
+  ctx.fillRect(bx + 22, by - 70, 78, 3);
+
+  // engraved text on pedestal
+  ctx.fillStyle = `rgba(226,168,32,${0.72 * pulse})`;
+  ctx.font = '5px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('SPIRIT OF', bx + 61, by - 52);
+  ctx.fillText('DETROIT', bx + 61, by - 44);
+
+  // throne seat
+  const tx = bx + 26, ty = by - 70;
+  ctx.fillStyle = '#0e1822';
+  ctx.fillRect(tx - 2, ty - 74, 72, 74);
+  ctx.fillStyle = '#121e2c';
+  ctx.fillRect(tx, ty - 72, 68, 70);
+  // throne arch / backrest
+  ctx.fillStyle = '#0e1822';
+  ctx.fillRect(tx + 6, ty - 92, 56, 22);
+  ctx.fillStyle = '#0a1218';
+  ctx.fillRect(tx + 8, ty - 90, 52, 20);
+  ctx.fillStyle = '#1a2a3a';
+  ctx.fillRect(tx + 12, ty - 87, 44, 15);
+
+  // ─ figure body (seated, verdigris bronze) ─
+  const fg  = '#3a7858';
+  const fgS = '#2a5840';
+  const fgH = '#4a9870';
+
+  // torso
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 14, ty - 62, 40, 36);
+  ctx.fillStyle = fgS;
+  ctx.fillRect(tx + 42, ty - 62, 12, 36);
+  // robe folds
+  ctx.fillStyle = fgS;
+  ctx.fillRect(tx + 20, ty - 60, 2, 30);
+  ctx.fillRect(tx + 30, ty - 62, 2, 34);
+  ctx.fillRect(tx + 40, ty - 58, 2, 28);
+  ctx.fillStyle = fgH;
+  ctx.fillRect(tx + 16, ty - 62, 4, 36);
+
+  // head
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 22, ty - 84, 24, 24);
+  ctx.fillStyle = fgS;
+  ctx.fillRect(tx + 36, ty - 84, 10, 24);
+  // minimal face detail
+  ctx.fillStyle = fgS;
+  ctx.fillRect(tx + 25, ty - 77, 8, 4);
+  ctx.fillRect(tx + 26, ty - 72, 6, 3);
+  // golden laurel crown
+  ctx.fillStyle = `rgba(226,168,32,${0.85 * pulse})`;
+  ctx.fillRect(tx + 20, ty - 88, 28, 5);
+  ctx.shadowBlur = 6; ctx.shadowColor = '#E2A820';
+  ctx.fillRect(tx + 22, ty - 89, 24, 3);
+  ctx.shadowBlur = 0;
+
+  // left arm raised → holds golden sphere (Family / Humanity)
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 6, ty - 70, 12, 28);
+  ctx.fillRect(tx + 2, ty - 80, 16, 12);
+  // golden sphere
+  ctx.fillStyle = `rgba(226,168,32,${pulse})`;
+  ctx.shadowBlur = 12; ctx.shadowColor = '#E2A820';
+  ctx.beginPath(); ctx.arc(tx + 9, ty - 90, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255,235,110,0.5)';
+  ctx.beginPath(); ctx.arc(tx + 6, ty - 93, 5, 0, Math.PI * 2); ctx.fill();
+
+  // right arm extended, holding small family group
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 54, ty - 60, 28, 10);
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 78, ty - 70, 6, 14);   // adult figure 1
+  ctx.fillRect(tx + 84, ty - 72, 5, 10);   // child
+  ctx.fillRect(tx + 87, ty - 68, 6, 12);   // adult figure 2
+
+  // legs (seated, knees forward)
+  ctx.fillStyle = fg;
+  ctx.fillRect(tx + 14, ty - 28, 16, 28);
+  ctx.fillRect(tx + 36, ty - 28, 16, 28);
+  ctx.fillStyle = fgH;
+  ctx.fillRect(tx + 14, ty - 30, 18, 6);
+  ctx.fillRect(tx + 34, ty - 30, 18, 6);
+  // sandaled feet
+  ctx.fillStyle = fgS;
+  ctx.fillRect(tx + 12, ty, 20, 6);
+  ctx.fillRect(tx + 34, ty, 18, 6);
+
+  // verdigris sheen overlay
+  ctx.fillStyle = 'rgba(80,200,140,0.08)';
+  ctx.fillRect(tx + 6, ty - 92, 88, 100);
+
+  // decorative side panels on pedestal
+  ctx.fillStyle = '#2a2a40';
+  [[12, 0], [102, 0]].forEach(([ox]) => {
+    ctx.fillRect(bx + ox, by - 68, 8, 26);
+    ctx.fillStyle = '#3a3a55';
+    ctx.fillRect(bx + ox + 1, by - 66, 6, 10);
+    ctx.fillRect(bx + ox + 1, by - 54, 6, 10);
+    ctx.fillStyle = '#2a2a40';
+  });
+}
+
+// ── JOE LOUIS FIST (Monument to Joe Louis) ────────────────────────
+function drawJoeLouis(ctx, bx, frame) {
+  const by = GROUND;
+  const sway = Math.sin(frame * 0.025) * 1.5;
+
+  // steel triangular pylon frame
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(bx + 10, by - 162, 7, 162);  // left leg
+  ctx.fillRect(bx + 103, by - 162, 7, 162); // right leg
+  ctx.fillRect(bx + 8, by - 165, 104, 8);   // top crossbar
+  ctx.fillStyle = '#222';
+  ctx.fillRect(bx + 17, by - 100, 86, 5);   // mid cross brace
+  // bolt details on frame
+  ctx.fillStyle = '#444';
+  [[bx+9,by-165],[bx+104,by-165],[bx+14,by-100],[bx+100,by-100]].forEach(([fx,fy]) => {
+    ctx.fillRect(fx, fy, 6, 6);
+  });
+
+  // suspension chains
+  ctx.strokeStyle = '#4a4a4a'; ctx.lineWidth = 2;
+  const c1x = bx + 35, c1y = by - 160;
+  const c2x = bx + 85, c2y = by - 160;
+  const fCX  = bx + 55 + sway, fCY = by - 108;
+  ctx.beginPath(); ctx.moveTo(c1x, c1y); ctx.lineTo(fCX - 6, fCY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(c2x, c2y); ctx.lineTo(fCX + 6, fCY); ctx.stroke();
+  // chain link steps
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  for (let i = 1; i < 5; i++) {
+    const t = i / 5;
+    ctx.strokeRect(c1x + (fCX-6-c1x)*t - 1, c1y + (fCY-c1y)*t - 1, 5, 3);
+    ctx.strokeRect(c2x + (fCX+6-c2x)*t - 1, c2y + (fCY-c2y)*t - 1, 5, 3);
+  }
+
+  // forearm (angled, going lower-left to upper-right toward fist)
+  const aX = bx + 38 + sway, aY = by - 100;
+  ctx.fillStyle = '#8a4a18';
+  ctx.fillRect(aX,      aY + 8,  16, 10);
+  ctx.fillRect(aX + 8,  aY + 0,  16, 10);
+  ctx.fillRect(aX + 16, aY - 8,  16, 10);
+  ctx.fillStyle = '#7a3a10';
+  ctx.fillRect(aX + 22, aY - 15, 16, 8);
+
+  // fist (massive, clenched)
+  const fX = aX + 20, fY = aY - 24;
+  ctx.fillStyle = '#9a5a20';
+  ctx.fillRect(fX, fY, 36, 30);
+  // knuckle ridge
+  ctx.fillStyle = '#ba7830';
+  ctx.fillRect(fX, fY, 36, 9);
+  // individual knuckle bumps
+  [0, 9, 18, 27].forEach(kx => {
+    ctx.fillStyle = '#c88030';
+    ctx.fillRect(fX + kx, fY - 4, 7, 6);
+  });
+  // thumb
+  ctx.fillStyle = '#9a5a20';
+  ctx.fillRect(fX - 9, fY + 5, 10, 16);
+  ctx.fillStyle = '#8a4a18';
+  ctx.fillRect(fX - 9, fY + 5, 10, 6);
+  // finger divisions
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  [8, 17, 26].forEach(kx => ctx.fillRect(fX + kx, fY, 1, 30));
+  // right-side shading
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.fillRect(fX + 28, fY, 8, 30);
+  // verdigris patina hints
+  ctx.fillStyle = 'rgba(60,160,80,0.10)';
+  ctx.fillRect(fX, fY, 10, 30);
+
+  // label plaque
+  ctx.fillStyle = '#181818';
+  ctx.fillRect(bx + 14, by - 16, 92, 16);
+  ctx.fillStyle = '#282828';
+  ctx.fillRect(bx + 16, by - 14, 88, 12);
+  ctx.fillStyle = '#886611';
+  ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MONUMENT TO', bx + 60, by - 9);
+  ctx.fillStyle = '#cc9922';
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('JOE LOUIS', bx + 60, by - 2);
+
+  ctx.fillStyle = '#111';
+  ctx.fillRect(bx + 5, by - 3, 110, 3);
+}
+
+// ── GUARDIAN BUILDING (art deco, mid-parallax background) ─────────
+function drawGuardianBuilding(ctx, bx, frame) {
+  const by = GROUND;
+  const glow = 0.75 + Math.sin(frame * 0.05) * 0.25;
+  const tx = bx + 14;
+  const tw = 58, th = 198;
+
+  // ── base setback (widest) ──
+  ctx.fillStyle = '#8a3c14';
+  ctx.fillRect(tx - 14, by - 82, tw + 28, 82);
+  ctx.fillStyle = '#9e4820';
+  ctx.fillRect(tx - 10, by - 80, tw + 20, 76);
+
+  // ── mid setback ──
+  ctx.fillStyle = '#8a3c14';
+  ctx.fillRect(tx - 7, by - 134, tw + 14, 52);
+  ctx.fillStyle = '#9e4820';
+  ctx.fillRect(tx - 5, by - 132, tw + 10, 48);
+
+  // ── main tower shaft ──
+  ctx.fillStyle = '#8a3c14';
+  ctx.fillRect(tx, by - th, tw, th);
+  ctx.fillStyle = '#9e4820';
+  ctx.fillRect(tx + 3, by - th, tw - 6, th);
+
+  // gold horizontal bands at setback ledges
+  ctx.fillStyle = '#e8c870';
+  [by - 82, by - 134, by - 170].forEach(bY => {
+    ctx.fillRect(tx - 14, bY, tw + 28, 4);
+  });
+
+  // art deco checkerboard tile on main tower face
+  ctx.fillStyle = '#6a2c0a';
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 6; col++) {
+      if ((row + col) % 2 === 0) ctx.fillRect(tx + 4 + col * 8, by - 165 + row * 8, 7, 7);
+    }
+  }
+  ctx.fillStyle = '#bc8830';
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 6; col++) {
+      if ((row + col) % 2 === 1) ctx.fillRect(tx + 4 + col * 8, by - 165 + row * 8, 7, 7);
+    }
+  }
+
+  // vertical pilasters (columns) on base section
+  ctx.fillStyle = '#cc6824';
+  [tx - 11, tx + 8, tx + 24, tx + 40, tx + tw + 3].forEach(px => {
+    ctx.fillRect(px, by - 82, 4, 82);
+  });
+
+  // cream horizontal stripe pattern on base
+  ctx.fillStyle = '#e8d8b8';
+  for (let i = 0; i < 5; i++) ctx.fillRect(tx - 8, by - 76 + i * 13, tw + 16, 3);
+  ctx.fillStyle = '#d8c8a8';
+  for (let i = 0; i < 3; i++) ctx.fillRect(tx - 2, by - 128 + i * 12, tw + 4, 3);
+
+  // arched windows — base section (4 columns × 5 rows)
+  const winCols = [tx - 10, tx + 8, tx + 26, tx + 44];
+  winCols.forEach((wx, wi) => {
+    for (let row = 0; row < 5; row++) {
+      const wy = by - 74 + row * 14;
+      ctx.fillStyle = '#0a0808';
+      ctx.fillRect(wx, wy, 14, 11);
+      ctx.fillRect(wx + 2, wy - 4, 10, 6); // arch
+      const lit = Math.sin(frame * 0.014 + row * 1.5 + wi * 0.8) > 0;
+      ctx.fillStyle = lit ? `rgba(226,168,32,${0.5 * glow})` : '#060404';
+      ctx.fillRect(wx + 1, wy + 1, 12, 9);
+      if (lit) {
+        ctx.shadowBlur = 4; ctx.shadowColor = '#E2A820';
+        ctx.fillRect(wx + 1, wy + 1, 12, 9);
+        ctx.shadowBlur = 0;
+      }
+    }
+    // mid section windows
+    for (let row = 0; row < 3; row++) {
+      const wy = by - 130 + row * 14;
+      ctx.fillStyle = '#0a0808';
+      ctx.fillRect(wx + 3, wy, 10, 10);
+      const lit = Math.sin(frame * 0.017 + row * 1.2 + wi * 1.1) > 0;
+      ctx.fillStyle = lit ? `rgba(226,168,32,${0.45 * glow})` : '#060404';
+      ctx.fillRect(wx + 4, wy + 1, 8, 8);
+    }
+  });
+
+  // pointed spire setbacks
+  ctx.fillStyle = '#6a2c10';
+  ctx.fillRect(tx + tw/2 - 9, by - th - 22, 18, 24);
+  ctx.fillStyle = '#8a3c14';
+  ctx.fillRect(tx + tw/2 - 6, by - th - 40, 12, 20);
+  ctx.fillStyle = '#9a4a1a';
+  ctx.fillRect(tx + tw/2 - 4, by - th - 54, 8, 16);
+  // glowing spire tip
+  ctx.fillStyle = `rgba(226,168,32,${glow})`;
+  ctx.shadowBlur = 10; ctx.shadowColor = '#E2A820';
+  ctx.fillRect(tx + tw/2 - 1, by - th - 65, 2, 13);
+  ctx.shadowBlur = 0;
+
+  // ornate ground-floor entry arch
+  ctx.fillStyle = '#6a2c0a';
+  ctx.fillRect(tx - 12, by - 30, tw + 24, 30);
+  ctx.fillStyle = '#e8c870';
+  ctx.fillRect(tx - 10, by - 28, tw + 20, 4);
+  // arch opening
+  ctx.fillStyle = '#040404';
+  ctx.fillRect(tx + tw/2 - 14, by - 28, 28, 28);
+  ctx.fillRect(tx + tw/2 - 12, by - 34, 24, 8);
+  ctx.fillRect(tx + tw/2 - 10, by - 39, 20, 7);
+  // door frame gold trim
+  ctx.strokeStyle = '#e8c870'; ctx.lineWidth = 1;
+  ctx.strokeRect(tx + tw/2 - 13, by - 28, 26, 28);
+
+  ctx.fillStyle = `rgba(226,168,32,${0.65 * glow})`;
+  ctx.font = '5px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('GUARDIAN', tx + tw/2, by - 38);
+  ctx.fillText('BLDG', tx + tw/2, by - 31);
+
+  // right-side shading
+  ctx.fillStyle = 'rgba(0,0,0,0.28)';
+  ctx.fillRect(tx + tw - 5, by - th, 8, th);
+  ctx.fillRect(tx + tw + 9, by - 82, 8, 82);
+}
+
+// ── MAGIC STICK / MAJESTIC COMPLEX (Woodward Ave) ──────────────────
+function drawMagicStick(ctx, bx, frame) {
+  const by = GROUND;
+  const flash = Math.floor(frame / 12) % 2 === 0;
+  const bw = 222, bh = 142;
+
+  // brick facade
+  ctx.fillStyle = '#3a1208';
+  ctx.fillRect(bx, by - bh, bw, bh);
+  ctx.fillStyle = '#4a1a0c';
+  for (let row = 0; row < Math.floor(bh / 9); row++) {
+    const xOff = (row % 2) * 14;
+    for (let col = 0; col < Math.ceil(bw / 28); col++) {
+      ctx.fillRect(bx + col * 28 + xOff, by - bh + row * 9, 26, 8);
+    }
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  for (let row = 0; row <= bh; row += 9) ctx.fillRect(bx, by - bh + row, bw, 1);
+
+  // roof coping & ornamental blocks
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(bx - 2, by - bh - 6, bw + 4, 7);
+  ctx.fillStyle = '#441a0a';
+  ctx.fillRect(bx + 10, by - bh - 14, 30, 9);
+  ctx.fillRect(bx + 90, by - bh - 16, 42, 11);
+  ctx.fillRect(bx + 180, by - bh - 14, 30, 9);
+
+  // ─ MAJESTIC THEATRE marquee ─
+  const marqY = by - bh + 12;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(bx + 10, marqY, bw - 20, 40);
+  ctx.strokeStyle = '#cc9900'; ctx.lineWidth = 2;
+  ctx.strokeRect(bx + 10, marqY, bw - 20, 40);
+  // blinking border lights
+  ctx.fillStyle = flash ? '#ffdd00' : '#886600';
+  for (let lx = bx + 15; lx < bx + bw - 15; lx += 12) {
+    ctx.fillRect(lx, marqY + 3, 5, 5);
+    ctx.fillRect(lx, marqY + 32, 5, 5);
+  }
+  for (let ly = marqY + 8; ly < marqY + 32; ly += 12) {
+    ctx.fillRect(bx + 13, ly, 5, 5);
+    ctx.fillRect(bx + bw - 18, ly, 5, 5);
+  }
+  // "MAJESTIC" text
+  ctx.shadowBlur = flash ? 7 : 0; ctx.shadowColor = '#ffaa00';
+  ctx.fillStyle = '#ffdd00';
+  ctx.font = 'bold 10px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MAJESTIC', bx + bw / 2, marqY + 18);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#cc9900';
+  ctx.font = '6px "Press Start 2P"';
+  ctx.fillText('THEATRE', bx + bw / 2, marqY + 30);
+
+  // ─ MAGIC STICK neon sign (upper left) ─
+  const msX = bx + 5, msY = marqY - 30;
+  ctx.fillStyle = '#0a0020';
+  ctx.fillRect(msX, msY, 92, 26);
+  ctx.shadowBlur = flash ? 5 : 0; ctx.shadowColor = '#aa00ff';
+  ctx.strokeStyle = '#aa00ff'; ctx.lineWidth = 1;
+  ctx.strokeRect(msX, msY, 92, 26);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = flash ? '#cc44ff' : '#8800cc';
+  ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MAGIC', msX + 46, msY + 11);
+  ctx.fillText('STICK', msX + 46, msY + 21);
+
+  // ─ Majestic 20 Café sign (upper right) ─
+  const m20X = bx + bw - 97, m20Y = marqY - 28;
+  ctx.fillStyle = '#1a0a00';
+  ctx.fillRect(m20X, m20Y, 90, 24);
+  ctx.shadowBlur = flash ? 4 : 0; ctx.shadowColor = '#ff6600';
+  ctx.strokeStyle = '#ff6600'; ctx.lineWidth = 1;
+  ctx.strokeRect(m20X, m20Y, 90, 24);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff8800';
+  ctx.font = '6px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MAJESTIC 20', m20X + 45, m20Y + 11);
+  ctx.fillText('CAFÉ', m20X + 45, m20Y + 21);
+
+  // show listing strip below marquee
+  const showY = marqY + 54;
+  ctx.fillStyle = '#111';
+  ctx.fillRect(bx + 10, showY, bw - 20, 24);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx + 10, showY, bw - 20, 24);
+  ctx.fillStyle = '#ffdd00';
+  ctx.font = '6px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('TONIGHT:', bx + bw / 2, showY + 10);
+  ctx.fillStyle = '#ff8800';
+  ctx.fillText('RAT KING TRIBUTE', bx + bw / 2, showY + 20);
+
+  // ─ storefront (ground floor) ─
+  const sfY = by - 48;
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(bx, sfY, bw, 48);
+  // box office
+  ctx.fillStyle = '#141414';
+  ctx.fillRect(bx + 10, sfY + 6, 48, 32);
+  ctx.fillStyle = 'rgba(100,140,200,0.14)';
+  ctx.fillRect(bx + 12, sfY + 8, 44, 28);
+  ctx.fillStyle = '#cc9922';
+  ctx.font = '5px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('BOX', bx + 34, sfY + 20);
+  ctx.fillText('OFFICE', bx + 34, sfY + 29);
+  // main double doors
+  const dX = bx + bw / 2 - 24;
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(dX, sfY + 4, 48, 44);
+  ctx.fillStyle = '#222';
+  ctx.fillRect(dX + 2, sfY + 6, 21, 38);
+  ctx.fillRect(dX + 25, sfY + 6, 21, 38);
+  ctx.fillStyle = '#886600';
+  ctx.fillRect(dX + 18, sfY + 24, 4, 4);
+  ctx.fillRect(dX + 26, sfY + 24, 4, 4);
+  // right side window
+  ctx.fillStyle = '#141414';
+  ctx.fillRect(bx + bw - 58, sfY + 6, 48, 32);
+  ctx.fillStyle = 'rgba(100,140,200,0.10)';
+  ctx.fillRect(bx + bw - 56, sfY + 8, 44, 28);
+
+  // Woodward Ave street sign (on building flank)
+  ctx.fillStyle = '#003388';
+  ctx.fillRect(bx + bw - 8, by - bh + 18, 8, 44);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.save();
+  ctx.translate(bx + bw - 4, by - bh + 40);
+  ctx.rotate(Math.PI / 2);
+  ctx.fillText('WOODWARD', 0, 0);
+  ctx.restore();
+}
+
+// ── PIE SCI PIZZA (Trumbull Ave) ──────────────────────────────────
+function drawPieSci(ctx, bx, frame) {
+  const by = GROUND;
+  const np = 0.80 + Math.sin(frame * 0.06) * 0.20; // neon pulse
+  const bw = 148, bh = 92;
+
+  // building facade
+  ctx.fillStyle = '#1a1a14';
+  ctx.fillRect(bx, by - bh, bw, bh);
+  ctx.fillStyle = '#222218';
+  for (let row = 0; row < Math.floor(bh / 12); row++) {
+    ctx.fillRect(bx, by - bh + row * 12, bw, 11);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  for (let row = 0; row <= bh; row += 12) ctx.fillRect(bx, by - bh + row, bw, 1);
+
+  // ─ upper mural panel ─
+  ctx.fillStyle = '#0a3030';
+  ctx.fillRect(bx + 8, by - bh + 6, bw - 16, 44);
+  ctx.fillStyle = '#0c3c3c';
+  ctx.fillRect(bx + 10, by - bh + 8, bw - 20, 40);
+
+  // pizza slice icon (left side of panel)
+  ctx.fillStyle = '#cc7700';
+  ctx.fillRect(bx + 14, by - bh + 14, 22, 20);
+  ctx.fillStyle = '#ffcc00';
+  ctx.fillRect(bx + 20, by - bh + 14, 10, 7);      // cheese blob
+  ctx.fillStyle = '#cc2200';
+  ctx.fillRect(bx + 15, by - bh + 21, 5, 5);
+  ctx.fillRect(bx + 24, by - bh + 24, 4, 4);        // pepperoni
+  ctx.fillStyle = '#4a3a2a';
+  ctx.fillRect(bx + 14, by - bh + 32, 22, 3);       // crust edge
+
+  // atom rings (science theme)
+  ctx.strokeStyle = `rgba(0,221,170,${np})`; ctx.lineWidth = 1;
+  ctx.shadowBlur = np > 0.9 ? 4 : 0; ctx.shadowColor = '#00ddaa';
+  ctx.beginPath(); ctx.ellipse(bx + 25, by - bh + 23, 17, 6, -0.4, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(bx + 25, by - bh + 23, 17, 6,  0.4, 0, Math.PI * 2); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // "PIE SCI" name
+  ctx.fillStyle = `rgba(0,220,170,${np})`;
+  ctx.shadowBlur = np > 0.9 ? 7 : 2; ctx.shadowColor = '#00ddaa';
+  ctx.font = 'bold 10px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('PIE SCI', bx + bw / 2 + 12, by - bh + 23);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#00aa88';
+  ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('PIZZA', bx + bw / 2 + 12, by - bh + 33);
+  ctx.fillStyle = 'rgba(0,180,140,0.55)';
+  ctx.font = '4px "Press Start 2P"';
+  ctx.fillText('TRUMBULL AVE', bx + bw / 2 + 12, by - bh + 43);
+
+  // roof + HVAC
+  ctx.fillStyle = '#0d0d0d';
+  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(bx + bw - 32, by - bh - 16, 22, 13);
+  ctx.fillRect(bx + bw - 28, by - bh - 23, 14, 8);
+  ctx.fillRect(bx + 14, by - bh - 14, 8, 11);
+  ctx.fillRect(bx + 12, by - bh - 16, 12, 4);
+
+  // ─ storefront (ground floor) ─
+  const sfH = 38;
+  ctx.fillStyle = '#0c0c0c';
+  ctx.fillRect(bx, by - sfH, bw, sfH);
+
+  // OPEN neon in window
+  ctx.fillStyle = '#08100e';
+  ctx.fillRect(bx + 8, by - sfH + 4, 56, 24);
+  ctx.fillStyle = `rgba(0,200,150,${np})`;
+  ctx.shadowBlur = np > 0.9 ? 5 : 1; ctx.shadowColor = '#00cc88';
+  ctx.font = '6px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('OPEN', bx + 36, by - sfH + 13);
+  ctx.font = '4px "Press Start 2P"';
+  ctx.fillText('LATE NIGHT', bx + 36, by - sfH + 23);
+  ctx.shadowBlur = 0;
+
+  // front door
+  ctx.fillStyle = '#181818';
+  ctx.fillRect(bx + bw / 2 - 17, by - sfH + 2, 34, sfH - 2);
+  ctx.fillStyle = '#222';
+  ctx.fillRect(bx + bw / 2 - 15, by - sfH + 4, 15, sfH - 6);
+  ctx.fillRect(bx + bw / 2 + 0,  by - sfH + 4, 15, sfH - 6);
+  ctx.fillStyle = '#00aa88';
+  ctx.fillRect(bx + bw / 2 - 3, by - sfH + 14, 6, 2);
+
+  // right window
+  ctx.fillStyle = '#0a0c0a';
+  ctx.fillRect(bx + bw - 46, by - sfH + 4, 38, 24);
+  ctx.fillStyle = 'rgba(0,150,100,0.07)';
+  ctx.fillRect(bx + bw - 44, by - sfH + 6, 34, 20);
+
+  // chalkboard menu sign
+  ctx.fillStyle = '#1a2a1a';
+  ctx.fillRect(bx + 4, by - sfH + 4, 42, 24);
+  ctx.strokeStyle = '#2a4a2a'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx + 4, by - sfH + 4, 42, 24);
+  ctx.fillStyle = '#88cc88';
+  ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('NY STYLE', bx + 25, by - sfH + 14);
+  ctx.fillText('$3/SLICE', bx + 25, by - sfH + 22);
 }
 
 // ── OVERLAY SCREENS ────────────────────────────
