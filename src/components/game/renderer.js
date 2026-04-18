@@ -2144,51 +2144,197 @@ function drawPieSci(ctx, bx, frame) {
 
 // ── SPIRIT OF DETROIT STATUE ──────────────────────────────────────────────────
 function drawSpiritOfDetroit(ctx, bx, frame) {
-  const bw=124, statueH=158;
-  const by=GROUND;
-  // granite plaza base
-  ctx.fillStyle='#444444'; ctx.fillRect(bx,by-14,bw,14);
-  ctx.fillStyle='#3a3a3a'; ctx.fillRect(bx+6,by-18,bw-12,6);
-  // lower pedestal tier
-  ctx.fillStyle='#5a5a5a'; ctx.fillRect(bx+14,by-42,bw-28,28);
-  ctx.fillStyle='#E2A820'; ctx.fillRect(bx+14,by-44,bw-28,3); ctx.fillRect(bx+14,by-16,bw-28,3);
-  // upper pedestal tier
-  ctx.fillStyle='#666'; ctx.fillRect(bx+22,by-70,bw-44,30);
-  ctx.fillStyle='#E2A820'; ctx.fillRect(bx+22,by-72,bw-44,3); ctx.fillRect(bx+22,by-42,bw-44,3);
+  // Total footprint ~220px wide to capture full arm spread
+  const bw = 220;
+  const by = GROUND;
+  const cx = bx + bw / 2; // statue center x
+
+  // ── marble arch / backing panel ──
+  ctx.fillStyle = '#d4cfc8';
+  ctx.beginPath();
+  ctx.moveTo(bx + 10, by - 14);
+  ctx.lineTo(bx + 10, by - 200);
+  ctx.quadraticCurveTo(cx, by - 240, bx + bw - 10, by - 200);
+  ctx.lineTo(bx + bw - 10, by - 14);
+  ctx.fill();
+  // marble veining lines
+  ctx.strokeStyle = 'rgba(180,175,168,0.6)'; ctx.lineWidth = 1;
+  [[bx+30,by-30,bx+60,by-180],[bx+80,by-20,bx+100,by-220],[bx+140,by-25,bx+160,by-210]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+  // MICHIGAN medallion circle at top of arch
+  ctx.strokeStyle='#a89e8e'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(cx, by-220, 18, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#c8c2ba'; ctx.beginPath(); ctx.arc(cx, by-220, 16, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle='#8a7e70'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('MICHIGAN', cx, by-218);
+
+  // inscription text on marble
+  const glow = 0.6 + Math.sin(frame * 0.04) * 0.2;
+  ctx.fillStyle='rgba(120,105,80,0.8)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('"NOW THE SPIRIT"', cx, by-172);
+  ctx.fillText('OF THE LORD', cx, by-163);
+
+  // ── pedestal (tiered, granite) ──
+  // bottom slab
+  ctx.fillStyle='#4a4a4a'; ctx.fillRect(cx-52, by-16, 104, 16);
+  ctx.fillStyle='#3a3a3a'; ctx.fillRect(cx-48, by-20, 96, 6);
+  // mid pedestal
+  ctx.fillStyle='#555'; ctx.fillRect(cx-44, by-50, 88, 32);
+  ctx.fillStyle='#E2A820'; ctx.fillRect(cx-44, by-52, 88, 3); ctx.fillRect(cx-44, by-20, 88, 3);
+  // upper pedestal block (statue sits here)
+  ctx.fillStyle='#5e5e5e'; ctx.fillRect(cx-38, by-82, 76, 34);
+  ctx.fillStyle='#E2A820'; ctx.fillRect(cx-38, by-84, 76, 3); ctx.fillRect(cx-38, by-50, 76, 3);
   // pedestal text
-  const glow=0.7+Math.sin(frame*0.04)*0.3;
   ctx.fillStyle=`rgba(226,168,32,${glow})`; ctx.font='5px "Press Start 2P"'; ctx.textAlign='center';
   ctx.shadowBlur=6; ctx.shadowColor='#E2A820';
-  ctx.fillText('SPIRIT OF',bx+bw/2,by-56); ctx.fillText('DETROIT',bx+bw/2,by-47);
+  ctx.fillText('SPIRIT OF', cx, by-68); ctx.fillText('DETROIT', cx, by-59);
   ctx.shadowBlur=0;
-  // seated bronze figure (verdigris)
-  const fx=bx+bw/2, fy=by-70;
-  // torso + robes
-  ctx.fillStyle='#3a7858'; ctx.fillRect(fx-18,fy-60,36,50);
-  ctx.fillStyle='#2e6048'; ctx.fillRect(fx-16,fy-58,6,46); ctx.fillRect(fx+10,fy-58,6,46);
-  // legs (seated)
-  ctx.fillStyle='#3a7858'; ctx.fillRect(fx-22,fy-16,20,24); ctx.fillRect(fx+2,fy-16,20,24);
-  // feet
-  ctx.fillStyle='#2e6048'; ctx.fillRect(fx-24,fy+8,12,8); ctx.fillRect(fx+12,fy+8,12,8);
-  // left arm raised (holding golden sphere)
-  ctx.fillStyle='#3a7858'; ctx.fillRect(fx-30,fy-72,12,40);
-  const sphPulse=0.85+Math.sin(frame*0.05)*0.15;
+
+  // ── verdigris bronze figure — seated cross-legged ──
+  const fy = by - 82; // feet-of-torso Y (statue sits on top pedestal)
+  const V1 = '#3d8c6a', V2 = '#2e6b50', V3 = '#4aaa80', Vd = '#1e4a38';
+
+  // cross-legged base (thighs + shins folded)
+  // left thigh going left
+  ctx.fillStyle=V1;
+  ctx.beginPath(); ctx.ellipse(cx-14, fy+4, 22, 10, -0.3, 0, Math.PI*2); ctx.fill();
+  // right thigh going right
+  ctx.beginPath(); ctx.ellipse(cx+14, fy+4, 22, 10, 0.3, 0, Math.PI*2); ctx.fill();
+  // left shin folded across
+  ctx.fillStyle=V2;
+  ctx.beginPath(); ctx.ellipse(cx-8, fy+10, 18, 7, 0.2, 0, Math.PI*2); ctx.fill();
+  // right shin folded across
+  ctx.beginPath(); ctx.ellipse(cx+8, fy+10, 18, 7, -0.2, 0, Math.PI*2); ctx.fill();
+  // feet visible at sides
+  ctx.fillStyle=Vd;
+  ctx.beginPath(); ctx.ellipse(cx-28, fy+14, 8, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx+28, fy+14, 8, 5, 0, 0, Math.PI*2); ctx.fill();
+
+  // draped cloth over lower body
+  ctx.fillStyle=V2;
+  ctx.beginPath();
+  ctx.moveTo(cx-30, fy+2);
+  ctx.quadraticCurveTo(cx, fy+18, cx+30, fy+2);
+  ctx.quadraticCurveTo(cx+28, fy-4, cx-28, fy-4);
+  ctx.fill();
+  // cloth fold lines
+  ctx.strokeStyle=Vd; ctx.lineWidth=1;
+  [[cx-10,fy-2,cx-6,fy+14],[cx+2,fy-1,cx+4,fy+14],[cx+12,fy-2,cx+8,fy+13]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
+
+  // torso — broad, slightly forward-leaning
+  ctx.fillStyle=V1;
+  ctx.beginPath();
+  ctx.moveTo(cx-20, fy-4);
+  ctx.lineTo(cx-24, fy-52);
+  ctx.quadraticCurveTo(cx, fy-60, cx+24, fy-52);
+  ctx.lineTo(cx+20, fy-4);
+  ctx.fill();
+  // torso shading / musculature
+  ctx.fillStyle=V2; ctx.fillRect(cx-22, fy-50, 6, 42); ctx.fillRect(cx+16, fy-50, 6, 42);
+  ctx.fillStyle=V3;
+  ctx.beginPath(); ctx.ellipse(cx, fy-28, 8, 14, 0, 0, Math.PI*2); ctx.fill();
+
+  // ── RIGHT arm — raised up-right, palm holding sunburst sphere ──
+  // upper arm
+  ctx.fillStyle=V1; ctx.save(); ctx.translate(cx+20, fy-46);
+  ctx.rotate(-0.9); ctx.fillRect(-6,-36,12,38); ctx.restore();
+  // forearm continues up-right
+  ctx.save(); ctx.translate(cx+44, fy-76);
+  ctx.rotate(-0.55); ctx.fillStyle=V1; ctx.fillRect(-5,-30,10,32); ctx.restore();
+  // open upturned palm (right)
+  ctx.fillStyle=V2;
+  ctx.beginPath(); ctx.ellipse(cx+62, fy-100, 10, 6, 0.4, 0, Math.PI*2); ctx.fill();
+  // fingers spread (right hand)
+  ctx.strokeStyle=V1; ctx.lineWidth=4;
+  [[-0.6,-12],[-0.2,-13],[0.2,-13],[0.6,-11],[1.0,-8]].forEach(([a,len])=>{
+    ctx.beginPath(); ctx.moveTo(cx+62, fy-100);
+    ctx.lineTo(cx+62+Math.sin(a)*Math.abs(len), fy-100+Math.cos(a)*len); ctx.stroke();
+  });
+
+  // sunburst sphere (right hand)
+  const sphPulse = 0.8 + Math.sin(frame * 0.05) * 0.2;
+  const sx = cx+62, sy = fy - 118;
+  // outer glow
+  ctx.shadowBlur=18; ctx.shadowColor='rgba(226,168,32,0.9)';
+  ctx.fillStyle=`rgba(226,168,32,${sphPulse*0.4})`;
+  ctx.beginPath(); ctx.arc(sx, sy, 20, 0, Math.PI*2); ctx.fill();
+  // sunburst rays
+  ctx.strokeStyle=`rgba(226,168,32,${sphPulse})`; ctx.lineWidth=2;
+  for (let r=0; r<12; r++) {
+    const a = (r/12)*Math.PI*2;
+    const r0=13, r1=22+Math.sin(frame*0.08+r)*2;
+    ctx.beginPath(); ctx.moveTo(sx+Math.cos(a)*r0, sy+Math.sin(a)*r0);
+    ctx.lineTo(sx+Math.cos(a)*r1, sy+Math.sin(a)*r1); ctx.stroke();
+  }
+  // sphere body
   ctx.fillStyle=`rgba(226,168,32,${sphPulse})`;
-  ctx.shadowBlur=12; ctx.shadowColor='rgba(226,168,32,0.8)';
-  ctx.beginPath(); ctx.arc(fx-24,fy-78,10,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(sx, sy, 12, 0, Math.PI*2); ctx.fill();
+  // sphere highlight
+  ctx.fillStyle='rgba(255,240,160,0.6)';
+  ctx.beginPath(); ctx.arc(sx-3, sy-3, 5, 0, Math.PI*2); ctx.fill();
   ctx.shadowBlur=0;
-  // right arm extended (holding family group)
-  ctx.fillStyle='#3a7858'; ctx.fillRect(fx+18,fy-66,32,10);
-  ctx.fillStyle='#3a7858';
-  [0,10,20].forEach(ox=>{ ctx.beginPath(); ctx.arc(fx+52+ox,fy-64,4,0,Math.PI*2); ctx.fill(); ctx.fillRect(fx+48+ox,fy-60,8,14); });
-  // head + laurel
-  ctx.fillStyle='#3a7858'; ctx.beginPath(); ctx.arc(fx,fy-66,12,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle=`rgba(226,168,32,${glow})`;
-  ctx.shadowBlur=8; ctx.shadowColor='#E2A820';
-  for (let i=-3;i<=3;i++) ctx.fillRect(fx+i*4-2,fy-79,5,5);
+
+  // ── LEFT arm — extended outward-left, palm holding small golden figure ──
+  // upper arm
+  ctx.fillStyle=V1; ctx.save(); ctx.translate(cx-20, fy-44);
+  ctx.rotate(0.5); ctx.fillRect(-6,-10,12,38); ctx.restore();
+  // forearm continues left-outward
+  ctx.save(); ctx.translate(cx-46, fy-28);
+  ctx.rotate(0.15); ctx.fillStyle=V1; ctx.fillRect(-5,-10,10,32); ctx.restore();
+  // open upturned palm (left)
+  ctx.fillStyle=V2;
+  ctx.beginPath(); ctx.ellipse(cx-72, fy-18, 10, 6, -0.2, 0, Math.PI*2); ctx.fill();
+  // fingers spread (left hand)
+  ctx.strokeStyle=V1; ctx.lineWidth=4;
+  [[-0.4,-12],[0.0,-13],[0.4,-12],[0.8,-10]].forEach(([a,len])=>{
+    ctx.beginPath(); ctx.moveTo(cx-72, fy-18);
+    ctx.lineTo(cx-72+Math.sin(a)*Math.abs(len), fy-18-Math.abs(len)*0.6); ctx.stroke();
+  });
+
+  // small golden deity/family figure on left palm
+  const lx = cx-72, ly = fy-32;
+  ctx.shadowBlur=8; ctx.shadowColor='rgba(226,168,32,0.7)';
+  ctx.fillStyle=`rgba(226,168,32,${0.7+Math.sin(frame*0.04)*0.2})`;
+  // figure body
+  ctx.beginPath(); ctx.arc(lx, ly-8, 4, 0, Math.PI*2); ctx.fill(); // head
+  ctx.fillRect(lx-3, ly-4, 6, 10); // torso
+  // arms raised (victory pose)
+  ctx.strokeStyle=`rgba(226,168,32,${0.8+Math.sin(frame*0.04)*0.15})`; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(lx-3, ly-1); ctx.lineTo(lx-7, ly-6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx+3, ly-1); ctx.lineTo(lx+7, ly-6); ctx.stroke();
   ctx.shadowBlur=0;
-  // verdigris sheen overlay
-  ctx.fillStyle='rgba(100,200,160,0.1)'; ctx.fillRect(fx-30,fy-78,90,statueH-80);
+
+  // ── head ──
+  ctx.fillStyle=V1;
+  ctx.beginPath(); ctx.arc(cx-2, fy-62, 13, 0, Math.PI*2); ctx.fill();
+  // face — slight left-turn
+  ctx.fillStyle=Vd;
+  // eyes
+  ctx.beginPath(); ctx.arc(cx-7, fy-65, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx+1, fy-65, 2, 0, Math.PI*2); ctx.fill();
+  // brow ridge
+  ctx.strokeStyle=Vd; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(cx-10,fy-68); ctx.lineTo(cx-4,fy-67); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx-2,fy-67); ctx.lineTo(cx+4,fy-68); ctx.stroke();
+  // nose
+  ctx.beginPath(); ctx.moveTo(cx-4,fy-64); ctx.lineTo(cx-3,fy-60); ctx.stroke();
+  // mouth
+  ctx.beginPath(); ctx.moveTo(cx-6,fy-58); ctx.quadraticCurveTo(cx-2,fy-56,cx+2,fy-58); ctx.stroke();
+  // hair waves
+  ctx.strokeStyle=V2; ctx.lineWidth=2;
+  for (let w=0;w<4;w++){
+    ctx.beginPath();
+    ctx.moveTo(cx-10+w*4, fy-73);
+    ctx.quadraticCurveTo(cx-8+w*4, fy-78, cx-6+w*4, fy-73);
+    ctx.stroke();
+  }
+
+  // verdigris patina sheen
+  ctx.fillStyle='rgba(90,190,150,0.08)';
+  ctx.fillRect(bx+10, by-240, bw-20, 240);
 }
 
 // ── JOE LOUIS FIST — Monument to Joe Louis ───────────────────────────────────
