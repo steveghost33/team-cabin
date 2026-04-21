@@ -154,11 +154,9 @@ export function CharRight({ size = 64, animate = true, delay = '0.5s' }) {
       <rect x="7"  y="1"  width="18" height="4"  fill="#6B4C2A" />
       <rect x="7"  y="4"  width="3"  height="4"  fill="#6B4C2A" />
       <rect x="22" y="4"  width="3"  height="4"  fill="#6B4C2A" />
-      {/* glasses: lens tint → dot pupils → dark frames */}
-      <rect x="11" y="7"  width="3"  height="3"  fill="#B8D0E0" />
-      <rect x="18" y="7"  width="3"  height="3"  fill="#B8D0E0" />
-      <rect x="12" y="8"  width="1"  height="1"  fill="#1a1a1a" />
-      <rect x="19" y="8"  width="1"  height="1"  fill="#1a1a1a" />
+      {/* glasses — bold dark frames, dark eye squares, matching Steve */}
+      <rect x="11" y="7"  width="2"  height="2"  fill="#1a1a1a" />
+      <rect x="18" y="7"  width="2"  height="2"  fill="#1a1a1a" />
       <rect x="10" y="6"  width="5"  height="1"  fill="#222222" />
       <rect x="10" y="10" width="5"  height="1"  fill="#222222" />
       <rect x="10" y="6"  width="1"  height="5"  fill="#222222" />
