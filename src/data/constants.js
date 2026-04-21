@@ -26,7 +26,7 @@ export const SHOWS = [
     d:    '08',
     v:    'Ypsi Ale House',
     loc:  'Ypsilanti, MI',
-    t:    'w/ Cult Therapy & Shindig Machine',
+    t:    'w/ Shindig Machine, Frost Is Rad & Twin Deer',
     feat: true,
     ticketUrl: '#',   // ← replace with real ticket link
   },
