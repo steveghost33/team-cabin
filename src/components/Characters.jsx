@@ -13,10 +13,11 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="17" y="40" width="12" height="7" fill="#3D1C00" />
       <rect x="3"  y="40" width="12" height="2" fill="#5C3010" />
       <rect x="17" y="40" width="12" height="2" fill="#5C3010" />
-      {/* black pants */}
-      <rect x="6"  y="27" width="8"  height="13" fill="#1c1c2c" />
-      <rect x="18" y="27" width="8"  height="13" fill="#1c1c2c" />
-      <rect x="13" y="27" width="1"  height="13" fill="#0e0e1a" />
+      {/* black pants — full width crotch fill closes the gap between legs */}
+      <rect x="6"  y="27" width="20" height="4"  fill="#1c1c2c" />
+      <rect x="6"  y="31" width="8"  height="9"  fill="#1c1c2c" />
+      <rect x="18" y="31" width="8"  height="9"  fill="#1c1c2c" />
+      <rect x="13" y="31" width="1"  height="9"  fill="#0e0e1a" />
       {/* belt */}
       <rect x="5"  y="26" width="22" height="2"  fill="#503000" />
       <rect x="14" y="26" width="4"  height="2"  fill="#D4A020" />
