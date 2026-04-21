@@ -42,12 +42,12 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       {/* head — flat top, sandy hair block, skin face */}
       <rect x="7"  y="1"  width="18" height="5"  fill="#C8A060" />
       <rect x="7"  y="6"  width="18" height="9"  fill="#F4B47C" />
-      {/* beard — cheek strips, split mustache, full chin */}
-      <rect x="8"  y="9"  width="2"  height="6"  fill="#7C5108" />
-      <rect x="22" y="9"  width="2"  height="6"  fill="#7C5108" />
+      {/* beard — full width cheeks, split mustache, full chin */}
+      <rect x="7"  y="9"  width="3"  height="6"  fill="#7C5108" />
+      <rect x="22" y="9"  width="3"  height="6"  fill="#7C5108" />
       <rect x="10" y="10" width="5"  height="2"  fill="#7C5108" />
       <rect x="17" y="10" width="5"  height="2"  fill="#7C5108" />
-      <rect x="9"  y="12" width="14" height="3"  fill="#7C5108" />
+      <rect x="7"  y="12" width="18" height="3"  fill="#7C5108" />
       {/* glasses — bold dark frames, dark eye squares, no tint */}
       <rect x="11" y="7"  width="2"  height="2"  fill="#1a1a1a" />
       <rect x="18" y="7"  width="2"  height="2"  fill="#1a1a1a" />
