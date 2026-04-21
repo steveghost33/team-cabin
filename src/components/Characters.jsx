@@ -2,7 +2,7 @@
 // viewBox 0 0 32 47
 // No opacity, no SVG stroke — pure pixel rects, NES palette, chunky boots, big heads
 
-// ── STEVE — red flannel, blue jeans, pixel glasses, beard ──────────────────
+// ── STEVE — gray plaid flannel, black pants, pixel glasses, beard ──────────────────
 export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
   return (
     <svg width={size} height={Math.round(size * 1.47)} viewBox="0 0 32 47"
@@ -13,26 +13,26 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="17" y="40" width="12" height="7" fill="#3D1C00" />
       <rect x="3"  y="40" width="12" height="2" fill="#5C3010" />
       <rect x="17" y="40" width="12" height="2" fill="#5C3010" />
-      {/* blue jeans */}
-      <rect x="6"  y="27" width="8"  height="13" fill="#0038EC" />
-      <rect x="18" y="27" width="8"  height="13" fill="#0038EC" />
-      <rect x="13" y="27" width="1"  height="13" fill="#0020B0" />
+      {/* black pants */}
+      <rect x="6"  y="27" width="8"  height="13" fill="#1c1c2c" />
+      <rect x="18" y="27" width="8"  height="13" fill="#1c1c2c" />
+      <rect x="13" y="27" width="1"  height="13" fill="#0e0e1a" />
       {/* belt */}
       <rect x="5"  y="26" width="22" height="2"  fill="#503000" />
       <rect x="14" y="26" width="4"  height="2"  fill="#D4A020" />
-      {/* red flannel body */}
-      <rect x="5"  y="16" width="22" height="11" fill="#CC2200" />
-      {/* plaid — solid dark lines, no opacity */}
-      <rect x="5"  y="20" width="22" height="1"  fill="#881100" />
-      <rect x="5"  y="24" width="22" height="1"  fill="#881100" />
-      <rect x="10" y="16" width="1"  height="11" fill="#881100" />
-      <rect x="16" y="16" width="1"  height="11" fill="#881100" />
-      <rect x="22" y="16" width="1"  height="11" fill="#881100" />
+      {/* gray plaid flannel body */}
+      <rect x="5"  y="16" width="22" height="11" fill="#848688" />
+      {/* plaid — solid dark lines */}
+      <rect x="5"  y="20" width="22" height="1"  fill="#5a5c5e" />
+      <rect x="5"  y="24" width="22" height="1"  fill="#5a5c5e" />
+      <rect x="10" y="16" width="1"  height="11" fill="#5a5c5e" />
+      <rect x="16" y="16" width="1"  height="11" fill="#5a5c5e" />
+      <rect x="22" y="16" width="1"  height="11" fill="#5a5c5e" />
       {/* inner shirt visible at collar */}
       <rect x="13" y="16" width="6"  height="3"  fill="#3A5020" />
       {/* arms */}
-      <rect x="0"  y="16" width="5"  height="10" fill="#CC2200" />
-      <rect x="27" y="16" width="5"  height="10" fill="#CC2200" />
+      <rect x="0"  y="16" width="5"  height="10" fill="#848688" />
+      <rect x="27" y="16" width="5"  height="10" fill="#848688" />
       {/* hands */}
       <rect x="0"  y="25" width="5"  height="4"  fill="#F4B47C" />
       <rect x="27" y="25" width="5"  height="4"  fill="#F4B47C" />
