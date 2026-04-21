@@ -39,28 +39,32 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="27" y="25" width="5"  height="4"  fill="#F4B47C" />
       {/* neck */}
       <rect x="13" y="12" width="6"  height="5"  fill="#F4B47C" />
-      {/* head — tapered top corners for less blocky bald look */}
-      <rect x="9"  y="1"  width="14" height="2"  fill="#F4B47C" />
-      <rect x="8"  y="3"  width="16" height="1"  fill="#F4B47C" />
-      <rect x="7"  y="4"  width="18" height="11" fill="#F4B47C" />
-      {/* bald — minimal sideburn, just 1px wide short stub */}
-      <rect x="7"  y="7"  width="1"  height="3"  fill="#7C5108" />
-      <rect x="24" y="7"  width="1"  height="3"  fill="#7C5108" />
+      {/* head — dome/arch top like rounded 8-bit head */}
+      <rect x="12" y="1"  width="8"  height="1"  fill="#F4B47C" />
+      <rect x="10" y="2"  width="12" height="1"  fill="#F4B47C" />
+      <rect x="9"  y="3"  width="14" height="1"  fill="#F4B47C" />
+      <rect x="8"  y="4"  width="16" height="1"  fill="#F4B47C" />
+      <rect x="7"  y="5"  width="18" height="10" fill="#F4B47C" />
+      {/* bald — minimal sideburn stubs at ear level */}
+      <rect x="7"  y="8"  width="1"  height="2"  fill="#7C5108" />
+      <rect x="24" y="8"  width="1"  height="2"  fill="#7C5108" />
       {/* beard — bold lower face */}
       <rect x="7"  y="11" width="18" height="4"  fill="#7C5108" />
       {/* eyes — big NES squares */}
       <rect x="11" y="7"  width="3"  height="3"  fill="#000" />
       <rect x="18" y="7"  width="3"  height="3"  fill="#000" />
-      {/* pixel-art glasses — rects only, no stroke */}
-      <rect x="10" y="6"  width="5"  height="1"  fill="#7C5108" />
-      <rect x="10" y="10" width="5"  height="1"  fill="#7C5108" />
-      <rect x="10" y="6"  width="1"  height="5"  fill="#7C5108" />
-      <rect x="14" y="6"  width="1"  height="5"  fill="#7C5108" />
-      <rect x="17" y="6"  width="5"  height="1"  fill="#7C5108" />
-      <rect x="17" y="10" width="5"  height="1"  fill="#7C5108" />
-      <rect x="17" y="6"  width="1"  height="5"  fill="#7C5108" />
-      <rect x="21" y="6"  width="1"  height="5"  fill="#7C5108" />
-      <rect x="15" y="8"  width="2"  height="1"  fill="#7C5108" />
+      {/* pixel-art glasses — dark gray frames, blue-gray lens tint */}
+      <rect x="11" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="18" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="10" y="6"  width="5"  height="1"  fill="#222222" />
+      <rect x="10" y="10" width="5"  height="1"  fill="#222222" />
+      <rect x="10" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="14" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="17" y="6"  width="5"  height="1"  fill="#222222" />
+      <rect x="17" y="10" width="5"  height="1"  fill="#222222" />
+      <rect x="17" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="21" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="15" y="8"  width="2"  height="1"  fill="#222222" />
     </svg>
   );
 }
@@ -162,16 +166,18 @@ export function CharRight({ size = 64, animate = true, delay = '0.5s' }) {
       {/* eyes */}
       <rect x="11" y="7"  width="3"  height="3"  fill="#1a1a1a" />
       <rect x="18" y="7"  width="3"  height="3"  fill="#1a1a1a" />
-      {/* pixel-art glasses — rects only, no stroke */}
-      <rect x="10" y="6"  width="5"  height="1"  fill="#6B4C2A" />
-      <rect x="10" y="10" width="5"  height="1"  fill="#6B4C2A" />
-      <rect x="10" y="6"  width="1"  height="5"  fill="#6B4C2A" />
-      <rect x="14" y="6"  width="1"  height="5"  fill="#6B4C2A" />
-      <rect x="17" y="6"  width="5"  height="1"  fill="#6B4C2A" />
-      <rect x="17" y="10" width="5"  height="1"  fill="#6B4C2A" />
-      <rect x="17" y="6"  width="1"  height="5"  fill="#6B4C2A" />
-      <rect x="21" y="6"  width="1"  height="5"  fill="#6B4C2A" />
-      <rect x="15" y="8"  width="2"  height="1"  fill="#6B4C2A" />
+      {/* pixel-art glasses — dark gray frames, blue-gray lens tint */}
+      <rect x="11" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="18" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="10" y="6"  width="5"  height="1"  fill="#222222" />
+      <rect x="10" y="10" width="5"  height="1"  fill="#222222" />
+      <rect x="10" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="14" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="17" y="6"  width="5"  height="1"  fill="#222222" />
+      <rect x="17" y="10" width="5"  height="1"  fill="#222222" />
+      <rect x="17" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="21" y="6"  width="1"  height="5"  fill="#222222" />
+      <rect x="15" y="8"  width="2"  height="1"  fill="#222222" />
     </svg>
   );
 }
