@@ -50,12 +50,11 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="24" y="8"  width="1"  height="2"  fill="#7C5108" />
       {/* beard — bold lower face */}
       <rect x="7"  y="11" width="18" height="4"  fill="#7C5108" />
-      {/* eyes — big NES squares */}
-      <rect x="11" y="7"  width="3"  height="3"  fill="#000" />
-      <rect x="18" y="7"  width="3"  height="3"  fill="#000" />
-      {/* pixel-art glasses — dark gray frames, blue-gray lens tint */}
+      {/* glasses: lens tint → dot pupils → dark frames */}
       <rect x="11" y="7"  width="3"  height="3"  fill="#B8D0E0" />
       <rect x="18" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="12" y="8"  width="1"  height="1"  fill="#1a1a1a" />
+      <rect x="19" y="8"  width="1"  height="1"  fill="#1a1a1a" />
       <rect x="10" y="6"  width="5"  height="1"  fill="#222222" />
       <rect x="10" y="10" width="5"  height="1"  fill="#222222" />
       <rect x="10" y="6"  width="1"  height="5"  fill="#222222" />
@@ -163,12 +162,11 @@ export function CharRight({ size = 64, animate = true, delay = '0.5s' }) {
       <rect x="7"  y="1"  width="18" height="4"  fill="#6B4C2A" />
       <rect x="7"  y="4"  width="3"  height="4"  fill="#6B4C2A" />
       <rect x="22" y="4"  width="3"  height="4"  fill="#6B4C2A" />
-      {/* eyes */}
-      <rect x="11" y="7"  width="3"  height="3"  fill="#1a1a1a" />
-      <rect x="18" y="7"  width="3"  height="3"  fill="#1a1a1a" />
-      {/* pixel-art glasses — dark gray frames, blue-gray lens tint */}
+      {/* glasses: lens tint → dot pupils → dark frames */}
       <rect x="11" y="7"  width="3"  height="3"  fill="#B8D0E0" />
       <rect x="18" y="7"  width="3"  height="3"  fill="#B8D0E0" />
+      <rect x="12" y="8"  width="1"  height="1"  fill="#1a1a1a" />
+      <rect x="19" y="8"  width="1"  height="1"  fill="#1a1a1a" />
       <rect x="10" y="6"  width="5"  height="1"  fill="#222222" />
       <rect x="10" y="10" width="5"  height="1"  fill="#222222" />
       <rect x="10" y="6"  width="1"  height="5"  fill="#222222" />
