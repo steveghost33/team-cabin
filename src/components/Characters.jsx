@@ -39,12 +39,8 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="27" y="25" width="5"  height="4"  fill="#F4B47C" />
       {/* neck */}
       <rect x="13" y="12" width="6"  height="5"  fill="#F4B47C" />
-      {/* head — sandy hair on dome top, skin face below */}
-      <rect x="13" y="1"  width="6"  height="1"  fill="#C8A060" />
-      <rect x="11" y="2"  width="10" height="1"  fill="#C8A060" />
-      <rect x="9"  y="3"  width="14" height="1"  fill="#C8A060" />
-      <rect x="8"  y="4"  width="16" height="1"  fill="#C8A060" />
-      <rect x="7"  y="5"  width="18" height="1"  fill="#C8A060" />
+      {/* head — flat top, sandy hair block, skin face */}
+      <rect x="7"  y="1"  width="18" height="5"  fill="#C8A060" />
       <rect x="7"  y="6"  width="18" height="9"  fill="#F4B47C" />
       {/* beard */}
       <rect x="8"  y="11" width="16" height="4"  fill="#7C5108" />
