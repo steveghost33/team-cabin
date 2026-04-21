@@ -40,11 +40,9 @@ export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
       <rect x="13" y="12" width="6"  height="5"  fill="#F4B47C" />
       {/* head — wider + taller for big Mario-style head */}
       <rect x="7"  y="1"  width="18" height="14" fill="#F4B47C" />
-      {/* hair — dark brown top block */}
-      <rect x="7"  y="1"  width="18" height="4"  fill="#7C5108" />
-      {/* sideburns */}
-      <rect x="7"  y="4"  width="2"  height="5"  fill="#7C5108" />
-      <rect x="23" y="4"  width="2"  height="5"  fill="#7C5108" />
+      {/* bald — no top hair, small sideburns only */}
+      <rect x="7"  y="4"  width="2"  height="7"  fill="#7C5108" />
+      <rect x="23" y="4"  width="2"  height="7"  fill="#7C5108" />
       {/* beard — bold lower face */}
       <rect x="7"  y="11" width="18" height="4"  fill="#7C5108" />
       {/* eyes — big NES squares */}
