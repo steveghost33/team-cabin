@@ -13,8 +13,8 @@ export default function Music() {
       {/* Bandcamp embed */}
       <div style={{ marginBottom: '2rem' }}>
         <iframe
-          style={{ border: 0, width: '100%', height: '120px' }}
-          src="https://bandcamp.com/EmbeddedPlayer/album=1839020246/size=large/bgcol=000000/linkcol=e5c76b/tracklist=false/artwork=small/transparent=true/"
+          style={{ border: 0, width: '400px', height: '241px' }}
+          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
           seamless
           title="Tall Bike by Team Cabin"
         />
