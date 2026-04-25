@@ -1,0 +1,109 @@
+.music {
+  padding: var(--section-padding);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.music__trigger-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.music__trigger {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  border: 3px solid var(--color-gold);
+  padding: 14px 32px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  letter-spacing: 0.06em;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.music__trigger--closed {
+  background: var(--color-gold);
+  color: var(--color-green);
+}
+
+.music__trigger--open {
+  background: var(--color-green-mid);
+  color: var(--color-cream);
+}
+
+.music__trigger:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #000;
+}
+
+.music__trigger-icon {
+  font-size: 1.2rem;
+}
+
+.music__trigger-arrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  transition: transform var(--transition-normal);
+}
+
+.music__trigger-arrow--open {
+  transform: rotate(90deg);
+}
+
+.music__embed-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.music__embed {
+  border: 0;
+  width: 400px;
+  height: 241px;
+}
+
+.music__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.1rem;
+  animation: fadeIn 0.18s ease;
+}
+
+/* Per-link color comes from --link-color and --link-bg CSS custom properties
+   set inline on each element, since every platform has a unique brand color. */
+.music__link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.4rem;
+  text-decoration: none;
+  border: 3px solid var(--link-color);
+  background: var(--link-bg);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.music__link:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0 var(--link-color);
+}
+
+.music__link-icon {
+  font-size: 1.7rem;
+  flex-shrink: 0;
+}
+
+.music__link-name {
+  font-family: var(--font-pixel);
+  font-size: 0.48rem;
+  color: var(--link-color);
+  margin-bottom: 0.3rem;
+}
+
+.music__link-label {
+  font-family: var(--font-vt323);
+  font-size: 1.3rem;
+  color: var(--color-cream);
+}

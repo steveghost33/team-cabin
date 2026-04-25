@@ -1,0 +1,74 @@
+.shows {
+  background: rgba(0, 0, 0, 0.45);
+  border-top: 3px solid rgba(212, 160, 23, 0.2);
+  border-bottom: 3px solid rgba(212, 160, 23, 0.2);
+}
+
+.shows__inner {
+  padding: var(--section-padding);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.shows__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.show-card {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.4rem 1.8rem;
+  border: 3px solid rgba(212, 160, 23, 0.22);
+  background: rgba(0, 0, 0, 0.25);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: default;
+}
+
+.show-card--featured {
+  border-color: var(--color-gold);
+  background: rgba(212, 160, 23, 0.07);
+}
+
+.show-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--color-gold-dark);
+}
+
+.show-card__date {
+  text-align: center;
+}
+
+.show-card__month {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: #e74c3c;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.show-card__day {
+  font-family: var(--font-pixel);
+  font-size: 1.2rem;
+  color: var(--color-gold);
+  display: block;
+}
+
+.show-card__venue {
+  font-family: var(--font-vt323);
+  font-size: 2.2rem;
+  color: var(--color-cream);
+  display: block;
+  line-height: 1.1;
+}
+
+.show-card__details {
+  font-family: var(--font-vt323);
+  font-size: 1.5rem;
+  color: var(--color-gold-light);
+  display: block;
+  margin-top: 0.2rem;
+}

@@ -21,24 +21,18 @@ npm run build
 src/
 ├── App.jsx                  ← Root: controls section order
 ├── index.js                 ← Entry point
-├── index.css                ← Global styles & animations
+├── styles/                  ← Global styles, CSS variables, component CSS
 │
-├── data/
+├── config/
 │   └── constants.js         ← ⭐ EDIT YOUR CONTENT HERE
 │                               Shows, music links, bios,
-│                               social links, brand colors
+│                               social links, nav links, brand colors
 │
 └── components/
-    ├── Nav.jsx              ← Sticky navigation bar
-    ├── Hero.jsx             ← Full-screen hero with logo + characters
-    ├── Music.jsx            ← Streaming platform links grid
-    ├── Shows.jsx            ← Upcoming shows list
-    ├── Band.jsx             ← Band member cards
-    ├── GameSection.jsx      ← Game section wrapper + description
-    ├── PizzaGame.jsx        ← Detroit Pizza Quest canvas game
-    ├── TCLogo.jsx           ← TC circle logo (SVG)
-    ├── Characters.jsx       ← Pixel art characters (Steve, Mike, Kyle)
-    └── SectionTitle.jsx     ← Reusable dashed section heading
+    ├── common/              ← Reusable presentational components
+    ├── layout/              ← Site-wide layout components
+    └── features/            ← Page sections and feature-specific code
+        └── game/            ← Detroit Pizza Quest engine/rendering modules
 ```
 
 ---
@@ -46,7 +40,7 @@ src/
 ## How to Edit Common Things
 
 ### Add a new show
-Open `src/data/constants.js` and add to the `SHOWS` array:
+Open `src/config/constants.js` and add to the `SHOWS` array:
 ```js
 {
   mo: 'APR', d: '15',
@@ -58,22 +52,22 @@ Open `src/data/constants.js` and add to the `SHOWS` array:
 Set `feat: true` to give it the gold highlight treatment.
 
 ### Update music links
-In `src/data/constants.js`, update the `url` fields in `MUSIC_LINKS`:
+In `src/config/constants.js`, update the `url` fields in `MUSIC_LINKS`:
 ```js
 { name: 'Spotify', ..., url: 'https://open.spotify.com/artist/YOUR_ID' },
 ```
 
 ### Update social links
-In `src/data/constants.js`, update the `url` fields in `SOCIAL_LINKS`:
+In `src/config/constants.js`, update the `url` fields in `SOCIAL_LINKS`:
 ```js
 { label: 'Instagram', url: 'https://instagram.com/teamcabin' },
 ```
 
 ### Update band bios
-In `src/data/constants.js`, edit the `bio` and `pizza` fields in `MEMBERS`.
+In `src/config/constants.js`, edit the `bio` and `pizza` fields in `MEMBERS`.
 
 ### Change brand colors
-In `src/data/constants.js`, edit the `C` object:
+In `src/config/constants.js`, edit the `C` object:
 ```js
 export const C = {
   gold:  '#D4A017',   // main gold
@@ -84,12 +78,12 @@ export const C = {
 ```
 
 ### Change game difficulty
-Open `src/components/PizzaGame.jsx` and edit the settings at the top:
+Open `src/components/features/game/constants.js` and edit the settings:
 ```js
-const WIN         = 16;    // pizzas needed to win (lower = easier)
-const SPAWN_RATE  = 130;   // frames between enemies (higher = easier)
-const JUMP_POWER  = -13;   // more negative = higher jump
-const ENEMY_SPEED = 2.5;   // higher = faster enemies
+export const PIZZA_TO_BOSS = 16;     // slices needed to trigger boss
+export const JUMP_POWER = -13;       // more negative = higher jump
+
+// Per-level enemy speed and spawn rate live in each LEVELS entry.
 ```
 
 ---
