@@ -1,12 +1,3 @@
-// ─────────────────────────────────────
-//  SectionTitle.jsx
-//  The dashed-line section heading used
-//  throughout the site.
-//
-//  Usage:
-//    <SectionTitle>FIND OUR MUSIC</SectionTitle>
-//    <SectionTitle color="#ff0000">SHOWS</SectionTitle>
-// ─────────────────────────────────────
 import { C } from '../data/constants';
 
 export default function SectionTitle({ children, color }) {

@@ -1,6 +1,4 @@
-// Characters.jsx — 8-bit Super Mario Bros style band members
-// viewBox 0 0 32 47
-// No opacity, no SVG stroke — pure pixel rects, NES palette, chunky boots, big heads
+// 8-bit band member sprites — pure pixel rects, NES palette, viewBox 0 0 32 47
 
 // ── STEVE — gray plaid flannel, black pants, pixel glasses, beard ──────────────────
 export function CharLeft({ size = 64, animate = true, delay = '0s' }) {
@@ -173,3 +171,5 @@ export function CharRight({ size = 64, animate = true, delay = '0.5s' }) {
     </svg>
   );
 }
+
+export const CHARS = [CharLeft, CharMid, CharRight];

@@ -1,9 +1,6 @@
-// Band.jsx — member cards, Mike fixed: dark gray shoes, plain hoodie, mustard hat
 import SectionTitle from './SectionTitle';
-import { CharLeft, CharMid, CharRight } from './Characters';
+import { CHARS } from './Characters';
 import { C, MEMBERS } from '../data/constants';
-
-const CHARS = [CharLeft, CharMid, CharRight];
 
 export default function Band() {
   return (

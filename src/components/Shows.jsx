@@ -3,7 +3,7 @@ import { C, SHOWS } from '../data/constants';
 
 export default function Shows() {
   return (
-    <div
+    <section
       id="shows"
       style={{
         background: 'rgba(0,0,0,0.45)',
@@ -61,6 +61,6 @@ export default function Shows() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

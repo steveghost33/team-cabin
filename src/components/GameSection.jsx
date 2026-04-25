@@ -4,7 +4,7 @@ import { C } from '../data/constants';
 
 export default function GameSection() {
   return (
-    <div id="game" style={{ background: '#030a02', borderTop: `4px solid ${C.gold}` }}>
+    <section id="game" style={{ background: '#030a02', borderTop: `4px solid ${C.gold}` }}>
       <div style={{ padding: '4rem 1rem', maxWidth: 820, margin: '0 auto' }}>
         <SectionTitle color={C.gold}>🍕 DETROIT PIZZA QUEST</SectionTitle>
         <p style={{
@@ -22,6 +22,6 @@ export default function GameSection() {
         </p>
         <PizzaGame />
       </div>
-    </div>
+    </section>
   );
 }

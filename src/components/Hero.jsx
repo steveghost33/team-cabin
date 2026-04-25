@@ -1,13 +1,6 @@
-// ─────────────────────────────────────
-//  Hero.jsx
-//  Full-screen hero section with the
-//  TC logo, band name, and pixel characters.
-// ─────────────────────────────────────
 import TCLogo from './TCLogo';
-import { CharLeft, CharMid, CharRight } from './Characters';
+import { CHARS } from './Characters';
 import { C, MEMBERS } from '../data/constants';
-
-const CHARS = [CharLeft, CharMid, CharRight];
 
 export default function Hero() {
   return (

@@ -1,16 +1,9 @@
-// ─────────────────────────────────────────────
-//  game/GameEngine.js
-//  Core game logic — state machine, physics,
-//  spawning, collision. No React, no canvas
-//  drawing. Returns draw-ready state each frame.
-// ─────────────────────────────────────────────
 import {
   W, H, GROUND, PW, PH,
   GRAVITY, JUMP_POWER, MOVE_SPEED,
   MAX_HP, HP_REGEN, MAX_LIVES, PIZZA_TO_BOSS,
-  GLD
+  GLD, LEVELS
 } from './constants.js';
-import { LEVELS } from './constants.js';
 
 export class GameEngine {
   constructor(onSync) {

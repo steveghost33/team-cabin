@@ -1,8 +1,3 @@
-// ─────────────────────────────────────
-//  Footer.jsx
-//  Site footer with logo and social links.
-//  Edit social links in src/data/constants.js
-// ─────────────────────────────────────
 import { useState } from 'react';
 import TCLogo from './TCLogo';
 import { C, SOCIAL_LINKS } from '../data/constants';

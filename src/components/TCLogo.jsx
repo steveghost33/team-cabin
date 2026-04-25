@@ -1,10 +1,3 @@
-// ─────────────────────────────────────
-//  TCLogo.jsx
-//  The Team Cabin TC circle logo.
-//  Pass `size` prop to scale it.
-//  e.g. <TCLogo size={120} />
-// ─────────────────────────────────────
-
 const G    = '#1C3D12';   // letter color
 const GOLD = '#E2A820';   // circle fill
 

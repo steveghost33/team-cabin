@@ -1,13 +1,7 @@
-// ─────────────────────────────────────────────
-//  PizzaGame.jsx
-//  Thin React shell — canvas + controls only.
-//  All logic lives in game/GameEngine.js
-//  All drawing lives in game/renderer.js
-// ─────────────────────────────────────────────
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GameEngine } from './game/GameEngine.js';
 import { renderFrame } from './game/renderer.js';
-import { GLD, GRN, GRN2, CREAM } from './game/constants.js';
+import { GLD, GRN, CREAM } from './game/constants.js';
 
 export default function PizzaGame() {
   const canvasRef          = useRef(null);
@@ -543,7 +537,7 @@ export default function PizzaGame() {
   );
 
   // Large round action button — convex dome like a console face button
-  const ActBtn = ({ label, k, btnColor = '#c0392b', shadowColor = '#7a1010', size = 96 }) => (
+  const ActBtn = ({ k, btnColor = '#c0392b', shadowColor = '#7a1010', size = 96 }) => (
     <button
       style={{
         ...base,
@@ -657,7 +651,7 @@ export default function PizzaGame() {
       </div>
 
       {/* Main control row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
 
         {/* Left — proper d-pad cross */}
         <DPad />

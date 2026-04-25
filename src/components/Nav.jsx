@@ -1,17 +1,12 @@
-// ─────────────────────────────────────
-//  Nav.jsx
-//  Sticky top navigation bar.
-//  Edit nav links in the navLinks array.
-// ─────────────────────────────────────
 import TCLogo from './TCLogo';
 import { C } from '../data/constants';
 
 const navLinks = [
-  { id: 'home',  l: 'Home' },
-  { id: 'music', l: 'Music' },
-  { id: 'shows', l: 'Shows' },
-  { id: 'band',  l: 'The Band' },
-  { id: 'game',  l: '🍕 Pizza Quest' },
+  { id: 'home',  label: 'Home' },
+  { id: 'music', label: 'Music' },
+  { id: 'shows', label: 'Shows' },
+  { id: 'band',  label: 'The Band' },
+  { id: 'game',  label: '🍕 Pizza Quest' },
 ];
 
 export default function Nav({ scrollTo }) {
@@ -61,7 +56,7 @@ export default function Nav({ scrollTo }) {
               onMouseEnter={(e) => (e.target.style.color = C.gold)}
               onMouseLeave={(e) => (e.target.style.color = C.cream)}
             >
-              {n.l}
+              {n.label}
             </button>
           ))}
         </div>

@@ -1,9 +1,3 @@
-// ─────────────────────────────────────
-//  TEAM CABIN — Editable Site Data
-//  Change shows, music links, bios,
-//  social links, and colors all here.
-// ─────────────────────────────────────
-
 // ── Brand Colors ──
 export const C = {
   gold:   '#D4A017',
@@ -17,9 +11,7 @@ export const C = {
 };
 
 // ── Upcoming Shows ──
-// Add or remove show objects here.
-// feat: true  → gold highlight + bigger ticket button
-// feat: false → standard styling
+// feat: true → gold highlight border
 export const SHOWS = [
   {
     mo:   'MAY',
@@ -28,19 +20,10 @@ export const SHOWS = [
     loc:  'Ypsilanti, MI',
     t:    'w/ Shindig Machine, Frost Is Rad & Twin Deer',
     feat: true,
-    ticketUrl: '#',   // ← replace with real ticket link
   },
-  // Add more shows like this:
-  // {
-  //   mo: 'APR', d: '15',
-  //   v: 'El Club', loc: 'Detroit, MI',
-  //   t: '9PM Doors', feat: false, ticketUrl: '#',
-  // },
 ];
 
 // ── Music Streaming Links ──
-// Order: Bandcamp first, Spotify last. No SoundCloud.
-// YouTube uses label: 'Watch Now →' instead of 'Listen Now →'
 export const MUSIC_LINKS = [
   { name: 'Bandcamp',     icon: '◎', color: '#1da0c3', bg: 'rgba(29,160,195,0.1)',  url: 'https://teamcabin.bandcamp.com/album/tall-bike' },
   { name: 'Apple Music',  icon: '♪', color: '#fc3c44', bg: 'rgba(252,60,68,0.1)',   url: 'https://music.apple.com/us/album/tall-bike-single/1895354765' },
@@ -61,11 +44,7 @@ export const SOCIAL_LINKS = [
 ];
 
 // ── Band Members ──
-// bio    = shown on the band section card
-// pizza  = fun pizza preference shown at bottom of card
-// charId = 0 (Steve/plaid), 1 (Mike/hoodie), 2 (Kyle/green jacket)
-//          Must match the character pixel art order — don't change unless
-//          you also update the character components.
+// charId maps to CHARS index in Characters.jsx: 0=Steve, 1=Mike, 2=Kyle
 export const MEMBERS = [
   {
     charId: 0,
