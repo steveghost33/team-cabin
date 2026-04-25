@@ -1,7 +1,10 @@
-// Music.jsx — single expandable "Listen Now" button
+// Music.jsx — Bandcamp player + expandable platform links
 import { useState } from 'react';
 import SectionTitle from './SectionTitle';
 import { C, MUSIC_LINKS } from '../data/constants';
+
+// To update: get album ID from Bandcamp → Share/Embed → "Embed this album" → album=XXXXXXXXXX
+const BANDCAMP_ALBUM_ID = '2112829752';
 
 export default function Music() {
   const [open, setOpen] = useState(false);
@@ -9,6 +12,18 @@ export default function Music() {
   return (
     <section id="music" style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
       <SectionTitle>FIND OUR MUSIC</SectionTitle>
+
+      {/* Bandcamp embedded player */}
+      <div style={{ marginBottom: '2rem' }}>
+        <iframe
+          style={{ border: 0, width: '100%', height: '120px', display: 'block' }}
+          src={`https://bandcamp.com/EmbeddedPlayer/album=${BANDCAMP_ALBUM_ID}/size=large/bgcol=1a1a1a/linkcol=d4a017/tracklist=false/artwork=small/transparent=true/`}
+          seamless
+          title="Team Cabin – Tall Bike on Bandcamp"
+        >
+          <a href="https://teamcabin.bandcamp.com/album/tall-bike">Tall Bike by Team Cabin</a>
+        </iframe>
+      </div>
 
       {/* Single trigger button */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
@@ -33,7 +48,7 @@ export default function Music() {
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 #000'; }}
         >
           <span style={{ fontSize: '1.2rem' }}>♫</span>
-          {open ? 'CLOSE' : 'LISTEN NOW'}
+          {open ? 'CLOSE' : 'LISTEN ON ALL PLATFORMS'}
           <span style={{
             display: 'inline-block',
             transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
