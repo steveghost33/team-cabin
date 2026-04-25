@@ -66,7 +66,6 @@ export default function MobileApp() {
           <button key={btn.id} className="m-hub-nav-btn" onClick={() => setPage(btn.id)}>
             {btn.icon && <span className="m-hub-nav-icon">{btn.icon}</span>}
             <span className="m-hub-nav-label">{btn.label}</span>
-            <span className="m-hub-nav-arrow">▶</span>
           </button>
         ))}
       </nav>
