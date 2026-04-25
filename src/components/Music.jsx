@@ -10,16 +10,6 @@ export default function Music() {
     <section id="music" style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
       <SectionTitle>FIND OUR MUSIC</SectionTitle>
 
-      {/* Bandcamp embed */}
-      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
-        <iframe
-          style={{ border: 0, width: '400px', height: '241px' }}
-          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
-          seamless
-          title="Tall Bike by Team Cabin"
-        />
-      </div>
-
       {/* Single trigger button */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
         <button
@@ -51,6 +41,16 @@ export default function Music() {
             fontSize: '0.8rem',
           }}>▶</span>
         </button>
+      </div>
+
+      {/* Bandcamp embed */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+        <iframe
+          style={{ border: 0, width: '400px', height: '241px' }}
+          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
+          seamless
+          title="Tall Bike by Team Cabin"
+        />
       </div>
 
       {/* Expandable grid */}
