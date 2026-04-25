@@ -3,8 +3,7 @@ import { useState } from 'react';
 import SectionTitle from './SectionTitle';
 import { C, MUSIC_LINKS } from '../data/constants';
 
-// To update: get album ID from Bandcamp → Share/Embed → "Embed this album" → album=XXXXXXXXXX
-const BANDCAMP_ALBUM_ID = '2112829752';
+const BANDCAMP_ALBUM_ID = '3306975666';
 
 export default function Music() {
   const [open, setOpen] = useState(false);
@@ -16,8 +15,8 @@ export default function Music() {
       {/* Bandcamp embedded player */}
       <div style={{ marginBottom: '2rem' }}>
         <iframe
-          style={{ border: 0, width: '100%', height: '120px', display: 'block' }}
-          src={`https://bandcamp.com/EmbeddedPlayer/album=${BANDCAMP_ALBUM_ID}/size=large/bgcol=1a1a1a/linkcol=d4a017/tracklist=false/artwork=small/transparent=true/`}
+          style={{ border: 0, width: '100%', height: '241px', display: 'block' }}
+          src={`https://bandcamp.com/EmbeddedPlayer/album=${BANDCAMP_ALBUM_ID}/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/`}
           seamless
           title="Team Cabin – Tall Bike on Bandcamp"
         >
