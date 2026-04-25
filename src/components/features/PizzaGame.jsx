@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GameEngine } from './game/GameEngine.js';
 import { renderFrame } from './game/renderer.js';
-import { GLD, GRN, CREAM } from './game/constants.js';
+import { GLD, GRN, CREAM, SONG_FILE, SONG_VOLUME } from './game/constants.js';
+import { useFullscreen } from '../../hooks/useFullscreen.js';
+import { useMobile } from '../../hooks/useMobile.js';
 
 export default function PizzaGame() {
   const canvasRef          = useRef(null);
@@ -17,25 +19,10 @@ export default function PizzaGame() {
   const activeDirPointers  = useRef({});
 
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isMobile, setIsMobile]   = useState(false);
   const [isPaused, setIsPaused]   = useState(false);
   const [isMuted,  setIsMuted]    = useState(false);
-
-  // ── DETECT MOBILE ────────────────────────────
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  // ── FULLSCREEN LISTENER ──────────────────────
-  useEffect(() => {
-    const handler = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', handler);
-    return () => document.removeEventListener('fullscreenchange', handler);
-  }, []);
+  const isMobile = useMobile();
+  const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
 
   // ── MAIN GAME LOOP ───────────────────────────
   useEffect(() => {
@@ -46,9 +33,9 @@ export default function PizzaGame() {
     const engine = new GameEngine((state) => setGameState(s => ({ ...s, ...state })));
     engineRef.current = engine;
 
-    const music = new Audio('/kylesong.mp3');
+    const music = new Audio(SONG_FILE);
     music.loop = true;
-    music.volume = 0.5;
+    music.volume = SONG_VOLUME;
     musicRef.current = music;
 
     // wrap startGame to reset pause + play music
@@ -90,7 +77,7 @@ export default function PizzaGame() {
         if (next) {
           music.volume = 0;
         } else {
-          music.volume = 0.5;
+          music.volume = SONG_VOLUME;
           if (engine.gState === 'playing' && !pausedRef.current) music.play().catch(() => {});
         }
         return;
@@ -222,21 +209,6 @@ export default function PizzaGame() {
     }
   }, [gameState.state]);
 
-  // ── FULLSCREEN ───────────────────────────────
-  const enterFullscreen = useCallback(async () => {
-    try {
-      const el = document.documentElement;
-      if (el.requestFullscreen) await el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
-      setIsFullscreen(true);
-    } catch { setIsFullscreen(true); }
-  }, []);
-
-  const exitFullscreen = useCallback(async () => {
-    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch {}
-    setIsFullscreen(false);
-  }, []);
-
   // ── PAUSE / MUTE HANDLERS ────────────────────
   const handlePause = useCallback(() => {
     const engine = engineRef.current;
@@ -258,7 +230,7 @@ export default function PizzaGame() {
     if (next) {
       music.volume = 0;
     } else {
-      music.volume = 0.5;
+      music.volume = SONG_VOLUME;
       if (engine && engine.gState === 'playing' && !pausedRef.current) music.play().catch(() => {});
     }
   }, []);

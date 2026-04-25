@@ -1,0 +1,77 @@
+.hero {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #060f04 0%, #0d1f09 55%, #1e3314 100%);
+}
+
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.hero__logo {
+  animation: float 4s ease-in-out infinite;
+  margin-bottom: 2rem;
+  filter: drop-shadow(0 0 28px var(--color-gold));
+}
+
+.hero__title {
+  font-family: var(--font-pixel);
+  font-size: clamp(1.4rem, 5vw, 3.2rem);
+  color: var(--color-gold);
+  animation: glow 2.5s ease-in-out infinite;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.hero__subtitle {
+  font-family: var(--font-vt323);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  color: var(--color-gold-light);
+  letter-spacing: 0.1em;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.hero__characters {
+  display: flex;
+  gap: clamp(2rem, 6vw, 5rem);
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+}
+
+.hero__character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hero__character-name {
+  font-family: var(--font-vt323);
+  font-size: 0.95rem;
+  color: var(--color-gold-light);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.hero__scroll-hint {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--color-gold);
+  animation: blink 1s step-end infinite;
+  letter-spacing: 0.1em;
+}
