@@ -1,3 +1,5 @@
+import { useMobile } from './hooks/useMobile';
+import MobileApp from './components/layout/MobileApp';
 import Nav from './components/layout/Nav';
 import Footer from './components/layout/Footer';
 import Hero from './components/features/Hero';
@@ -7,6 +9,12 @@ import Band from './components/features/Band';
 import GameSection from './components/features/GameSection';
 
 export default function App() {
+  const isMobile = useMobile();
+
+  if (isMobile) {
+    return <MobileApp />;
+  }
+
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
