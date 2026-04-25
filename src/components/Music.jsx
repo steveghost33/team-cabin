@@ -11,7 +11,7 @@ export default function Music() {
       <SectionTitle>FIND OUR MUSIC</SectionTitle>
 
       {/* Bandcamp embed */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
         <iframe
           style={{ border: 0, width: '400px', height: '241px' }}
           src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
