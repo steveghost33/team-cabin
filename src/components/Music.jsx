@@ -10,6 +10,16 @@ export default function Music() {
     <section id="music" style={{ padding: '5rem 2rem', maxWidth: 1100, margin: '0 auto' }}>
       <SectionTitle>FIND OUR MUSIC</SectionTitle>
 
+      {/* Bandcamp embed */}
+      <div style={{ marginBottom: '2rem' }}>
+        <iframe
+          style={{ border: 0, width: '100%', height: '120px' }}
+          src="https://bandcamp.com/EmbeddedPlayer/album=1839020246/size=large/bgcol=000000/linkcol=e5c76b/tracklist=false/artwork=small/transparent=true/"
+          seamless
+          title="Tall Bike by Team Cabin"
+        />
+      </div>
+
       {/* Single trigger button */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
         <button
@@ -33,7 +43,7 @@ export default function Music() {
           onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 #000'; }}
         >
           <span style={{ fontSize: '1.2rem' }}>♫</span>
-          {open ? 'CLOSE' : 'LISTEN NOW'}
+          {open ? 'CLOSE' : 'LISTEN ON ALL PLATFORMS'}
           <span style={{
             display: 'inline-block',
             transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
