@@ -198,7 +198,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--color-green);
+  background: linear-gradient(180deg, #060f04 0%, #0d1f09 55%, #1e3314 100%);
   overscroll-behavior: none;
 }
 
