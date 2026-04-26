@@ -6,7 +6,6 @@ import Music from '../features/Music';
 import Shows from '../features/Shows';
 import Band from '../features/Band';
 import GameSection from '../features/GameSection';
-import { useFullscreen } from '../../hooks/useFullscreen';
 import '../../styles/components/MobileApp.css';
 
 const PAGES = { HUB: 'hub', MUSIC: 'music', SHOWS: 'shows', BAND: 'band', GAME: 'game' };
@@ -20,31 +19,12 @@ const NAV_BUTTONS = [
 
 export default function MobileApp() {
   const [page, setPage] = useState(PAGES.HUB);
-  const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
-
-  const openPage = async (nextPage) => {
-    if (nextPage === PAGES.GAME) {
-      await enterFullscreen();
-    } else if (isFullscreen) {
-      await exitFullscreen();
-    }
-
-    setPage(nextPage);
-  };
-
-  const handleBack = async () => {
-    if (page === PAGES.GAME && isFullscreen) {
-      await exitFullscreen();
-    }
-
-    setPage(PAGES.HUB);
-  };
 
   if (page !== PAGES.HUB) {
     return (
       <div className="m-page">
         <header className="m-page-header">
-          <button className="m-back-btn" onClick={handleBack}>
+          <button className="m-back-btn" onClick={() => setPage(PAGES.HUB)}>
             BACK
           </button>
         </header>
@@ -97,7 +77,7 @@ export default function MobileApp() {
 
       <nav className="m-hub-nav" aria-label="Main navigation">
         {NAV_BUTTONS.map(btn => (
-          <button key={btn.id} className="m-hub-nav-btn" onClick={() => void openPage(btn.id)}>
+          <button key={btn.id} className="m-hub-nav-btn" onClick={() => setPage(btn.id)}>
             {btn.icon && <span className="m-hub-nav-icon">{btn.icon}</span>}
             <span className="m-hub-nav-label">{btn.label}</span>
           </button>

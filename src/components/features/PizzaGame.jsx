@@ -21,8 +21,10 @@ export default function PizzaGame() {
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
   const [isPaused, setIsPaused]   = useState(false);
   const [isMuted,  setIsMuted]    = useState(false);
+  const [isImmersive, setIsImmersive] = useState(false);
   const isMobile = useMobile();
   const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
+  const isExpanded = isFullscreen || isImmersive;
 
   // ── MAIN GAME LOOP ───────────────────────────
   useEffect(() => {
@@ -235,6 +237,25 @@ export default function PizzaGame() {
     }
   }, []);
 
+  useEffect(() => {
+    if (isMobile) {
+      setIsImmersive(true);
+    }
+  }, [isMobile]);
+
+  const handleEnterExpanded = useCallback(async () => {
+    const enteredFullscreen = await enterFullscreen();
+
+    if (!enteredFullscreen || isMobile) {
+      setIsImmersive(true);
+    }
+  }, [enterFullscreen, isMobile]);
+
+  const handleExitExpanded = useCallback(async () => {
+    await exitFullscreen();
+    setIsImmersive(false);
+  }, [exitFullscreen]);
+
   // ── TOUCH / CLICK HANDLER ────────────────────
   const mb = useCallback((key, down) => {
     const engine = engineRef.current;
@@ -243,7 +264,7 @@ export default function PizzaGame() {
 
     if (key === 'pause') { if (down) handlePause(); return; }
     if (key === 'mute')  { if (down) handleMute();  return; }
-    if (key === 'fs')    { if (down) { isFullscreen ? exitFullscreen() : enterFullscreen(); } return; }
+    if (key === 'fs')    { if (down) { isExpanded ? void handleExitExpanded() : void handleEnterExpanded(); } return; }
 
     if (pausedRef.current) return; // block gameplay while paused
 
@@ -285,7 +306,7 @@ export default function PizzaGame() {
         engine.keys['ArrowRight'] = false;
       }
     }
-  }, [handlePause, handleMute, isFullscreen, enterFullscreen, exitFullscreen]);
+  }, [handlePause, handleMute, isExpanded, handleEnterExpanded, handleExitExpanded]);
 
   // ── SHARED BASE STYLE ───────────────────────
   const base = {
@@ -309,11 +330,11 @@ export default function PizzaGame() {
         cursor: 'pointer', lineHeight: 1,
         userSelect: 'none', touchAction: 'none',
       }}
-      onTouchStart={e => { e.preventDefault(); isFullscreen ? exitFullscreen() : enterFullscreen(); }}
+      onTouchStart={e => { e.preventDefault(); isExpanded ? void handleExitExpanded() : void handleEnterExpanded(); }}
       onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
-      onMouseDown={() => isFullscreen ? exitFullscreen() : enterFullscreen()}
-    >{isFullscreen ? '⊠' : '⛶'}</button>
+      onMouseDown={() => { isExpanded ? void handleExitExpanded() : void handleEnterExpanded(); }}
+    >{isExpanded ? '⊠' : '⛶'}</button>
   );
 
   // ── DESKTOP CONTROLS ────────────────────────
@@ -645,7 +666,7 @@ export default function PizzaGame() {
   const Controls = isMobile ? MobileControls : DesktopControls;
 
   // ── FULLSCREEN LAYOUT ───────────────────────
-  if (isFullscreen) {
+  if (isExpanded) {
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column' }}>
         <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#000' }}>
