@@ -4,6 +4,7 @@
 
 .m-hub {
   height: 100dvh;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -195,10 +196,11 @@
 
 .m-page {
   height: 100dvh;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #060f04 0%, #0d1f09 55%, #1e3314 100%);
+  background: #030a02;
   overscroll-behavior: none;
 }
 
@@ -250,4 +252,5 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  background: #030a02;
 }

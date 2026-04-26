@@ -36,11 +36,17 @@ body::after {
 }
 
 #root {
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .app {
-  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (max-width: 768px) {
+  body {
+    background: #030a02;
+  }
 }
 
 /* Keyframes */
