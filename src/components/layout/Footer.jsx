@@ -1,5 +1,6 @@
 import TCLogo from '../common/TCLogo';
 import { SOCIAL_LINKS } from '../../config/constants';
+import { getSafeExternalUrl } from '../../utils/safeUrl';
 import '../../styles/components/Footer.css';
 
 const ICONS = {
@@ -87,9 +88,15 @@ const ICONS = {
 
 function SocialIcon({ label, url }) {
   const IconComp = ICONS[label];
+  const safeUrl = getSafeExternalUrl(url);
+
+  if (!safeUrl) {
+    return null;
+  }
+
   return (
     <a
-      href={url}
+      href={safeUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}

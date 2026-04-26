@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import SectionTitle from '../common/SectionTitle';
 import { MUSIC_LINKS } from '../../config/constants';
+import { getSafeExternalUrl } from '../../utils/safeUrl';
 import '../../styles/components/Music.css';
 
 function MusicLink({ name, icon, color, bg, url, label }) {
+  const safeUrl = getSafeExternalUrl(url);
+
+  if (!safeUrl) {
+    return null;
+  }
+
   return (
     <a
-      href={url}
+      href={safeUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="music__link"
@@ -64,8 +71,11 @@ export default function Music({ linksOnly = false }) {
         <iframe
           className="music__embed"
           src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
-          seamless
           title="Tall Bike by Team Cabin"
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          allow="autoplay; encrypted-media"
         />
       </div>
 

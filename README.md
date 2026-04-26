@@ -6,7 +6,7 @@
 # Install dependencies
 npm install
 
-# Start dev server (opens at http://localhost:3000)
+# Start dev server (opens at http://localhost:5173)
 npm start
 
 # Build for production
@@ -94,3 +94,5 @@ After running `npm run build`, the `build/` folder is ready to deploy to:
 - **Netlify** — drag the `build/` folder into netlify.com
 - **Vercel** — `npx vercel` from this directory
 - **GitHub Pages** — add `"homepage": "."` to package.json, then `npm run build`
+
+Security headers are configured in `public/_headers` for Netlify-compatible hosts and `vercel.json` for Vercel. GitHub Pages does not support custom response headers, so use a fronting CDN or another static host if CSP and clickjacking headers are required.
