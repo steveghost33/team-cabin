@@ -64,7 +64,7 @@ export default function MobileApp() {
       <div className="m-hub-bandcamp">
         <iframe
           className="m-hub-bandcamp-frame"
-          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/tracklist=false/artwork=small/transparent=true/"
+          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=small/bgcol=333333/linkcol=e99708/transparent=true/"
           title="Tall Bike by Team Cabin"
           loading="lazy"
           seamless
