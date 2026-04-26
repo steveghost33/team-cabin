@@ -1908,7 +1908,7 @@ function drawInitials(ctx, frame, engine) {
 
   if (Math.floor(frame/25)%2===0) {
     ctx.fillStyle='#4A7A30'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
-    ctx.fillText(initialsPos < 2 ? '[ CONFIRM LETTER → NEXT ]' : '[ ENTER / START TO CONTINUE ]', W/2, H/2+100);
+    ctx.fillText(initialsPos < 2 ? 'ENTER · NEXT' : 'ENTER TO FINISH', W/2, H/2+100);
   }
 }
 
@@ -1929,17 +1929,16 @@ function drawTitle(ctx, frame, highSc, playerName) {
   ctx.fillText('— Team Cabin Edition —',W/2,H/2-90);
 
   // big simple instructions
-  ctx.fillStyle=CREAM; ctx.font='15px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MOVE:  ← →',       W/2, H/2 - 36);
-  ctx.fillText('JUMP:  SPACE / A',  W/2, H/2 + 6);
-  ctx.fillText('STOMP ENEMIES',     W/2, H/2 + 48);
+  ctx.fillStyle=CREAM; ctx.font='13px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('← → MOVE   SPACE JUMP',W/2, H/2 - 18);
+  ctx.fillText('STOMP ENEMIES',        W/2, H/2 + 18);
 
   // press start
   if (Math.floor(frame/25)%2===0) {
     ctx.fillStyle=GLD; ctx.font='14px "Press Start 2P"';
-    ctx.fillText('PRESS ENTER / START',W/2,H/2+110);
+    ctx.fillText('PRESS ENTER / START',W/2,H/2+90);
   }
-  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+140);}
+  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+120);}
 }
 
 function drawCharSelect(ctx, frame, selChar) {
@@ -1966,7 +1965,7 @@ function drawCharSelect(ctx, frame, selChar) {
     if(sel&&Math.floor(frame/20)%2===0){ctx.fillStyle=GLD;ctx.font='16px serif';ctx.fillText('▼',cx+cW/2,cy-8);}
   });
   ctx.fillStyle=CREAM; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('← → SELECT   ENTER / START CONFIRM',W/2,H-16);
+  ctx.fillText('← → PICK   ENTER START',W/2,H-16);
 }
 
 function drawLevelUp(ctx, frame, lvlIdx, lvl) {
