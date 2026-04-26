@@ -235,15 +235,6 @@ export default function PizzaGame() {
     }
   }, []);
 
-  // ── MOBILE AUTO-FULLSCREEN ───────────────────
-  // Browsers require a user gesture before requestFullscreen; grab the first touch.
-  useEffect(() => {
-    if (!isMobile || isFullscreen) return;
-    const onFirst = () => { enterFullscreen(); document.removeEventListener('touchstart', onFirst); };
-    document.addEventListener('touchstart', onFirst, { once: true, passive: true });
-    return () => document.removeEventListener('touchstart', onFirst);
-  }, [isMobile, isFullscreen, enterFullscreen]);
-
   // ── TOUCH / CLICK HANDLER ────────────────────
   const mb = useCallback((key, down) => {
     const engine = engineRef.current;
