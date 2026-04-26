@@ -82,6 +82,19 @@
   letter-spacing: 0.1em;
 }
 
+.m-hub-bandcamp {
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.m-hub-bandcamp-frame {
+  width: 100%;
+  height: 42px;
+  border: 0;
+  display: block;
+}
+
 /* ── Nav buttons (linktree style) ── */
 
 .m-hub-nav {

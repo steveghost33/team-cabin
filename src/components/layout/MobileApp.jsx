@@ -61,6 +61,20 @@ export default function MobileApp() {
         </div>
       </div>
 
+      <div className="m-hub-bandcamp">
+        <iframe
+          className="m-hub-bandcamp-frame"
+          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=small/bgcol=333333/linkcol=ffffff/transparent=true/"
+          title="Tall Bike by Team Cabin"
+          loading="lazy"
+          seamless
+        >
+          <a href="https://teamcabin.bandcamp.com/album/tall-bike">
+            Tall Bike by Team Cabin
+          </a>
+        </iframe>
+      </div>
+
       <nav className="m-hub-nav" aria-label="Main navigation">
         {NAV_BUTTONS.map(btn => (
           <button key={btn.id} className="m-hub-nav-btn" onClick={() => setPage(btn.id)}>
