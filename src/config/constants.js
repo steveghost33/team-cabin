@@ -47,9 +47,6 @@ export const MUSIC_LINKS = [
 export const SOCIAL_LINKS = [
   { label: 'Instagram',   url: 'https://www.instagram.com/teamcabin' },
   { label: 'Facebook',    url: 'https://www.facebook.com/TeamCabin/' },
-  { label: 'Threads',     url: 'https://www.threads.com/@teamcabin' },
-  { label: 'Twitter / X', url: 'https://x.com/weareteamcabin' },
-  { label: 'TikTok',      url: 'https://www.tiktok.com/@weareteamcabin' },
   { label: 'YouTube',     url: 'https://youtube.com/@teamcabinmi?si=my2xg-r5hxGNAAsl' },
 ];
 

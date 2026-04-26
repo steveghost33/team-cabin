@@ -31,46 +31,6 @@ const ICONS = {
       <rect x="5" y="7" width="3" height="7" fill="currentColor" />
     </svg>
   ),
-  Threads: () => (
-    <svg viewBox="0 0 16 16" width="32" height="32" style={{ imageRendering: 'pixelated' }} aria-hidden="true">
-      <rect x="5" y="4" width="6" height="1" fill="currentColor" />
-      <rect x="4" y="5" width="1" height="4" fill="currentColor" />
-      <rect x="11" y="5" width="1" height="2" fill="currentColor" />
-      <rect x="5" y="8" width="6" height="1" fill="currentColor" />
-      <rect x="6" y="5" width="4" height="3" fill="currentColor" />
-      <rect x="7" y="6" width="2" height="1" fill="#030a02" />
-      <rect x="6" y="9" width="5" height="1" fill="currentColor" />
-      <rect x="11" y="9" width="1" height="2" fill="currentColor" />
-      <rect x="5" y="11" width="6" height="1" fill="currentColor" />
-      <rect x="4" y="9" width="1" height="2" fill="currentColor" />
-      <rect x="8" y="12" width="2" height="2" fill="currentColor" />
-    </svg>
-  ),
-  'Twitter / X': () => (
-    <svg viewBox="0 0 16 16" width="32" height="32" style={{ imageRendering: 'pixelated' }} aria-hidden="true">
-      <rect x="2"  y="2"  width="2" height="2" fill="currentColor" />
-      <rect x="4"  y="4"  width="2" height="2" fill="currentColor" />
-      <rect x="6"  y="6"  width="4" height="2" fill="currentColor" />
-      <rect x="8"  y="4"  width="2" height="2" fill="currentColor" />
-      <rect x="10" y="2"  width="2" height="2" fill="currentColor" />
-      <rect x="4"  y="8"  width="2" height="2" fill="currentColor" />
-      <rect x="2"  y="10" width="2" height="2" fill="currentColor" />
-      <rect x="8"  y="8"  width="2" height="2" fill="currentColor" />
-      <rect x="10" y="10" width="2" height="2" fill="currentColor" />
-      <rect x="12" y="12" width="2" height="2" fill="currentColor" />
-    </svg>
-  ),
-  TikTok: () => (
-    <svg viewBox="0 0 16 16" width="32" height="32" style={{ imageRendering: 'pixelated' }} aria-hidden="true">
-      <rect x="7"  y="2"  width="4" height="1" fill="currentColor" />
-      <rect x="10" y="2"  width="1" height="4" fill="currentColor" />
-      <rect x="7"  y="3"  width="1" height="7" fill="currentColor" />
-      <rect x="5"  y="9"  width="4" height="1" fill="currentColor" />
-      <rect x="4"  y="10" width="1" height="2" fill="currentColor" />
-      <rect x="9"  y="10" width="1" height="2" fill="currentColor" />
-      <rect x="5"  y="12" width="4" height="1" fill="currentColor" />
-    </svg>
-  ),
   YouTube: () => (
     <svg viewBox="0 0 16 16" width="32" height="32" style={{ imageRendering: 'pixelated' }} aria-hidden="true">
       <rect x="1"  y="4"  width="14" height="8" fill="currentColor" />
