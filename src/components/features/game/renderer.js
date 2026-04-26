@@ -1924,14 +1924,27 @@ function drawTitle(ctx, frame, highSc, playerName) {
 
   // title
   ctx.fillStyle=GLD; ctx.font='22px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('DETROIT PIZZA QUEST',W/2,H/2-118);
+  ctx.fillText('TC PIZZA QUEST',W/2,H/2-118);
   ctx.fillStyle='rgba(226,168,32,0.55)'; ctx.font='10px "Press Start 2P"';
   ctx.fillText('— Team Cabin Edition —',W/2,H/2-90);
 
-  // big simple instructions
-  ctx.fillStyle=CREAM; ctx.font='13px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('← → MOVE   SPACE JUMP',W/2, H/2 - 18);
-  ctx.fillText('STOMP ENEMIES',        W/2, H/2 + 18);
+  // divider
+  ctx.strokeStyle='rgba(226,168,32,0.3)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W/2-210,H/2-70); ctx.lineTo(W/2+210,H/2-70); ctx.stroke();
+
+  // how to play header
+  ctx.fillStyle=GLD; ctx.font='8px "Press Start 2P"'; ctx.textAlign='center';
+  ctx.fillText('HOW TO PLAY', W/2, H/2-52);
+
+  // directions — desktop keys first, mobile equivalent after ·
+  ctx.fillStyle=CREAM; ctx.font='9px "Press Start 2P"';
+  ctx.fillText('MOVE  ←→ ARROWS  ·  D-PAD',    W/2, H/2-28);
+  ctx.fillText('JUMP  SPACE  ·  TAP A BUTTON',   W/2, H/2-6);
+  ctx.fillText('STOMP ENEMIES  +  COLLECT PIZZAS',W/2, H/2+18);
+  ctx.fillText('16 PIZZAS  →  BOSS FIGHT  →  WIN',W/2, H/2+40);
+
+  // divider
+  ctx.beginPath(); ctx.moveTo(W/2-210,H/2+58); ctx.lineTo(W/2+210,H/2+58); ctx.stroke();
 
   // press start
   if (Math.floor(frame/25)%2===0) {
