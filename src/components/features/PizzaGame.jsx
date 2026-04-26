@@ -235,6 +235,15 @@ export default function PizzaGame() {
     }
   }, []);
 
+  // ── MOBILE AUTO-FULLSCREEN ───────────────────
+  // Browsers require a user gesture before requestFullscreen; grab the first touch.
+  useEffect(() => {
+    if (!isMobile || isFullscreen) return;
+    const onFirst = () => { enterFullscreen(); document.removeEventListener('touchstart', onFirst); };
+    document.addEventListener('touchstart', onFirst, { once: true, passive: true });
+    return () => document.removeEventListener('touchstart', onFirst);
+  }, [isMobile, isFullscreen, enterFullscreen]);
+
   // ── TOUCH / CLICK HANDLER ────────────────────
   const mb = useCallback((key, down) => {
     const engine = engineRef.current;
@@ -392,7 +401,7 @@ export default function PizzaGame() {
 
       {/* Row 2 — visual keyboard map */}
       <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <KeyGroup label="MOVE LEFT / RIGHT">
+        <KeyGroup label="MOVE">
           <div style={{ display: 'flex', gap: 6 }}>
             <Key label="←" />
             <Key label="→" />
@@ -400,10 +409,10 @@ export default function PizzaGame() {
         </KeyGroup>
 
         <KeyGroup label="JUMP">
-          <Key label="SPACE BAR" w={148} />
+          <Key label="SPACE" w={110} />
         </KeyGroup>
 
-        <KeyGroup label="START / CONFIRM">
+        <KeyGroup label="START">
           <Key label="ENTER" w={88} />
         </KeyGroup>
 
@@ -414,7 +423,7 @@ export default function PizzaGame() {
           </div>
         </KeyGroup>
 
-        <KeyGroup label="MUTE MUSIC">
+        <KeyGroup label="MUTE">
           <Key label="M" />
         </KeyGroup>
       </div>
