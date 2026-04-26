@@ -25,7 +25,7 @@ export default function MobileApp() {
       <div className="m-page">
         <header className="m-page-header">
           <button className="m-back-btn" onClick={() => setPage(PAGES.HUB)}>
-            ◀ BACK
+            BACK
           </button>
         </header>
         <div className="m-page-body">

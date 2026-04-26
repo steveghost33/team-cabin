@@ -214,6 +214,9 @@
 }
 
 .m-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   background: none;
   border: 2px solid var(--color-gold);
   color: var(--color-gold);
@@ -226,6 +229,17 @@
   transition: background var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+}
+
+.m-back-btn::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 7px solid var(--color-gold);
+  flex-shrink: 0;
 }
 
 .m-back-btn:active {
