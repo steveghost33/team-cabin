@@ -22,8 +22,21 @@ function MusicLink({ name, icon, color, bg, url, label }) {
   );
 }
 
-export default function Music() {
+export default function Music({ linksOnly = false }) {
   const [open, setOpen] = useState(false);
+
+  if (linksOnly) {
+    return (
+      <section id="music" className="music" aria-label="Music">
+        <SectionTitle>FIND OUR MUSIC</SectionTitle>
+        <div id="music-platform-list" className="music__grid">
+          {MUSIC_LINKS.map((link) => (
+            <MusicLink key={link.name} {...link} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="music" className="music" aria-label="Music">

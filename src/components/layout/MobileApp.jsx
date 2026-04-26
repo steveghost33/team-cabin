@@ -29,7 +29,7 @@ export default function MobileApp() {
           </button>
         </header>
         <div className="m-page-body">
-          {page === PAGES.MUSIC && <Music />}
+          {page === PAGES.MUSIC && <Music linksOnly />}
           {page === PAGES.SHOWS && <Shows />}
           {page === PAGES.BAND  && <Band />}
           {page === PAGES.GAME  && <GameSection />}
