@@ -32,7 +32,9 @@ export default function Nav({ scrollTo }) {
               onClick={() => scrollTo(link.id)}
               aria-label={`Go to ${link.label} section`}
             >
-              {link.label}
+              {link.mobileLabel
+                ? <><span className="nav__link-desktop">{link.label}</span><span className="nav__link-mobile">{link.mobileLabel}</span></>
+                : link.label}
             </button>
           ))}
         </div>

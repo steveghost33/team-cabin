@@ -17,7 +17,7 @@ export const NAV_LINKS = [
   { id: 'music', label: 'Music' },
   { id: 'shows', label: 'Shows' },
   { id: 'band',  label: 'The Band' },
-  { id: 'game',  label: '🍕 Pizza Quest' },
+  { id: 'game',  label: '🍕 Pizza Quest', mobileLabel: '🍕 Pizza Quest Game' },
 ];
 
 // ── Upcoming Shows ──

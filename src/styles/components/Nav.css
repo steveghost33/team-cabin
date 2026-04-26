@@ -56,6 +56,10 @@
   color: var(--color-gold);
 }
 
+.nav__link-mobile {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .nav__container {
     height: auto;
@@ -67,5 +71,13 @@
   .nav__link {
     font-size: 0.55rem;
     padding: 0.45rem 0.5rem;
+  }
+
+  .nav__link-desktop {
+    display: none;
+  }
+
+  .nav__link-mobile {
+    display: inline;
   }
 }
