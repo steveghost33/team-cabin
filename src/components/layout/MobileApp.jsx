@@ -14,7 +14,7 @@ const NAV_BUTTONS = [
   { id: PAGES.MUSIC, label: 'MUSIC',       icon: '♫' },
   { id: PAGES.SHOWS, label: 'SHOWS',       icon: '★' },
   { id: PAGES.BAND,  label: 'THE BAND',    icon: '◈' },
-  { id: PAGES.GAME,  label: '🍕 PIZZA QUEST', icon: null },
+  { id: PAGES.GAME,  label: '🍕 PIZZA QUEST GAME', icon: null },
 ];
 
 export default function MobileApp() {
