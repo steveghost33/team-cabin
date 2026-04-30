@@ -17,10 +17,15 @@ export default function PizzaGame() {
   // When React re-renders, button elements remount and lose setPointerCapture —
   // the global listener below catches the stray pointerup and clears the key.
   const activeDirPointers  = useRef({});
+  const leaderboardRef     = useRef([]);
 
   const [gameState, setGameState] = useState({ state: 'title', score: 0, lives: 3, pizza: 0, hp: 100, level: 1 });
   const [isPaused, setIsPaused]   = useState(false);
   const [isMuted,  setIsMuted]    = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const scoreSubmitted = useRef(false);
+
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const [isImmersive, setIsImmersive] = useState(false);
   const isMobile = useMobile();
   const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
@@ -120,6 +125,55 @@ export default function PizzaGame() {
 
       renderFrame(ctx, engine, frameRef.current);
 
+      // draw leaderboard panel on canvas during initials / gameover / win
+      if (['initials', 'gameover', 'win'].includes(engine.gState)) {
+        const entries = leaderboardRef.current;
+        const isEnd   = engine.gState === 'gameover' || engine.gState === 'win';
+        const myScore = isEnd ? engine.sc : 0;
+        const myName  = isEnd && engine.sc > 0 ? engine.initials.join('') : '';
+        const px = 593, pw = 185, ph = 520;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,16,2,0.92)';
+        ctx.fillRect(px, 0, pw, ph);
+        ctx.strokeStyle = 'rgba(226,168,32,0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(px + 1, 0); ctx.lineTo(px + 1, ph); ctx.stroke();
+
+        ctx.fillStyle = '#E2A820';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText('TOP SCORES', px + pw / 2, 22);
+
+        if (entries.length === 0) {
+          ctx.fillStyle = 'rgba(255,240,200,0.4)';
+          ctx.font = '6px "Press Start 2P"';
+          ctx.fillText('no scores yet', px + pw / 2, 48);
+        } else {
+          const rowH = 22, startY = 36;
+          entries.slice(0, 10).forEach((entry, i) => {
+            const isMe = myName && entry.playerName === myName && entry.score === myScore;
+            const ry = startY + i * rowH;
+            ctx.fillStyle = isMe ? 'rgba(226,168,32,0.18)' : 'rgba(0,0,0,0.28)';
+            ctx.fillRect(px + 5, ry, pw - 10, rowH - 2);
+            if (isMe) {
+              ctx.strokeStyle = '#E2A820'; ctx.lineWidth = 1;
+              ctx.strokeRect(px + 5, ry, pw - 10, rowH - 2);
+            }
+            ctx.font = '6px "Press Start 2P"';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = isMe ? '#E2A820' : 'rgba(226,168,32,0.55)';
+            ctx.fillText(`#${i + 1}`, px + 9, ry + 14);
+            ctx.fillStyle = '#FFF8E7';
+            ctx.fillText(entry.playerName.slice(0, 3), px + 30, ry + 14);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = isMe ? '#E2A820' : '#FFF8E7';
+            ctx.fillText(entry.score.toLocaleString(), px + pw - 7, ry + 14);
+          });
+        }
+        ctx.restore();
+      }
+
       if (pausedRef.current) {
         ctx.fillStyle = 'rgba(0,0,0,0.62)';
         ctx.fillRect(0, 0, 780, 520);
@@ -210,6 +264,45 @@ export default function PizzaGame() {
       setIsPaused(false);
     }
   }, [gameState.state]);
+
+  // fetch leaderboard on mount (title screen) and after every game end
+  const fetchLeaderboard = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/scores`);
+      if (res.ok) setLeaderboard(await res.json());
+    } catch { /* API unavailable — silently ignore */ }
+  }, [API]);
+
+  useEffect(() => { fetchLeaderboard(); }, [fetchLeaderboard]);
+  useEffect(() => { leaderboardRef.current = leaderboard; }, [leaderboard]);
+
+  // submit score when game ends
+  useEffect(() => {
+    const state = gameState.state;
+    if (state !== 'gameover' && state !== 'win') {
+      if (state === 'initials') scoreSubmitted.current = false;
+      return;
+    }
+    if (scoreSubmitted.current) return;
+    scoreSubmitted.current = true;
+
+    const engine = engineRef.current;
+    if (!engine || engine.sc <= 0) return;
+
+    const playerName = engine.initials.join('');
+    const score = engine.sc;
+
+    (async () => {
+      try {
+        await fetch(`${API}/scores`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playerName, score }),
+        });
+        fetchLeaderboard();
+      } catch { /* API unavailable — silently ignore */ }
+    })();
+  }, [gameState.state, API, fetchLeaderboard]);
 
   // ── PAUSE / MUTE HANDLERS ────────────────────
   const handlePause = useCallback(() => {
@@ -668,7 +761,7 @@ export default function PizzaGame() {
   // ── FULLSCREEN LAYOUT ───────────────────────
   if (isExpanded) {
     return (
-      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#000', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#000' }}>
           <canvas
             ref={canvasRef}

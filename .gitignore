@@ -24,3 +24,8 @@ pnpm-debug.log*
 src/.DS_Store
 .idea/
 .vscode/
+
+# Backend
+backend/__pycache__/
+backend/*.db
+backend/*.pyc
