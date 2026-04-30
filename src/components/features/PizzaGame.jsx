@@ -270,7 +270,7 @@ export default function PizzaGame() {
     try {
       const res = await fetch(`${API}/scores`);
       if (res.ok) setLeaderboard(await res.json());
-    } catch { /* API unavailable — silently ignore */ }
+    } catch (err) { console.error('[PizzaGame] Failed to fetch leaderboard:', err); }
   }, [API]);
 
   useEffect(() => { fetchLeaderboard(); }, [fetchLeaderboard]);
@@ -300,7 +300,7 @@ export default function PizzaGame() {
           body: JSON.stringify({ playerName, score }),
         });
         fetchLeaderboard();
-      } catch { /* API unavailable — silently ignore */ }
+      } catch (err) { console.error('[PizzaGame] Failed to submit score:', err); }
     })();
   }, [gameState.state, API, fetchLeaderboard]);
 

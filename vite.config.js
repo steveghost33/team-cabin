@@ -34,4 +34,7 @@ export default defineConfig({
   preview: {
     headers: securityHeaders,
   },
+  test: {
+    environment: 'node',
+  },
 });

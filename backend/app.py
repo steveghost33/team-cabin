@@ -1,10 +1,26 @@
 import sqlite3
 import os
+import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(name)s: %(message)s',
+)
+log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "60 per minute"],
+    storage_uri="memory://",
+)
 
 DB_PATH = os.environ.get("DB_PATH", "leaderboard.db")
 
@@ -28,7 +44,19 @@ def init_db():
         conn.commit()
 
 
+@app.route("/health", methods=["GET"])
+def health():
+    try:
+        with get_db() as conn:
+            conn.execute("SELECT 1")
+        return jsonify({"status": "ok"})
+    except Exception as e:
+        log.error("Health check failed: %s", e)
+        return jsonify({"status": "error", "detail": str(e)}), 503
+
+
 @app.route("/scores", methods=["POST"])
+@limiter.limit("10 per minute")
 def post_score():
     data = request.get_json(silent=True) or {}
     player_name = data.get("playerName")
@@ -42,22 +70,31 @@ def post_score():
 
     score = int(score)
 
-    with get_db() as conn:
-        conn.execute(
-            "INSERT INTO scores (player_name, score) VALUES (?, ?)",
-            (str(player_name), score),
-        )
-        conn.commit()
+    try:
+        with get_db() as conn:
+            conn.execute(
+                "INSERT INTO scores (player_name, score) VALUES (?, ?)",
+                (str(player_name), score),
+            )
+            conn.commit()
+        log.info("Score saved: %s=%d", player_name, score)
+    except Exception as e:
+        log.error("Failed to save score for %s: %s", player_name, e)
+        return jsonify({"error": "Failed to save score"}), 500
 
     return jsonify({"message": "Score saved", "playerName": player_name, "score": score}), 201
 
 
 @app.route("/scores", methods=["GET"])
 def get_scores():
-    with get_db() as conn:
-        rows = conn.execute(
-            "SELECT player_name, score, timestamp FROM scores ORDER BY score DESC LIMIT 10"
-        ).fetchall()
+    try:
+        with get_db() as conn:
+            rows = conn.execute(
+                "SELECT player_name, score, timestamp FROM scores ORDER BY score DESC LIMIT 10"
+            ).fetchall()
+    except Exception as e:
+        log.error("Failed to fetch scores: %s", e)
+        return jsonify({"error": "Failed to fetch scores"}), 500
 
     results = [
         {"playerName": r["player_name"], "score": r["score"], "timestamp": r["timestamp"]}
@@ -68,8 +105,12 @@ def get_scores():
 
 @app.route("/high-score", methods=["GET"])
 def get_high_score():
-    with get_db() as conn:
-        row = conn.execute("SELECT MAX(score) AS high_score FROM scores").fetchone()
+    try:
+        with get_db() as conn:
+            row = conn.execute("SELECT MAX(score) AS high_score FROM scores").fetchone()
+    except Exception as e:
+        log.error("Failed to fetch high score: %s", e)
+        return jsonify({"error": "Failed to fetch high score"}), 500
 
     high_score = row["high_score"] if row["high_score"] is not None else 0
     return jsonify({"highScore": high_score})
