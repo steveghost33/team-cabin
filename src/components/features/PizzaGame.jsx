@@ -26,8 +26,8 @@ export default function PizzaGame() {
   const scoreSubmitted = useRef(false);
 
   const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const [isImmersive, setIsImmersive] = useState(false);
   const isMobile = useMobile();
+  const [isImmersive, setIsImmersive] = useState(isMobile);
   const { isFullscreen, enterFullscreen, exitFullscreen } = useFullscreen();
   const isExpanded = isFullscreen || isImmersive;
 
@@ -330,11 +330,6 @@ export default function PizzaGame() {
     }
   }, []);
 
-  useEffect(() => {
-    if (isMobile) {
-      setIsImmersive(true);
-    }
-  }, [isMobile]);
 
   const handleEnterExpanded = useCallback(async () => {
     const enteredFullscreen = await enterFullscreen();
@@ -546,13 +541,13 @@ export default function PizzaGame() {
     background: 'linear-gradient(180deg, #2e3148 0%, #1c1e2c 100%)',
     border: '1.5px solid #3a3d54',
     color: 'rgba(255,255,255,0.9)',
-    fontSize: '1.6rem',
+    fontSize: '1.2rem',
     userSelect: 'none',
     WebkitUserSelect: 'none',
   };
 
   // horizontal arms (left / right) — wide rectangles
-  const dpadH = { ...dpadArm, width: 72, height: 48, borderRadius: 10 };
+  const dpadH = { ...dpadArm, width: 58, height: 38, borderRadius: 8 };
 
   const DPad = () => (
     <div
@@ -580,7 +575,7 @@ export default function PizzaGame() {
           onContextMenu={e => e.preventDefault()}
         >
           {/* bold SVG triangle arrow */}
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none">
             <polygon points="4,11 16,3 16,19" fill="rgba(255,255,255,0.85)" />
           </svg>
         </button>
@@ -612,7 +607,7 @@ export default function PizzaGame() {
           onTouchEnd={e => e.preventDefault()}
           onContextMenu={e => e.preventDefault()}
         >
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <svg width="17" height="17" viewBox="0 0 22 22" fill="none">
             <polygon points="18,11 6,3 6,19" fill="rgba(255,255,255,0.85)" />
           </svg>
         </button>
@@ -649,8 +644,8 @@ export default function PizzaGame() {
       onTouchEnd={e => e.preventDefault()}
       onContextMenu={e => e.preventDefault()}
     >
-      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '1rem', lineHeight: 1 }}>A</span>
-      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.38rem', opacity: 0.8, lineHeight: 1 }}>JUMP</span>
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.8rem', lineHeight: 1 }}>A</span>
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.3rem', opacity: 0.8, lineHeight: 1 }}>JUMP</span>
     </button>
   );
 
@@ -662,8 +657,8 @@ export default function PizzaGame() {
         fontFamily: '"Press Start 2P"',
         fontSize: '0.36rem',
         color: active ? '#fff' : 'rgba(255,255,255,0.5)',
-        height: 28,
-        padding: '0 14px',
+        height: 22,
+        padding: '0 10px',
         borderRadius: 14,
         touchAction: 'none',
         background: active
@@ -690,8 +685,8 @@ export default function PizzaGame() {
         fontFamily: '"Press Start 2P"',
         fontSize: '0.4rem',
         color: 'rgba(255,255,255,0.7)',
-        height: 32,
-        padding: '0 18px',
+        height: 26,
+        padding: '0 14px',
         borderRadius: 16,
         touchAction: 'none',
         background: 'linear-gradient(180deg, #363a50, #22253a)',
@@ -717,13 +712,13 @@ export default function PizzaGame() {
       style={{
         background: 'linear-gradient(180deg, #1a1c28 0%, #13141e 100%)',
         borderTop: `2px solid #2a2d40`,
-        paddingTop: 10,
-        paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))',
-        paddingLeft: 16,
-        paddingRight: 16,
+        paddingTop: 6,
+        paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))',
+        paddingLeft: 12,
+        paddingRight: 12,
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
+        gap: 6,
         userSelect: 'none',
         WebkitUserSelect: 'none',
         WebkitTouchCallout: 'none',
@@ -731,7 +726,7 @@ export default function PizzaGame() {
       }}
     >
       {/* Utility row — small, centered, like controller menu buttons */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
         <UtilBtn label={isPaused ? '▶ RESUME' : '⏸ PAUSE'} onPress={handlePause} active={isPaused} activeColor='#e67e22' />
         <UtilBtn label={isMuted  ? '🔇 MUTED' : '🔊 MUSIC'} onPress={handleMute}  active={isMuted}  activeColor='#555566' />
       </div>
@@ -749,7 +744,7 @@ export default function PizzaGame() {
 
         {/* Right — A (JUMP) face button */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-          <ActBtn k="jump" btnColor='#d63031' shadowColor='#6b0f0f' size={96} />
+          <ActBtn k="jump" btnColor='#d63031' shadowColor='#6b0f0f' size={68} />
         </div>
 
       </div>
