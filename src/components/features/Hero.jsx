@@ -1,6 +1,6 @@
 import TCLogo from '../common/TCLogo';
 import { CHARS } from './Characters';
-import { MEMBERS } from '../../config/constants';
+import { BAND_INFO, BOOKING_EMAIL, MEMBERS } from '../../config/constants';
 import '../../styles/components/Hero.css';
 
 export default function Hero() {
@@ -14,7 +14,19 @@ export default function Hero() {
 
       <h1 className="hero__title">TEAM CABIN</h1>
 
-      <p className="hero__subtitle">Detroit's finest three-piece 🍕</p>
+      <p className="hero__subtitle">{BAND_INFO.shortDescription}</p>
+      <p className="hero__description">
+        {BAND_INFO.description} Based in {BAND_INFO.hometown}. Latest release: {BAND_INFO.latestRelease.title}.
+      </p>
+
+      <div className="hero__actions">
+        <a className="hero__action hero__action--primary" href="#music">
+          Listen Now
+        </a>
+        <a className="hero__action" href={`mailto:${BOOKING_EMAIL}?subject=Team%20Cabin%20Booking%20Inquiry`}>
+          Booking / Press
+        </a>
+      </div>
 
       <div className="hero__characters" role="list">
         {MEMBERS.map((member, i) => {

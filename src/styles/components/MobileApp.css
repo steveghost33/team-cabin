@@ -58,6 +58,16 @@
   color: var(--color-gold-light);
   letter-spacing: 0.08em;
   text-align: center;
+  margin-bottom: 0.35rem;
+}
+
+.m-hub-description {
+  font-family: var(--font-vt323);
+  font-size: 1.05rem;
+  color: var(--color-cream);
+  text-align: center;
+  line-height: 1.05;
+  max-width: 22rem;
   margin-bottom: 0.6rem;
 }
 
@@ -212,6 +222,13 @@
   letter-spacing: 0.05em;
 }
 
+.m-hub-contact {
+  font-family: var(--font-vt323);
+  font-size: 0.95rem;
+  color: var(--color-gold-light);
+  text-decoration: none;
+}
+
 /* ═══════════════════════════════════════════════
    SECTION PAGES — sticky back button + scrollable content
    ═══════════════════════════════════════════════ */
@@ -222,8 +239,20 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: #030a02;
+  background: linear-gradient(180deg, #060f04 0%, #0d1f09 55%, #1e3314 100%);
+  position: relative;
   overscroll-behavior: none;
+}
+
+.m-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px);
+  background-size: 40px 40px;
+  pointer-events: none;
 }
 
 .m-page-header {
@@ -234,6 +263,7 @@
   display: flex;
   align-items: center;
   backdrop-filter: blur(8px);
+  position: relative;
   z-index: 100;
 }
 
@@ -274,5 +304,7 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #030a02;
+  background: transparent;
+  position: relative;
+  z-index: 1;
 }

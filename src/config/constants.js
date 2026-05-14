@@ -11,6 +11,22 @@ export const C = {
   black:  '#0a0a0a',
 };
 
+export const SITE_URL = 'https://www.weareteamcabin.com';
+export const BOOKING_EMAIL = 'teamcabinmi@gmail.com';
+
+export const BAND_INFO = {
+  name: 'Team Cabin',
+  hometown: 'Detroit, Michigan',
+  region: 'Detroit-area / Southeast Michigan',
+  genre: 'punk / pop punk / Midwest emo',
+  shortDescription: 'Detroit-area punk / pop punk / Midwest emo.',
+  description: 'Team Cabin is a Detroit-area punk / pop punk / Midwest emo band making hooky, raw songs for basement shows, house venues, and late-night drives.',
+  latestRelease: {
+    title: 'Tall Bike',
+    type: 'Single',
+  },
+};
+
 // ── Nav Links ──
 export const NAV_LINKS = [
   { id: 'home',  label: 'Home' },
@@ -24,12 +40,13 @@ export const NAV_LINKS = [
 // feat: true → gold highlight border
 export const SHOWS = [
   {
-    mo:   'MAY',
-    d:    '08',
-    v:    'Ypsi Ale House',
-    loc:  'Ypsilanti, MI',
-    t:    'w/ Shindig Machine, Frost Is Rad & Twin Deer',
-    feat: true,
+    id: '2026-05-08-ypsi-ale-house',
+    date: '2026-05-08T20:00:00-04:00',
+    venue: 'Ypsi Ale House',
+    city: 'Ypsilanti',
+    state: 'MI',
+    details: 'w/ Shindig Machine, Frost Is Rad & Twin Deer',
+    featured: true,
   },
 ];
 

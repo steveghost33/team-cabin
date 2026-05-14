@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import TCLogo from '../common/TCLogo';
 import { CHARS } from '../features/Characters';
-import { MEMBERS, SOCIAL_LINKS } from '../../config/constants';
+import { BAND_INFO, BOOKING_EMAIL, MEMBERS, SOCIAL_LINKS } from '../../config/constants';
 import Music from '../features/Music';
 import Shows from '../features/Shows';
 import Band from '../features/Band';
@@ -47,7 +47,10 @@ export default function MobileApp() {
           <TCLogo size={80} />
         </div>
         <h1 className="m-hub-title">TEAM CABIN</h1>
-        <p className="m-hub-subtitle">Detroit's finest three-piece 🍕</p>
+        <p className="m-hub-subtitle">{BAND_INFO.shortDescription}</p>
+        <p className="m-hub-description">
+          Based in {BAND_INFO.hometown}. Listen to {BAND_INFO.latestRelease.title} and hit us up for booking or press.
+        </p>
         <div className="m-hub-chars">
           {MEMBERS.map((member, i) => {
             const Char = CHARS[member.charId];
@@ -100,6 +103,9 @@ export default function MobileApp() {
           ))}
         </div>
         <p className="m-hub-copy">© 2026 TEAM CABIN · DETROIT, MI</p>
+        <a className="m-hub-contact" href={`mailto:${BOOKING_EMAIL}?subject=Team%20Cabin%20Booking%20Inquiry`}>
+          {BOOKING_EMAIL}
+        </a>
       </footer>
     </div>
   );
