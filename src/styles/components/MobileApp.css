@@ -103,18 +103,19 @@
   --bandcamp-width: min(400px, calc(100vw - 3rem));
   --bandcamp-scale: calc(var(--bandcamp-width) / 400);
   --bandcamp-height: calc(120px * var(--bandcamp-scale));
-  height: calc(var(--bandcamp-height) + 6px);
+  --bandcamp-frame-padding: 6px;
+  height: calc(var(--bandcamp-height) + (var(--bandcamp-frame-padding) * 2));
 }
 
 .m-hub-bandcamp-frame {
   width: var(--bandcamp-width);
-  height: calc(var(--bandcamp-height) + 6px);
+  height: calc(var(--bandcamp-height) + (var(--bandcamp-frame-padding) * 2));
   border: 2px solid var(--color-gold);
   box-shadow: 4px 4px 0 rgba(160, 120, 16, 0.55);
   background: rgba(0, 0, 0, 0.28);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   overflow: hidden;
 }
 
