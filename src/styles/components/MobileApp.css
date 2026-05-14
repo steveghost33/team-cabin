@@ -94,22 +94,18 @@
 }
 
 .m-hub-bandcamp {
-  padding: 0 1.5rem;
+  padding: 0 1rem;
   margin: 0.55rem 0 0.82rem;
   position: relative;
   z-index: 1;
   display: flex;
   justify-content: center;
-  --bandcamp-width: min(400px, calc(100vw - 3rem));
-  --bandcamp-scale: calc(var(--bandcamp-width) / 400);
-  --bandcamp-height: calc(120px * var(--bandcamp-scale));
-  --bandcamp-frame-padding: 6px;
-  height: calc(var(--bandcamp-height) + (var(--bandcamp-frame-padding) * 2));
+  height: calc(var(--bandcamp-visible-height, 120px) + 12px);
 }
 
 .m-hub-bandcamp-frame {
-  width: var(--bandcamp-width);
-  height: calc(var(--bandcamp-height) + (var(--bandcamp-frame-padding) * 2));
+  width: calc(var(--bandcamp-visible-width, 400px) + 8px);
+  height: calc(var(--bandcamp-visible-height, 120px) + 12px);
   border: 2px solid var(--color-gold);
   box-shadow: 4px 4px 0 rgba(160, 120, 16, 0.55);
   background: rgba(0, 0, 0, 0.28);
@@ -119,14 +115,24 @@
   overflow: hidden;
 }
 
+.m-hub-bandcamp-shell {
+  width: var(--bandcamp-visible-width, 400px);
+  height: var(--bandcamp-visible-height, 120px);
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
 .m-hub-bandcamp-embed {
   width: 400px;
   height: 120px;
   border: 0;
   display: block;
-  flex-shrink: 0;
-  transform: scale(var(--bandcamp-scale));
-  transform-origin: top center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scale(var(--bandcamp-scale, 1));
+  transform-origin: top left;
 }
 
 /* ── Nav buttons (linktree style) ── */

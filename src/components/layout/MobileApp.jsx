@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TCLogo from '../common/TCLogo';
 import { CHARS } from '../features/Characters';
 import { BAND_INFO, BOOKING_EMAIL, MEMBERS, SOCIAL_LINKS } from '../../config/constants';
@@ -19,6 +19,21 @@ const NAV_BUTTONS = [
 
 export default function MobileApp() {
   const [page, setPage] = useState(PAGES.HUB);
+  const [bandcampScale, setBandcampScale] = useState(1);
+
+  useEffect(() => {
+    const updateBandcampScale = () => {
+      const horizontalPadding = 32;
+      const frameAllowance = 4;
+      const availableWidth = Math.max(320, window.innerWidth - horizontalPadding - frameAllowance);
+      setBandcampScale(Math.min(1, availableWidth / 400));
+    };
+
+    updateBandcampScale();
+    window.addEventListener('resize', updateBandcampScale);
+
+    return () => window.removeEventListener('resize', updateBandcampScale);
+  }, []);
 
   if (page !== PAGES.HUB) {
     return (
@@ -66,19 +81,28 @@ export default function MobileApp() {
         </div>
       </div>
 
-      <div className="m-hub-bandcamp">
+      <div
+        className="m-hub-bandcamp"
+        style={{
+          '--bandcamp-scale': bandcampScale,
+          '--bandcamp-visible-width': `${400 * bandcampScale}px`,
+          '--bandcamp-visible-height': `${120 * bandcampScale}px`,
+        }}
+      >
         <div className="m-hub-bandcamp-frame">
-          <iframe
-            className="m-hub-bandcamp-embed"
-            src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
-            title="Tall Bike by Team Cabin"
-            loading="lazy"
-            seamless
-          >
-            <a href="https://teamcabin.bandcamp.com/album/tall-bike">
-              Tall Bike by Team Cabin
-            </a>
-          </iframe>
+          <div className="m-hub-bandcamp-shell">
+            <iframe
+              className="m-hub-bandcamp-embed"
+              src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
+              title="Tall Bike by Team Cabin"
+              loading="lazy"
+              seamless
+            >
+              <a href="https://teamcabin.bandcamp.com/album/tall-bike">
+                Tall Bike by Team Cabin
+              </a>
+            </iframe>
+          </div>
         </div>
       </div>
 
