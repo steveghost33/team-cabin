@@ -108,7 +108,7 @@ export default function MobileApp() {
         </div>
         <p className="m-hub-copy">© 2026 TEAM CABIN · DETROIT, MI</p>
         <a className="m-hub-contact" href={`mailto:${BOOKING_EMAIL}?subject=Team%20Cabin%20Booking%20Inquiry`}>
-          {BOOKING_EMAIL}
+          For Booking/Press: {BOOKING_EMAIL}
         </a>
       </footer>
     </div>

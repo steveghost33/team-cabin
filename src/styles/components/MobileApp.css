@@ -100,18 +100,19 @@
   z-index: 1;
   display: flex;
   justify-content: center;
-  --bandcamp-scale: min(1, calc((100vw - 3rem) / 400));
-  height: calc(120px * var(--bandcamp-scale));
-  overflow: hidden;
+  --bandcamp-width: min(400px, calc(100vw - 3rem));
+  --bandcamp-scale: calc(var(--bandcamp-width) / 400);
+  --bandcamp-height: calc(120px * var(--bandcamp-scale));
+  height: calc(var(--bandcamp-height) + 6px);
 }
 
 .m-hub-bandcamp-frame {
-  width: calc(400px * var(--bandcamp-scale));
-  height: calc(120px * var(--bandcamp-scale));
+  width: var(--bandcamp-width);
+  height: calc(var(--bandcamp-height) + 6px);
   border: 2px solid var(--color-gold);
   box-shadow: 4px 4px 0 rgba(160, 120, 16, 0.55);
   background: rgba(0, 0, 0, 0.28);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .m-hub-bandcamp-embed {
