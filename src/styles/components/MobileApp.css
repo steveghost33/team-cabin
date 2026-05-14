@@ -112,7 +112,10 @@
   border: 2px solid var(--color-gold);
   box-shadow: 4px 4px 0 rgba(160, 120, 16, 0.55);
   background: rgba(0, 0, 0, 0.28);
-  overflow: visible;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
 }
 
 .m-hub-bandcamp-embed {
