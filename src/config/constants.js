@@ -18,9 +18,9 @@ export const BAND_INFO = {
   name: 'Team Cabin',
   hometown: 'Detroit, Michigan',
   region: 'Detroit-area / Southeast Michigan',
-  genre: 'punk / pop punk / Midwest emo',
-  shortDescription: 'Detroit-area punk / pop punk / Midwest emo.',
-  description: 'Team Cabin is a Detroit-area punk / pop punk / Midwest emo band making hooky, raw songs for basement shows, house venues, and late-night drives.',
+  genre: 'punk',
+  shortDescription: "Detroit's finest punk trio",
+  description: '',
   latestRelease: {
     title: 'Tall Bike',
     type: 'Single',

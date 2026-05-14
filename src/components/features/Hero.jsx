@@ -15,9 +15,11 @@ export default function Hero() {
       <h1 className="hero__title">TEAM CABIN</h1>
 
       <p className="hero__subtitle">{BAND_INFO.shortDescription}</p>
-      <p className="hero__description">
-        {BAND_INFO.description} Based in {BAND_INFO.hometown}. Latest release: {BAND_INFO.latestRelease.title}.
-      </p>
+      {BAND_INFO.description && (
+        <p className="hero__description">
+          {BAND_INFO.description}
+        </p>
+      )}
 
       <div className="hero__actions">
         <a className="hero__action hero__action--primary" href="#music">

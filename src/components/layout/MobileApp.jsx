@@ -48,9 +48,11 @@ export default function MobileApp() {
         </div>
         <h1 className="m-hub-title">TEAM CABIN</h1>
         <p className="m-hub-subtitle">{BAND_INFO.shortDescription}</p>
-        <p className="m-hub-description">
-          Based in {BAND_INFO.hometown}. Listen to {BAND_INFO.latestRelease.title} and hit us up for booking or press.
-        </p>
+        {BAND_INFO.description && (
+          <p className="m-hub-description">
+            {BAND_INFO.description}
+          </p>
+        )}
         <div className="m-hub-chars">
           {MEMBERS.map((member, i) => {
             const Char = CHARS[member.charId];
@@ -65,17 +67,19 @@ export default function MobileApp() {
       </div>
 
       <div className="m-hub-bandcamp">
-        <iframe
-          className="m-hub-bandcamp-frame"
-          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
-          title="Tall Bike by Team Cabin"
-          loading="lazy"
-          seamless
-        >
-          <a href="https://teamcabin.bandcamp.com/album/tall-bike">
-            Tall Bike by Team Cabin
-          </a>
-        </iframe>
+        <div className="m-hub-bandcamp-frame">
+          <iframe
+            className="m-hub-bandcamp-embed"
+            src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
+            title="Tall Bike by Team Cabin"
+            loading="lazy"
+            seamless
+          >
+            <a href="https://teamcabin.bandcamp.com/album/tall-bike">
+              Tall Bike by Team Cabin
+            </a>
+          </iframe>
+        </div>
       </div>
 
       <nav className="m-hub-nav" aria-label="Main navigation">
