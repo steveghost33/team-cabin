@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import TCLogo from '../common/TCLogo';
+import { getSafeExternalUrl } from '../../utils/safeUrl';
 import { CHARS } from '../features/Characters';
 import { BAND_INFO, BOOKING_EMAIL, MEMBERS, SOCIAL_LINKS } from '../../config/constants';
 import Music from '../features/Music';
@@ -134,6 +135,17 @@ export default function MobileApp() {
         <a className="m-hub-contact" href={`mailto:${BOOKING_EMAIL}?subject=Team%20Cabin%20Booking%20Inquiry`}>
           For Booking/Press: {BOOKING_EMAIL}
         </a>
+        <p className="m-hub-credit">
+          Created by{' '}
+          <a
+            href={getSafeExternalUrl('https://www.ellatechsolutions.com')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="m-hub-credit-link"
+          >
+            Ella Tech Solutions
+          </a>
+        </p>
       </footer>
     </div>
   );

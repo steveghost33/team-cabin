@@ -87,6 +87,17 @@ export default function Footer() {
       <p className="footer__tagline">
         No pizza was harmed in the making of this website 🍕
       </p>
+      <p className="footer__credit">
+        Created by{' '}
+        <a
+          href={getSafeExternalUrl('https://www.ellatechsolutions.com')}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer__credit-link"
+        >
+          Ella Tech Solutions
+        </a>
+      </p>
     </footer>
   );
 }

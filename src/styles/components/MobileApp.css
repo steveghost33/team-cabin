@@ -250,6 +250,26 @@
   text-decoration: none;
 }
 
+.m-hub-credit {
+  font-family: var(--font-pixel);
+  font-size: 0.28rem;
+  color: rgba(245, 240, 220, 0.45);
+  text-align: center;
+  letter-spacing: 0.05em;
+  margin-top: 0.2rem;
+}
+
+.m-hub-credit-link {
+  color: var(--color-gold-light);
+  text-decoration: none;
+}
+
+.m-hub-credit-link:active,
+.m-hub-credit-link:focus-visible {
+  color: var(--color-gold);
+  outline: none;
+}
+
 /* ═══════════════════════════════════════════════
    SECTION PAGES — sticky back button + scrollable content
    ═══════════════════════════════════════════════ */
