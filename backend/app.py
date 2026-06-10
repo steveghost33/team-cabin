@@ -1,3 +1,4 @@
+import math
 import sqlite3
 import os
 from flask import Flask, request, jsonify
@@ -6,7 +7,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+# Reject oversized request bodies outright (a single score submission is
+# only ever a few dozen bytes of JSON).
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024
+
 DB_PATH = os.environ.get("DB_PATH", "leaderboard.db")
+
+MAX_NAME_LENGTH = 32
+MAX_SCORE = 10_000_000
 
 
 def get_db():
@@ -37,15 +45,28 @@ def post_score():
     if player_name is None or score is None:
         return jsonify({"error": "playerName and score are required"}), 400
 
-    if not isinstance(score, (int, float)):
+    if not isinstance(player_name, str):
+        return jsonify({"error": "playerName must be a string"}), 400
+
+    player_name = player_name.strip()
+    if not player_name:
+        return jsonify({"error": "playerName must not be empty"}), 400
+    if len(player_name) > MAX_NAME_LENGTH:
+        return jsonify({"error": f"playerName must be at most {MAX_NAME_LENGTH} characters"}), 400
+
+    if isinstance(score, bool) or not isinstance(score, (int, float)):
         return jsonify({"error": "score must be a number"}), 400
+    if not math.isfinite(score):
+        return jsonify({"error": "score must be a finite number"}), 400
 
     score = int(score)
+    if score < 0 or score > MAX_SCORE:
+        return jsonify({"error": f"score must be between 0 and {MAX_SCORE}"}), 400
 
     with get_db() as conn:
         conn.execute(
             "INSERT INTO scores (player_name, score) VALUES (?, ?)",
-            (str(player_name), score),
+            (player_name, score),
         )
         conn.commit()
 
@@ -89,4 +110,5 @@ init_db()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
-    app.run(debug=True, port=port)
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug, port=port)
