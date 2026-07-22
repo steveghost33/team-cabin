@@ -40,12 +40,12 @@ export const NAV_LINKS = [
 // feat: true → gold highlight border
 export const SHOWS = [
   {
-    id: '2026-05-08-ypsi-ale-house',
-    date: '2026-05-08T20:00:00-04:00',
-    venue: 'Ypsi Ale House',
-    city: 'Ypsilanti',
+    id: '2026-08-29-a2-funhouse',
+    date: '2026-08-29T20:00:00-04:00',
+    venue: 'A2 Funhouse',
+    city: 'Ann Arbor',
     state: 'MI',
-    details: 'w/ Shindig Machine, Frost Is Rad & Twin Deer',
+    details: 'w/ Shindig Machine & Slug Love',
     featured: true,
   },
 ];
