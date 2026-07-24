@@ -94,13 +94,13 @@ export default function MobileApp() {
           <div className="m-hub-bandcamp-shell">
             <iframe
               className="m-hub-bandcamp-embed"
-              src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
-              title="Tall Bike by Team Cabin"
+              src="https://bandcamp.com/EmbeddedPlayer/track=3023152083/size=large/bgcol=333333/linkcol=e99708/tracklist=false/artwork=small/transparent=true/"
+              title="Sucker Punch by Team Cabin"
               loading="lazy"
               seamless
             >
-              <a href="https://teamcabin.bandcamp.com/album/tall-bike">
-                Tall Bike by Team Cabin
+              <a href="https://teamcabin.bandcamp.com/track/sucker-punch">
+                Sucker Punch by Team Cabin
               </a>
             </iframe>
           </div>

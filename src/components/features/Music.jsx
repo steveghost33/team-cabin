@@ -70,8 +70,8 @@ export default function Music({ linksOnly = false }) {
       <div className="music__embed-wrap">
         <iframe
           className="music__embed"
-          src="https://bandcamp.com/EmbeddedPlayer/album=3306975666/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/"
-          title="Tall Bike by Team Cabin"
+          src="https://bandcamp.com/EmbeddedPlayer/track=3023152083/size=large/bgcol=333333/linkcol=ffffff/tracklist=false/artwork=small/transparent=true/"
+          title="Sucker Punch by Team Cabin"
           loading="lazy"
           referrerPolicy="strict-origin-when-cross-origin"
           sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
