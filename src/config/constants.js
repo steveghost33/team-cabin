@@ -53,11 +53,11 @@ export const SHOWS = [
 // ── Music Streaming Links ──
 export const MUSIC_LINKS = [
   { name: 'Bandcamp',      icon: '◎', color: '#1da0c3', bg: 'rgba(29,160,195,0.1)',  url: 'https://teamcabin.bandcamp.com/track/sucker-punch' },
-  { name: 'Apple Music',   icon: '♪', color: '#fc3c44', bg: 'rgba(252,60,68,0.1)',   url: 'https://music.apple.com/us/album/tall-bike-single/1895354765' },
-  { name: 'YouTube Music', icon: '▶', color: '#ff0000', bg: 'rgba(255,0,0,0.1)',     url: 'https://music.youtube.com/channel/UCTjflMMBBqxCs2oUNMVLIuA?si=15mKpkFEZfdxr3v7' },
+  { name: 'Apple Music',   icon: '♪', color: '#fc3c44', bg: 'rgba(252,60,68,0.1)',   url: 'https://music.apple.com/us/song/sucker-punch/6793631889' },
+  { name: 'YouTube Music', icon: '▶', color: '#ff0000', bg: 'rgba(255,0,0,0.1)',     url: 'https://music.youtube.com/watch?v=0cWD5QburyI&si=aMe8o2DHZWREgxFL' },
   { name: 'YouTube',       icon: '▶', color: '#ff4444', bg: 'rgba(255,68,68,0.1)',   url: 'https://www.youtube.com/watch?v=DzjUkpx3O6g', label: 'Watch Now →' },
-  { name: 'Amazon Music',  icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.1)',   url: 'https://music.amazon.com/albums/B0GTWT6XVK?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_Q6SpmxblyKtmfFX6S9g9z92Da&trackAsin=B0GTXBRZCY' },
-  { name: 'Spotify',       icon: '♫', color: '#1db954', bg: 'rgba(29,185,84,0.1)',   url: 'https://open.spotify.com/album/7LCGYsups8nXjBB3NLyZkn?si=FhNynvoOSQ66DuGgyM3-zg' },
+  { name: 'Amazon Music',  icon: '★', color: '#ff9900', bg: 'rgba(255,153,0,0.1)',   url: 'https://music.amazon.com/albums/B0H9ZJ3MWB?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_lyZmIhvzLnHDQQrUTvsDUbu35' },
+  { name: 'Spotify',       icon: '♫', color: '#1db954', bg: 'rgba(29,185,84,0.1)',   url: 'https://open.spotify.com/track/52LyCMj1ADoZbhueELNdH9?si=cf19130777a74145' },
 ];
 
 // ── Social / Footer Links ──
