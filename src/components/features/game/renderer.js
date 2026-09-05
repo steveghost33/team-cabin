@@ -84,14 +84,14 @@ export function renderFrame(ctx, engine, frame) {
 
   // ── DETROIT LANDMARKS ───────────────────────
   if (engine.lvlIdx === 2) {
-    const piescibx = 500 - scrollX;
+    const piescibx = 600 - scrollX;
     if (piescibx > -200 && piescibx < W + 20) drawPieSci(ctx, piescibx, frame);
-    const spiritbx = 1800 - scrollX;
-    if (spiritbx > -200 && spiritbx < W + 20) drawSpiritOfDetroit(ctx, spiritbx, frame);
-    const fistbx = 3200 - scrollX;
-    if (fistbx > -200 && fistbx < W + 20) drawJoeLouisFist(ctx, fistbx, frame);
-    const magicbx = 5600 - scrollX;
-    if (magicbx > -280 && magicbx < W + 20) drawMagicStick(ctx, magicbx, frame);
+    const spiritbx = 2200 - scrollX;
+    if (spiritbx > -240 && spiritbx < W + 20) drawSpiritOfDetroit(ctx, spiritbx, frame);
+    const fistbx = 3900 - scrollX;
+    if (fistbx > -220 && fistbx < W + 20) drawJoeLouisFist(ctx, fistbx, frame);
+    const magicbx = 5700 - scrollX;
+    if (magicbx > -300 && magicbx < W + 20) drawMajestic(ctx, magicbx, frame);
   }
 
   // ── GROUND ───────────────────────────────────
@@ -179,7 +179,7 @@ function drawSky(ctx, lvl, frame, scrollX) {
   }
 
   // far bg silhouette buildings
-  ctx.fillStyle = lvl.hasSun ? 'rgba(80,50,20,0.18)' : 'rgba(4,8,6,0.7)';
+  ctx.fillStyle = lvl.silhouetteColor || (lvl.hasSun ? 'rgba(80,50,20,0.18)' : 'rgba(4,8,6,0.7)');
   for (let i = 0; i < 10; i++) {
     const bx = ((i*105 - scrollX*0.1) % (W+200) + W+200) % (W+200) - 100;
     ctx.fillRect(bx, GROUND-45-(i%4)*22, 40+(i%3)*14, 45+(i%4)*22);
@@ -220,7 +220,7 @@ function drawBuilding(ctx, b, scrollX, lvl, frame) {
       if (wx+10 < bx+b.w-4) {
         const lit = Math.sin(frame*0.013+r*1.8+c*0.9+b.x*0.01) > 0;
         const useAlt = wc2 && (r+c)%3===0;
-        ctx.fillStyle = lit ? (useAlt ? wc2 : wc) : (lvl.hasSun ? '#e8d8b0' : '#091505');
+        ctx.fillStyle = lit ? (useAlt ? wc2 : wc) : (lvl.hasSun ? '#e8d8b0' : (lvl.unlitWindow || '#091505'));
         if (lit) { ctx.shadowBlur=4; ctx.shadowColor = useAlt ? wc2 : wc; }
         ctx.fillRect(wx, wy, 10, 10);
         ctx.shadowBlur=0;
@@ -324,7 +324,7 @@ function drawWaterTower(ctx, scrollX) {
     for (let x = xOff; x < 36; x += 22) ctx.fillRect(bx - 18 + x, by - 106 + row * 9, 1, 9);
   }
   // right-side shading on cylinder
-  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.fillRect(bx + 9, by - 106, 9, 106);
 
   // small round window (cross inside circle — characteristic detail)
@@ -2050,14 +2050,14 @@ function drawDetroitBackground(ctx, scrollX, frame) {
 
 function drawDetroitDilapidated(ctx, bx, by, bw, bh) {
   // brick wall
-  ctx.fillStyle = '#1a0f0a';
+  ctx.fillStyle = '#2d1c12';
   ctx.fillRect(bx, by, bw, bh);
-  ctx.fillStyle = '#231409';
+  ctx.fillStyle = '#3b2513';
   for (let row = 0; row < bh; row += 9) {
     const off = (Math.floor(row / 9) % 2) * 10;
     for (let col = -off; col < bw; col += 20) ctx.fillRect(bx + col, by + row, 18, 7);
   }
-  ctx.fillStyle = '#120c07';
+  ctx.fillStyle = '#20150d';
   for (let row = 0; row < bh; row += 9) ctx.fillRect(bx, by + row, bw, 2);
   // dark/broken windows
   const wCols = Math.max(2, Math.floor(bw / 26));
@@ -2066,28 +2066,28 @@ function drawDetroitDilapidated(ctx, bx, by, bw, bh) {
     for (let wc = 0; wc < wCols; wc++) {
       const wx = bx + 8 + wc * 26, wy = by + 10 + wr * 30;
       const broken = (wr * wCols + wc) % 3 === 0;
-      ctx.fillStyle = broken ? '#090404' : '#0e0909';
+      ctx.fillStyle = broken ? '#150c0a' : '#1c1412';
       ctx.fillRect(wx, wy, 15, 17);
       if (broken) {
-        ctx.strokeStyle = '#1e0a0a'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#2e1512'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(wx+2, wy); ctx.lineTo(wx+11, wy+11); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(wx+10, wy+2); ctx.lineTo(wx+3, wy+15); ctx.stroke();
       }
     }
   }
   // jagged roofline
-  ctx.fillStyle = '#100c07';
+  ctx.fillStyle = '#1e160e';
   const nw = Math.max(7, bw / 7);
   for (let i = 0; i < bw; i += nw) {
     if (Math.floor(i / nw) % 3 === 1) ctx.fillRect(bx + i, by - 5 - (i * 3) % 10, nw * 0.65, 7);
   }
   // rebar stubs
-  ctx.strokeStyle = '#2a1a09'; ctx.lineWidth = 1;
+  ctx.strokeStyle = '#3d2a12'; ctx.lineWidth = 1;
   for (let i = 1; i <= 3; i++) {
     ctx.beginPath(); ctx.moveTo(bx + bw * (i / 4), by); ctx.lineTo(bx + bw * (i / 4), by - 6 - i * 2); ctx.stroke();
   }
   // rubble at base
-  ctx.fillStyle = '#1c110a';
+  ctx.fillStyle = '#2e1e12';
   for (let i = 0; i < bw; i += 15) {
     if ((i * 7) % 11 < 5) ctx.fillRect(bx + i, GROUND - 5, 11, 5);
   }
@@ -2098,18 +2098,18 @@ function drawDetroitMural(ctx, bx, by, bw, bh, type, _frame) {
   const img = imgMap[type];
 
   // dark wall base (fallback if image not loaded)
-  ctx.fillStyle = '#0f0c10';
+  ctx.fillStyle = '#221c22';
   ctx.fillRect(bx, by, bw, bh);
 
   if (img && img.complete && img.naturalWidth > 0) {
-    // draw actual mural photo, slightly darkened for 2AM atmosphere
+    // draw actual mural photo, lightly dimmed for 2AM atmosphere
     ctx.drawImage(img, bx, by, bw, bh);
-    ctx.fillStyle = 'rgba(0,0,0,0.28)';
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
     ctx.fillRect(bx, by, bw, bh);
   }
 
   // roof cap + side edges to ground the building
-  ctx.fillStyle = '#0c090d';
+  ctx.fillStyle = '#191419';
   ctx.fillRect(bx, by, bw, 4);
   ctx.fillRect(bx - 3, by, 3, bh);
   ctx.fillRect(bx + bw, by, 3, bh);
@@ -2155,326 +2155,506 @@ function drawPieSci(ctx, bx, frame) {
 }
 
 // ── SPIRIT OF DETROIT STATUE ──────────────────────────────────────────────────
+// Reference: the real memorial on Woodward — a concave white marble wall whose
+// top edge scoops downward in the middle, two carved seals (City of Detroit,
+// Wayne County 1796), the 2 Corinthians inscription in gilt letters, and the
+// green bronze figure seated cross-legged on a LOW marble base (no tall
+// pedestal): gilt sunburst sphere in the raised hand, gilt family group in the
+// lower outstretched hand, planting bed + iron fence across the front.
 function drawSpiritOfDetroit(ctx, bx, frame) {
-  // Total footprint ~220px wide to capture full arm spread
-  const bw = 220;
+  const bw = 240;
   const by = GROUND;
-  const cx = bx + bw / 2; // statue center x
+  const cx = bx + bw / 2;
+  const wl = bx + 12, wr = bx + bw - 12;   // wall left / right edges
+  const wTop = by - 262;                   // wall top at the outer edges
+  const wBot = by - 12;
 
-  // ── marble backing wall (flat rectangular slab, per the real memorial) ──
-  ctx.fillStyle = '#d4cfc8';
-  ctx.fillRect(bx + 10, by - 236, bw - 20, 222);
-  // marble tile seams
-  ctx.strokeStyle = 'rgba(160,155,148,0.5)'; ctx.lineWidth = 1;
-  for (let ty = by - 236; ty < by - 14; ty += 36) {
-    ctx.beginPath(); ctx.moveTo(bx+10, ty); ctx.lineTo(bx+bw-10, ty); ctx.stroke();
+  // ── concave marble wall (top edge scoops down through the middle) ────
+  ctx.beginPath();
+  ctx.moveTo(wl, wBot);
+  ctx.lineTo(wl, wTop);
+  ctx.quadraticCurveTo(cx, wTop + 34, wr, wTop);
+  ctx.lineTo(wr, wBot);
+  ctx.closePath();
+  const mg = ctx.createLinearGradient(wl, 0, wr, 0);
+  mg.addColorStop(0,    '#b5b0a8');
+  mg.addColorStop(0.45, '#e7e3db');
+  mg.addColorStop(1,    '#c2bdb4');
+  ctx.fillStyle = mg; ctx.fill();
+  ctx.save(); ctx.clip();
+
+  // marble course seams — they bow with the curve of the wall
+  ctx.strokeStyle = 'rgba(152,147,140,0.4)'; ctx.lineWidth = 1;
+  for (let ty = wTop + 22; ty < wBot; ty += 32) {
+    ctx.beginPath(); ctx.moveTo(wl, ty);
+    ctx.quadraticCurveTo(cx, ty + 10, wr, ty); ctx.stroke();
   }
-  // marble veining lines
-  ctx.strokeStyle = 'rgba(180,175,168,0.6)'; ctx.lineWidth = 1;
-  [[bx+30,by-30,bx+60,by-180],[bx+80,by-20,bx+100,by-220],[bx+140,by-25,bx+160,by-210]].forEach(([x1,y1,x2,y2])=>{
+  // marble panel joints
+  for (let vx = wl + 40; vx < wr; vx += 40) {
+    ctx.beginPath(); ctx.moveTo(vx, wTop); ctx.lineTo(vx, wBot); ctx.stroke();
+  }
+  // soft veining
+  ctx.strokeStyle = 'rgba(170,165,157,0.45)';
+  [[wl+26,wBot,wl+48,wTop+70],[cx-12,wBot-20,cx+12,wTop+56],[wr-32,wBot-8,wr-54,wTop+80]]
+    .forEach(([x1,y1,x2,y2]) => { ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); });
+  ctx.restore();
+
+  // small dark vents punched along the top edge, following the curve
+  ctx.fillStyle = 'rgba(64,62,58,0.7)';
+  for (let i = 1; i < 9; i++) {
+    const t = i / 9;
+    const vx = wl + (wr - wl) * t;
+    const vy = wTop + Math.sin(Math.PI * t) * 26 + 10;
+    ctx.fillRect(vx - 2, vy, 4, 4);
+  }
+
+  // ── the two carved seals — City of Detroit (left, lower), Wayne County ──
+  const drawSeal = (sx, sy, r, l1, l2) => {
+    ctx.fillStyle = '#d5d0c7'; ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = 'rgba(146,140,130,0.85)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI*2); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(sx, sy, r - 5, 0, Math.PI*2); ctx.stroke();
+    // lettering ring, suggested with tick marks
+    ctx.strokeStyle = 'rgba(150,144,134,0.65)';
+    for (let a = 0; a < 22; a++) {
+      const th = (a / 22) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(sx + Math.cos(th) * (r - 4), sy + Math.sin(th) * (r - 4));
+      ctx.lineTo(sx + Math.cos(th) * (r - 2), sy + Math.sin(th) * (r - 2));
+      ctx.stroke();
+    }
+    // two figures in low relief inside the seal
+    ctx.strokeStyle = 'rgba(138,132,122,0.95)'; ctx.lineWidth = 1.4;
+    [-4.5, 4.5].forEach(o => {
+      ctx.beginPath(); ctx.moveTo(sx + o, sy - 2); ctx.lineTo(sx + o, sy + 5); ctx.stroke();
+      ctx.beginPath(); ctx.arc(sx + o, sy - 4.5, 1.8, 0, Math.PI*2); ctx.stroke();
+    });
+    ctx.beginPath(); ctx.moveTo(sx - 3, sy - 1); ctx.lineTo(sx + 3, sy - 1); ctx.stroke();
+    ctx.fillStyle = 'rgba(126,120,110,0.9)'; ctx.font = '3px "Press Start 2P"'; ctx.textAlign = 'center';
+    ctx.fillText(l1, sx, sy + r - 7);
+    ctx.fillText(l2, sx, sy + r - 2);
+  };
+  drawSeal(cx - 48, by - 202, 22, 'CITY OF', 'DETROIT');
+  drawSeal(cx + 46, by - 222, 20, 'WAYNE CO', '1796');
+
+  // ── inscription — 2 Corinthians 3:17, gilt letters carved in the marble ──
+  ctx.fillStyle = 'rgba(152,122,52,0.9)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('"NOW THE LORD IS THAT SPIRIT', cx, by - 166);
+  ctx.fillText('AND WHERE THE SPIRIT OF THE', cx, by - 157);
+  ctx.fillText('LORD IS, THERE IS LIBERTY."', cx, by - 148);
+
+  // ── low marble base the figure sits on ───────────────────────────────
+  ctx.fillStyle = '#ded9d0'; ctx.fillRect(cx - 74, by - 30, 148, 18);
+  ctx.fillStyle = '#c4bfb6'; ctx.fillRect(cx - 74, by - 14, 148, 4);
+  ctx.fillStyle = '#eae6de';
+  ctx.beginPath(); ctx.ellipse(cx, by - 30, 70, 8, 0, Math.PI, Math.PI*2); ctx.fill();
+
+  // ── verdigris bronze figure, seated cross-legged ─────────────────────
+  const fy = by - 30;                    // seat line (top of the marble base)
+  const V1 = '#4c9a76', V2 = '#3a7d5e', V3 = '#63b892', Vd = '#25583f';
+
+  // folded legs — thighs out to the sides, shins crossed in front
+  ctx.fillStyle = V2;
+  ctx.beginPath(); ctx.ellipse(cx - 26, fy - 7, 28, 11, -0.16, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx + 26, fy - 7, 28, 11,  0.16, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = V1;
+  ctx.beginPath(); ctx.ellipse(cx - 12, fy - 2, 23, 8,  0.10, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx + 12, fy - 2, 23, 8, -0.10, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = Vd;   // bare feet tucked at the sides
+  ctx.beginPath(); ctx.ellipse(cx - 40, fy - 3, 9, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx + 40, fy - 3, 9, 6, 0, 0, Math.PI*2); ctx.fill();
+
+  // draped cloth across the lap
+  ctx.fillStyle = V2;
+  ctx.beginPath();
+  ctx.moveTo(cx - 34, fy - 16);
+  ctx.quadraticCurveTo(cx, fy + 3, cx + 34, fy - 16);
+  ctx.quadraticCurveTo(cx + 30, fy - 26, cx - 30, fy - 26);
+  ctx.fill();
+  ctx.strokeStyle = Vd; ctx.lineWidth = 1;
+  [[cx-14,fy-24,cx-9,fy-5],[cx+1,fy-25,cx+3,fy-5],[cx+15,fy-24,cx+10,fy-6]].forEach(([x1,y1,x2,y2]) => {
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
   });
-  // MICHIGAN state seal medallion at top of wall
-  ctx.strokeStyle='#a89e8e'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.arc(cx, by-222, 18, 0, Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#c8c2ba'; ctx.beginPath(); ctx.arc(cx, by-222, 16, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle='#8a7e70'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MICHIGAN', cx, by-220);
 
-  // inscription — 2 Corinthians 3:17, carved into the marble below the seal
-  const glow = 0.6 + Math.sin(frame * 0.04) * 0.2;
-  ctx.fillStyle='rgba(120,105,80,0.8)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('"NOW THE LORD"', cx, by-192);
-  ctx.fillText('IS THAT SPIRIT"', cx, by-183);
-
-  // ── pedestal (tiered, granite) ──
-  // bottom slab
-  ctx.fillStyle='#4a4a4a'; ctx.fillRect(cx-52, by-16, 104, 16);
-  ctx.fillStyle='#3a3a3a'; ctx.fillRect(cx-48, by-20, 96, 6);
-  // mid pedestal
-  ctx.fillStyle='#555'; ctx.fillRect(cx-44, by-50, 88, 32);
-  ctx.fillStyle='#E2A820'; ctx.fillRect(cx-44, by-52, 88, 3); ctx.fillRect(cx-44, by-20, 88, 3);
-  // upper pedestal block (statue sits here)
-  ctx.fillStyle='#5e5e5e'; ctx.fillRect(cx-38, by-82, 76, 34);
-  ctx.fillStyle='#E2A820'; ctx.fillRect(cx-38, by-84, 76, 3); ctx.fillRect(cx-38, by-50, 76, 3);
-  // pedestal text
-  ctx.fillStyle=`rgba(226,168,32,${glow})`; ctx.font='5px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.shadowBlur=6; ctx.shadowColor='#E2A820';
-  ctx.fillText('SPIRIT OF', cx, by-68); ctx.fillText('DETROIT', cx, by-59);
-  ctx.shadowBlur=0;
-
-  // ── verdigris bronze figure — seated cross-legged ──
-  const fy = by - 82; // feet-of-torso Y (statue sits on top pedestal)
-  const V1 = '#3d8c6a', V2 = '#2e6b50', V3 = '#4aaa80', Vd = '#1e4a38';
-
-  // cross-legged base (thighs + shins folded)
-  // left thigh going left
-  ctx.fillStyle=V1;
-  ctx.beginPath(); ctx.ellipse(cx-14, fy+4, 22, 10, -0.3, 0, Math.PI*2); ctx.fill();
-  // right thigh going right
-  ctx.beginPath(); ctx.ellipse(cx+14, fy+4, 22, 10, 0.3, 0, Math.PI*2); ctx.fill();
-  // left shin folded across
-  ctx.fillStyle=V2;
-  ctx.beginPath(); ctx.ellipse(cx-8, fy+10, 18, 7, 0.2, 0, Math.PI*2); ctx.fill();
-  // right shin folded across
-  ctx.beginPath(); ctx.ellipse(cx+8, fy+10, 18, 7, -0.2, 0, Math.PI*2); ctx.fill();
-  // feet visible at sides
-  ctx.fillStyle=Vd;
-  ctx.beginPath(); ctx.ellipse(cx-28, fy+14, 8, 5, 0, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(cx+28, fy+14, 8, 5, 0, 0, Math.PI*2); ctx.fill();
-
-  // draped cloth over lower body
-  ctx.fillStyle=V2;
+  // torso — broad chest, upright
+  ctx.fillStyle = V1;
   ctx.beginPath();
-  ctx.moveTo(cx-30, fy+2);
-  ctx.quadraticCurveTo(cx, fy+18, cx+30, fy+2);
-  ctx.quadraticCurveTo(cx+28, fy-4, cx-28, fy-4);
+  ctx.moveTo(cx - 22, fy - 20);
+  ctx.lineTo(cx - 27, fy - 72);
+  ctx.quadraticCurveTo(cx, fy - 82, cx + 27, fy - 72);
+  ctx.lineTo(cx + 22, fy - 20);
   ctx.fill();
-  // cloth fold lines
-  ctx.strokeStyle=Vd; ctx.lineWidth=1;
-  [[cx-10,fy-2,cx-6,fy+14],[cx+2,fy-1,cx+4,fy+14],[cx+12,fy-2,cx+8,fy+13]].forEach(([x1,y1,x2,y2])=>{
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  });
+  ctx.fillStyle = V2; ctx.fillRect(cx - 26, fy - 70, 7, 48); ctx.fillRect(cx + 19, fy - 70, 7, 48);
+  ctx.fillStyle = V3;                                     // chest highlight
+  ctx.beginPath(); ctx.ellipse(cx, fy - 52, 10, 15, 0, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = Vd; ctx.lineWidth = 1;                // sternum
+  ctx.beginPath(); ctx.moveTo(cx, fy - 60); ctx.lineTo(cx, fy - 26); ctx.stroke();
 
-  // torso — broad, slightly forward-leaning
-  ctx.fillStyle=V1;
-  ctx.beginPath();
-  ctx.moveTo(cx-20, fy-4);
-  ctx.lineTo(cx-24, fy-52);
-  ctx.quadraticCurveTo(cx, fy-60, cx+24, fy-52);
-  ctx.lineTo(cx+20, fy-4);
-  ctx.fill();
-  // torso shading / musculature
-  ctx.fillStyle=V2; ctx.fillRect(cx-22, fy-50, 6, 42); ctx.fillRect(cx+16, fy-50, 6, 42);
-  ctx.fillStyle=V3;
-  ctx.beginPath(); ctx.ellipse(cx, fy-28, 8, 14, 0, 0, Math.PI*2); ctx.fill();
+  // ── arms — drawn as jointed limbs so shoulder, elbow and hand connect ──
+  const rSh = [cx + 24, fy - 68], rEl = [cx + 54, fy - 82], rHd = [cx + 78, fy - 108];
+  const lSh = [cx - 24, fy - 66], lEl = [cx - 54, fy - 60], lHd = [cx - 80, fy - 48];
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const limb = (a, b, c, w) => {
+    ctx.strokeStyle = V1; ctx.lineWidth = w;
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.stroke();
+    ctx.strokeStyle = V2; ctx.lineWidth = w * 0.34;       // underside shading
+    ctx.beginPath(); ctx.moveTo(a[0], a[1] + w * 0.28); ctx.lineTo(b[0], b[1] + w * 0.28); ctx.stroke();
+  };
+  limb(rSh, rEl, rHd, 13);                                 // raised arm (viewer right)
+  limb(lSh, lEl, lHd, 13);                                 // outstretched arm (viewer left)
+  // deltoids
+  ctx.fillStyle = V1;
+  ctx.beginPath(); ctx.arc(rSh[0], rSh[1], 7, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(lSh[0], lSh[1], 7, 0, Math.PI*2); ctx.fill();
 
-  // ── RIGHT arm — raised up-right, palm holding sunburst sphere ──
-  // upper arm
-  ctx.fillStyle=V1; ctx.save(); ctx.translate(cx+20, fy-46);
-  ctx.rotate(-0.9); ctx.fillRect(-6,-36,12,38); ctx.restore();
-  // forearm continues up-right
-  ctx.save(); ctx.translate(cx+44, fy-76);
-  ctx.rotate(-0.55); ctx.fillStyle=V1; ctx.fillRect(-5,-30,10,32); ctx.restore();
-  // open upturned palm (right)
-  ctx.fillStyle=V2;
-  ctx.beginPath(); ctx.ellipse(cx+62, fy-100, 10, 6, 0.4, 0, Math.PI*2); ctx.fill();
-  // fingers spread (right hand)
-  ctx.strokeStyle=V1; ctx.lineWidth=4;
-  [[-0.6,-12],[-0.2,-13],[0.2,-13],[0.6,-11],[1.0,-8]].forEach(([a,len])=>{
-    ctx.beginPath(); ctx.moveTo(cx+62, fy-100);
-    ctx.lineTo(cx+62+Math.sin(a)*Math.abs(len), fy-100+Math.cos(a)*len); ctx.stroke();
-  });
+  // open, upturned palms with spread fingers
+  const palm = (hx, hy, tilt) => {
+    ctx.fillStyle = V2;
+    ctx.beginPath(); ctx.ellipse(hx, hy, 11, 5.5, tilt, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = V1; ctx.lineWidth = 3;
+    [-7, -2.5, 2, 6.5].forEach(fx => {
+      ctx.beginPath(); ctx.moveTo(hx + fx * 0.7, hy - 1); ctx.lineTo(hx + fx, hy - 8); ctx.stroke();
+    });
+  };
+  palm(rHd[0], rHd[1], 0.2);
+  palm(lHd[0], lHd[1], -0.2);
+  ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
 
-  // sunburst sphere (right hand)
-  const sphPulse = 0.8 + Math.sin(frame * 0.05) * 0.2;
-  const sx = cx+62, sy = fy - 118;
-  // outer glow
-  ctx.shadowBlur=18; ctx.shadowColor='rgba(226,168,32,0.9)';
-  ctx.fillStyle=`rgba(226,168,32,${sphPulse*0.4})`;
-  ctx.beginPath(); ctx.arc(sx, sy, 20, 0, Math.PI*2); ctx.fill();
-  // sunburst rays
-  ctx.strokeStyle=`rgba(226,168,32,${sphPulse})`; ctx.lineWidth=2;
-  for (let r=0; r<12; r++) {
-    const a = (r/12)*Math.PI*2;
-    const r0=13, r1=22+Math.sin(frame*0.08+r)*2;
-    ctx.beginPath(); ctx.moveTo(sx+Math.cos(a)*r0, sy+Math.sin(a)*r0);
-    ctx.lineTo(sx+Math.cos(a)*r1, sy+Math.sin(a)*r1); ctx.stroke();
+  // gilt sphere with sunburst rays, resting on the raised palm
+  const pulse = 0.78 + Math.sin(frame * 0.05) * 0.18;
+  const sx = rHd[0] + 1, sy = rHd[1] - 21;
+  ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(226,168,32,0.85)';
+  ctx.strokeStyle = `rgba(226,168,32,${pulse})`; ctx.lineWidth = 2;
+  for (let r = 0; r < 14; r++) {
+    const a = (r / 14) * Math.PI * 2;
+    const r0 = 12, r1 = 23 + Math.sin(frame * 0.07 + r) * 2;
+    ctx.beginPath(); ctx.moveTo(sx + Math.cos(a)*r0, sy + Math.sin(a)*r0);
+    ctx.lineTo(sx + Math.cos(a)*r1, sy + Math.sin(a)*r1); ctx.stroke();
   }
-  // sphere body
-  ctx.fillStyle=`rgba(226,168,32,${sphPulse})`;
-  ctx.beginPath(); ctx.arc(sx, sy, 12, 0, Math.PI*2); ctx.fill();
-  // sphere highlight
-  ctx.fillStyle='rgba(255,240,160,0.6)';
-  ctx.beginPath(); ctx.arc(sx-3, sy-3, 5, 0, Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
+  ctx.fillStyle = `rgba(226,168,32,${pulse})`;
+  ctx.beginPath(); ctx.arc(sx, sy, 11, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,243,178,0.7)';
+  ctx.beginPath(); ctx.arc(sx - 3, sy - 3, 4, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
 
-  // ── LEFT arm — extended outward-left, palm holding small golden figure ──
-  // upper arm
-  ctx.fillStyle=V1; ctx.save(); ctx.translate(cx-20, fy-44);
-  ctx.rotate(0.5); ctx.fillRect(-6,-10,12,38); ctx.restore();
-  // forearm continues left-outward
-  ctx.save(); ctx.translate(cx-46, fy-28);
-  ctx.rotate(0.15); ctx.fillStyle=V1; ctx.fillRect(-5,-10,10,32); ctx.restore();
-  // open upturned palm (left)
-  ctx.fillStyle=V2;
-  ctx.beginPath(); ctx.ellipse(cx-72, fy-18, 10, 6, -0.2, 0, Math.PI*2); ctx.fill();
-  // fingers spread (left hand)
-  ctx.strokeStyle=V1; ctx.lineWidth=4;
-  [[-0.4,-12],[0.0,-13],[0.4,-12],[0.8,-10]].forEach(([a,len])=>{
-    ctx.beginPath(); ctx.moveTo(cx-72, fy-18);
-    ctx.lineTo(cx-72+Math.sin(a)*Math.abs(len), fy-18-Math.abs(len)*0.6); ctx.stroke();
-  });
+  // gilt family group standing on the open left palm
+  const lx = lHd[0], ly = lHd[1] - 13;
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(226,168,32,0.7)';
+  ctx.fillStyle = `rgba(226,168,32,${0.72 + Math.sin(frame*0.04)*0.18})`;
+  ctx.beginPath(); ctx.arc(lx, ly - 10, 3.5, 0, Math.PI*2); ctx.fill();   // parent head
+  ctx.fillRect(lx - 3, ly - 7, 6, 11);                                    // parent body
+  ctx.strokeStyle = `rgba(226,168,32,${0.8 + Math.sin(frame*0.04)*0.15})`; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(lx - 3, ly - 4); ctx.lineTo(lx - 9, ly - 10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lx + 3, ly - 4); ctx.lineTo(lx + 9, ly - 10); ctx.stroke();
+  ctx.fillRect(lx - 9, ly - 3, 4, 7); ctx.fillRect(lx + 5, ly - 3, 4, 7); // two children
+  ctx.shadowBlur = 0;
 
-  // small golden deity/family figure on left palm
-  const lx = cx-72, ly = fy-32;
-  ctx.shadowBlur=8; ctx.shadowColor='rgba(226,168,32,0.7)';
-  ctx.fillStyle=`rgba(226,168,32,${0.7+Math.sin(frame*0.04)*0.2})`;
-  // figure body
-  ctx.beginPath(); ctx.arc(lx, ly-8, 4, 0, Math.PI*2); ctx.fill(); // head
-  ctx.fillRect(lx-3, ly-4, 6, 10); // torso
-  // arms raised (victory pose)
-  ctx.strokeStyle=`rgba(226,168,32,${0.8+Math.sin(frame*0.04)*0.15})`; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(lx-3, ly-1); ctx.lineTo(lx-7, ly-6); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(lx+3, ly-1); ctx.lineTo(lx+7, ly-6); ctx.stroke();
-  ctx.shadowBlur=0;
-
-  // ── head — bowed slightly forward, eyes downcast in quiet contemplation ──
-  ctx.fillStyle=V1;
-  ctx.beginPath(); ctx.arc(cx-2, fy-63, 15, 0, Math.PI*2); ctx.fill();
-  // face
-  ctx.strokeStyle=Vd; ctx.lineWidth=1.5;
-  // closed / downcast eyes (lids, not open circles — the statue looks down)
-  ctx.beginPath(); ctx.moveTo(cx-11,fy-64); ctx.quadraticCurveTo(cx-7,fy-62,cx-3,fy-64); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx+0,fy-64); ctx.quadraticCurveTo(cx+4,fy-62,cx+8,fy-64); ctx.stroke();
-  // brow ridge
-  ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(cx-12,fy-69); ctx.lineTo(cx-4,fy-68); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx-2,fy-68); ctx.lineTo(cx+6,fy-69); ctx.stroke();
-  // nose
-  ctx.beginPath(); ctx.moveTo(cx-3,fy-63); ctx.lineTo(cx-2,fy-58); ctx.stroke();
-  // solemn, closed mouth
-  ctx.beginPath(); ctx.moveTo(cx-6,fy-55); ctx.lineTo(cx+2,fy-55); ctx.stroke();
-  // hair — swept back off the brow in heavy waves
-  ctx.strokeStyle=V2; ctx.lineWidth=2.5;
-  for (let w=0;w<5;w++){
+  // ── head — level gaze, heavy waved hair swept back ───────────────────
+  ctx.fillStyle = V1;
+  ctx.beginPath(); ctx.arc(cx - 1, fy - 88, 16, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = V2;                                     // jaw / cheek shadow
+  ctx.beginPath(); ctx.ellipse(cx - 1, fy - 79, 10, 5, 0, 0, Math.PI); ctx.fill();
+  ctx.fillStyle = V1; ctx.fillRect(cx - 6, fy - 76, 12, 8);  // neck
+  ctx.strokeStyle = Vd; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx - 11, fy - 90); ctx.quadraticCurveTo(cx - 7, fy - 87, cx - 3, fy - 90); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + 1, fy - 90); ctx.quadraticCurveTo(cx + 5, fy - 87, cx + 9, fy - 90); ctx.stroke();
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(cx - 12, fy - 95); ctx.lineTo(cx - 3, fy - 94); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx + 1, fy - 94); ctx.lineTo(cx + 10, fy - 95); ctx.stroke();
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx - 2, fy - 89); ctx.lineTo(cx - 1, fy - 83); ctx.stroke();   // nose
+  ctx.beginPath(); ctx.moveTo(cx - 5, fy - 79); ctx.lineTo(cx + 3, fy - 79); ctx.stroke();   // mouth
+  // hair — one heavy mass capping the skull, swept back off the brow
+  ctx.fillStyle = V2;
+  ctx.beginPath();
+  ctx.arc(cx - 1, fy - 88, 17, Math.PI * 1.18, Math.PI * 1.82);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = Vd; ctx.lineWidth = 1.2;      // waves combed back through it
+  for (let w = 0; w < 3; w++) {
     ctx.beginPath();
-    ctx.moveTo(cx-13+w*5, fy-75);
-    ctx.quadraticCurveTo(cx-9+w*5, fy-81, cx-5+w*5, fy-75);
+    ctx.moveTo(cx - 9 + w * 6, fy - 99);
+    ctx.quadraticCurveTo(cx - 6 + w * 6, fy - 103, cx - 3 + w * 6, fy - 100);
     ctx.stroke();
   }
 
-  // verdigris patina sheen
-  ctx.fillStyle='rgba(90,190,150,0.08)';
-  ctx.fillRect(bx+10, by-240, bw-20, 240);
+  // ── planting bed + iron fence across the front of the plaza ──────────
+  ctx.fillStyle = '#3a2430';                              // dark ornamental shrubs
+  for (let i = 0; i < 9; i++) {
+    const sxb = bx + 22 + i * 24;
+    ctx.beginPath(); ctx.arc(sxb, by - 7, 8, Math.PI, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = '#356a29';                              // ornamental grasses
+  for (let i = 0; i < 15; i++) {
+    const gx = bx + 16 + i * 15;
+    ctx.fillRect(gx, by - 11, 2, 11); ctx.fillRect(gx + 4, by - 8, 2, 8);
+  }
+  ctx.strokeStyle = '#171b1d'; ctx.lineWidth = 1.5;       // black iron fence
+  ctx.beginPath(); ctx.moveTo(bx + 6, by - 13); ctx.lineTo(bx + bw - 6, by - 13); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + 6, by - 3);  ctx.lineTo(bx + bw - 6, by - 3);  ctx.stroke();
+  for (let px = bx + 6; px <= bx + bw - 6; px += 11) {
+    ctx.beginPath(); ctx.moveTo(px, by - 16); ctx.lineTo(px, by); ctx.stroke();
+  }
+
+  // small bronze dedication plaque cut into the face of the marble base
+  ctx.fillStyle = 'rgba(226,168,32,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('THE SPIRIT OF DETROIT', cx, by - 19);
 }
-
 // ── JOE LOUIS FIST — Monument to Joe Louis ───────────────────────────────────
+// Reference: Robert Graham's monument at Jefferson & Woodward — a 24-ft bronze
+// arm hung HORIZONTALLY (not dangling) on cables inside a four-legged pyramidal
+// steel frame, knuckles forward, the whole thing floating clear of the ground.
 function drawJoeLouisFist(ctx, bx, frame) {
-  const bw=150, bh=180;
-  const by=GROUND;
-  // pylon frame (black steel A-frame)
-  ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=8;
-  // left leg
-  ctx.beginPath(); ctx.moveTo(bx+16,by); ctx.lineTo(bx+bw/2,by-bh*0.62); ctx.stroke();
-  // right leg
-  ctx.beginPath(); ctx.moveTo(bx+bw-16,by); ctx.lineTo(bx+bw/2,by-bh*0.62); ctx.stroke();
-  // bracing crossbar
-  ctx.lineWidth=6;
-  ctx.beginPath(); ctx.moveTo(bx+bw*0.22,by-bh*0.34); ctx.lineTo(bx+bw*0.78,by-bh*0.34); ctx.stroke();
-  ctx.strokeStyle='#262626'; ctx.lineWidth=5;
-  ctx.beginPath(); ctx.moveTo(bx+bw/2,by-bh*0.62); ctx.lineTo(bx+bw/2,by-bh+16); ctx.stroke();
-  // gusset bolts at the apex
-  ctx.fillStyle='#111'; [bx+bw/2-5,bx+bw/2+5].forEach(px=>{ ctx.beginPath(); ctx.arc(px,by-bh*0.62+5,3,0,Math.PI*2); ctx.fill(); });
+  const bw = 176, bh = 196;
+  const by = GROUND;
+  const apexX = bx + bw / 2, apexY = by - bh;
+  const sway = Math.sin(frame * 0.02) * 1.6;
 
-  // suspension cables (sway animation) — the arm hangs from the apex
-  const sway=Math.sin(frame*0.025)*2;
-  ctx.strokeStyle='#333'; ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.moveTo(bx+bw/2-3,by-bh*0.6); ctx.lineTo(bx+bw*0.36+sway,by-bh*0.42); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(bx+bw/2+3,by-bh*0.6); ctx.lineTo(bx+bw*0.64+sway,by-bh*0.42); ctx.stroke();
+  // ── pyramidal frame: rear pair of legs first (lighter, set back) ─────
+  ctx.strokeStyle = '#4b4f52'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(bx + 44, by - 6);      ctx.lineTo(apexX + 5, apexY + 3); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + bw - 44, by - 6); ctx.lineTo(apexX + 5, apexY + 3); ctx.stroke();
 
-  // ── forearm — thick bronze-black, angled down toward the fist ──
-  const armY=by-bh*0.42+sway;
-  const BR1='#211307', BR2='#140b04', BR3='#3a220f';
-  ctx.fillStyle=BR1; ctx.save(); ctx.translate(bx+bw*0.5,armY); ctx.rotate(-0.16);
-  ctx.fillRect(-13,-8,26,64);
-  // forearm shading seam
-  ctx.strokeStyle=BR2; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(-13,-4); ctx.lineTo(13,54); ctx.stroke();
-  ctx.restore();
+  // front pair of legs — dark steel plate girders
+  ctx.strokeStyle = '#232629'; ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.moveTo(bx + 8, by);      ctx.lineTo(apexX, apexY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + bw - 8, by); ctx.lineTo(apexX, apexY); ctx.stroke();
+  // edge highlight down the front legs
+  ctx.strokeStyle = 'rgba(150,158,164,0.35)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(bx + 11, by); ctx.lineTo(apexX - 2, apexY + 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx + bw - 11, by); ctx.lineTo(apexX + 2, apexY + 4); ctx.stroke();
 
-  // ── fist — one large rounded bronze-black mass, knuckles forward ──
-  const fcx=bx+bw*0.5+sway*0.6, fcy=armY+58;
-  const fw=bw*0.42, fh=bh*0.2;
-  ctx.fillStyle=BR1;
+  // apex gusset plate + bolts
+  ctx.fillStyle = '#1b1e20'; ctx.fillRect(apexX - 8, apexY - 3, 16, 12);
+  ctx.fillStyle = '#5c6165';
+  [-4, 4].forEach(o => { ctx.beginPath(); ctx.arc(apexX + o, apexY + 4, 1.6, 0, Math.PI*2); ctx.fill(); });
+
+  // concrete footings
+  ctx.fillStyle = '#3d3f41';
+  ctx.fillRect(bx + 2, by - 5, 16, 6); ctx.fillRect(bx + bw - 18, by - 5, 16, 6);
+
+  // ── suspension cables from the apex down to the arm ──────────────────
+  const armY = by - bh * 0.5 + sway;      // the arm hangs level, mid-frame
+  const fistCx = bx + bw * 0.3 + sway * 0.5;
+  const elbowX = bx + bw * 0.82;
+  ctx.strokeStyle = '#8d9296'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(apexX - 2, apexY + 8); ctx.lineTo(fistCx + 22, armY - 9); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(apexX + 2, apexY + 8); ctx.lineTo(elbowX - 10, armY - 9); ctx.stroke();
+
+  // ── horizontal bronze forearm — thick, tapering toward the wrist ─────
+  const BR1 = '#3b352d', BR2 = '#211d18', BR3 = '#57503f', ARM_H = 24;
+  ctx.fillStyle = BR1;
   ctx.beginPath();
-  ctx.moveTo(fcx-fw/2, fcy+fh*0.3);
-  ctx.quadraticCurveTo(fcx-fw/2-4, fcy-fh*0.6, fcx-fw*0.2, fcy-fh*0.7);
-  ctx.quadraticCurveTo(fcx+fw*0.3, fcy-fh*0.8, fcx+fw/2, fcy-fh*0.3);
-  ctx.quadraticCurveTo(fcx+fw/2+4, fcy+fh*0.5, fcx+fw*0.3, fcy+fh*0.75);
-  ctx.quadraticCurveTo(fcx-fw*0.1, fcy+fh*0.9, fcx-fw/2, fcy+fh*0.3);
-  ctx.fill();
-  // knuckle ridge along the top
-  ctx.fillStyle=BR3;
-  [-0.32,-0.12,0.08,0.28].forEach(kx=>{ ctx.beginPath(); ctx.arc(fcx+fw*kx, fcy-fh*0.55, fw*0.12, Math.PI, Math.PI*2); ctx.fill(); });
-  // finger divisions
-  ctx.strokeStyle=BR2; ctx.lineWidth=1.5;
-  [-0.22,-0.02,0.18].forEach(kx=>{ ctx.beginPath(); ctx.moveTo(fcx+fw*kx,fcy-fh*0.45); ctx.lineTo(fcx+fw*kx,fcy+fh*0.65); ctx.stroke(); });
-  // thumb wrapped along the near side
-  ctx.fillStyle=BR1;
-  ctx.beginPath(); ctx.ellipse(fcx-fw*0.42, fcy+fh*0.15, fw*0.14, fh*0.42, 0.3, 0, Math.PI*2); ctx.fill();
-  // verdigris patina sheen
-  ctx.fillStyle='rgba(70,150,120,0.14)';
-  ctx.beginPath(); ctx.ellipse(fcx-fw*0.05, fcy-fh*0.35, fw*0.35, fh*0.3, -0.2, 0, Math.PI*2); ctx.fill();
+  ctx.moveTo(elbowX + 6, armY - ARM_H * 0.62);
+  ctx.lineTo(fistCx + 20, armY - ARM_H * 0.5);
+  ctx.lineTo(fistCx + 20, armY + ARM_H * 0.5);
+  ctx.lineTo(elbowX + 6, armY + ARM_H * 0.72);
+  ctx.closePath(); ctx.fill();
+  // cut end of the forearm (the arm stops mid-bicep, as the real one does)
+  ctx.fillStyle = BR2;
+  ctx.beginPath(); ctx.ellipse(elbowX + 6, armY + 1, 4, ARM_H * 0.67, 0, 0, Math.PI*2); ctx.fill();
+  // top highlight + underside shadow along the forearm
+  ctx.fillStyle = BR3; ctx.globalAlpha = 0.45;
+  ctx.fillRect(fistCx + 20, armY - ARM_H * 0.5, elbowX - fistCx - 14, 3);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = BR2;
+  ctx.fillRect(fistCx + 20, armY + ARM_H * 0.34, elbowX - fistCx - 14, 4);
+
+  // ── the fist — one heavy rounded mass, knuckles facing forward-left ──
+  const fcy = armY;
+  const fw = 70, fh = 48;
+  ctx.fillStyle = BR1;
+  ctx.beginPath();
+  ctx.moveTo(fistCx + fw * 0.34, fcy - fh * 0.5);                                   // wrist top
+  ctx.quadraticCurveTo(fistCx - fw * 0.2, fcy - fh * 0.62, fistCx - fw * 0.46, fcy - fh * 0.24);
+  ctx.quadraticCurveTo(fistCx - fw * 0.58, fcy + fh * 0.16, fistCx - fw * 0.34, fcy + fh * 0.44);
+  ctx.quadraticCurveTo(fistCx + fw * 0.02, fcy + fh * 0.66, fistCx + fw * 0.34, fcy + fh * 0.5);
+  ctx.closePath(); ctx.fill();
+
+  // silhouette outline so the mass reads against the night sky
+  ctx.strokeStyle = '#15120f'; ctx.lineWidth = 1.5; ctx.stroke();
+  // knuckle row across the front of the fist
+  [-0.40, -0.24, -0.06, 0.12].forEach((k, i) => {
+    const kx = fistCx + fw * k, ky = fcy - fh * (0.26 - i * 0.04);
+    ctx.fillStyle = BR3;
+    ctx.beginPath(); ctx.ellipse(kx, ky, fw * 0.11, fh * 0.17, -0.25, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = BR2; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.ellipse(kx, ky, fw * 0.11, fh * 0.17, -0.25, 0, Math.PI*2); ctx.stroke();
+  });
+  // curled finger divisions running back from the knuckles
+  ctx.strokeStyle = BR2; ctx.lineWidth = 1.5;
+  [-0.32, -0.14, 0.04].forEach(k => {
+    ctx.beginPath();
+    ctx.moveTo(fistCx + fw * k - 4, fcy - fh * 0.18);
+    ctx.quadraticCurveTo(fistCx + fw * k, fcy + fh * 0.1, fistCx + fw * k - 2, fcy + fh * 0.42);
+    ctx.stroke();
+  });
+  // thumb folded across the near side of the curled fingers
+  ctx.fillStyle = BR1;
+  ctx.beginPath(); ctx.ellipse(fistCx - fw * 0.12, fcy + fh * 0.3, fw * 0.26, fh * 0.16, 0.18, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = BR2; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.ellipse(fistCx - fw * 0.12, fcy + fh * 0.3, fw * 0.26, fh * 0.16, 0.18, 0, Math.PI*2); ctx.stroke();
+  // patina sheen over the top of the fist
+  ctx.fillStyle = 'rgba(96,150,128,0.13)';
+  ctx.beginPath(); ctx.ellipse(fistCx - fw * 0.08, fcy - fh * 0.28, fw * 0.32, fh * 0.22, -0.2, 0, Math.PI*2); ctx.fill();
+
+  // ── cast shadow on the plaza below the fist ──────────────────────────
+  ctx.fillStyle = 'rgba(0,0,0,0.32)';
+  ctx.beginPath(); ctx.ellipse(fistCx + 14, by - 3, 46, 7, 0, 0, Math.PI*2); ctx.fill();
 
   // plaque
-  ctx.fillStyle='#241a10'; ctx.fillRect(bx+10,by-24,bw-20,20);
-  ctx.fillStyle='rgba(226,168,32,0.7)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MONUMENT TO JOE LOUIS',bx+bw/2,by-11);
+  ctx.fillStyle = '#2b2f31'; ctx.fillRect(bx + bw / 2 - 56, by - 22, 112, 18);
+  ctx.fillStyle = 'rgba(226,168,32,0.75)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MONUMENT TO JOE LOUIS', bx + bw / 2, by - 10);
+  ctx.lineCap = 'butt';
 }
 
-// ── MAGIC STICK / MAJESTIC COMPLEX — Woodward Ave ────────────────────────────
-function drawMagicStick(ctx, bx, frame) {
-  const bw=226, bh=146, storeH=48;
-  const by=GROUND;
-  const upperH=bh-storeH;
-  // brick facade
-  ctx.fillStyle='#2a1a10'; ctx.fillRect(bx,by-bh,bw,upperH);
-  ctx.fillStyle='rgba(0,0,0,0.18)';
-  for (let y=8;y<upperH;y+=9) ctx.fillRect(bx,by-bh+y,bw,1);
-  for (let row=0;row<Math.floor(upperH/9);row++) {
-    const xOff=(row%2)*12;
-    for (let x=xOff;x<bw;x+=24) ctx.fillRect(bx+x,by-bh+row*9,1,9);
+
+// ── THE MAJESTIC COMPLEX — Woodward Ave (Majestic Theatre + Magic Stick) ─────
+// Reference: the real Woodward facade — tall orange terra-cotta panels split by
+// cream piers, polychrome (blue/red/gold) foliate strips running the full
+// height, stepped Deco capitals and a stepped parapet along the roofline, then
+// the black marquee with gold MAJESTIC THEATRE letters over a white letterboard
+// and three bays of dark entrance doors in a banded stone base.
+function drawMajestic(ctx, bx, frame) {
+  const bw = 250, bh = 214, storeH = 50;
+  const by = GROUND;
+  const upperH = bh - storeH;
+  const uy = by - bh;                       // top of the facade
+  const flash = Math.floor(frame / 14) % 2 === 0;
+
+  // ── cream terra-cotta field ──────────────────────────────────────────
+  ctx.fillStyle = '#ded3b8'; ctx.fillRect(bx, uy, bw, upperH);
+  ctx.strokeStyle = 'rgba(150,140,116,0.3)'; ctx.lineWidth = 1;
+  for (let ty = uy + 14; ty < by - storeH; ty += 14) {
+    ctx.beginPath(); ctx.moveTo(bx, ty); ctx.lineTo(bx + bw, ty); ctx.stroke();
   }
-  // roof coping
-  ctx.fillStyle='#1a1010'; ctx.fillRect(bx-2,by-bh-4,bw+4,5);
-  for (let i=0;i<8;i++) ctx.fillRect(bx+i*(bw/8),by-bh-4,bw/8-3,8);
-  // MAGIC STICK neon sign (upper left, purple)
-  const flash=Math.floor(frame/14)%2===0;
-  const msX=bx+14, msY=by-upperH+10;
-  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(msX,msY,80,34);
-  ctx.strokeStyle=flash?`rgba(160,0,255,0.95)`:`rgba(80,0,140,0.6)`; ctx.lineWidth=2; ctx.strokeRect(msX,msY,80,34);
-  if (flash) { ctx.shadowBlur=12; ctx.shadowColor='rgba(160,0,255,0.9)'; }
-  ctx.fillStyle=flash?'#cc44ff':'#8820cc'; ctx.font='7px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MAGIC',msX+40,msY+14); ctx.fillText('STICK',msX+40,msY+26);
-  ctx.shadowBlur=0;
-  // MAJESTIC 20 CAFE sign (upper right, orange)
-  const m20X=bx+bw-110, m20Y=msY;
-  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(m20X,m20Y,96,34);
-  ctx.strokeStyle=flash?`rgba(255,140,0,0.9)`:`rgba(160,80,0,0.6)`; ctx.lineWidth=2; ctx.strokeRect(m20X,m20Y,96,34);
-  if (flash) { ctx.shadowBlur=10; ctx.shadowColor='rgba(255,140,0,0.9)'; }
-  ctx.fillStyle=flash?'#ffaa00':'#cc7000'; ctx.font='6px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MAJESTIC 20',m20X+48,m20Y+14); ctx.fillText('CAFÉ',m20X+48,m20Y+26);
-  ctx.shadowBlur=0;
-  // Majestic Theatre marquee (center, large)
-  const mqX=bx+bw*0.25, mqY=by-storeH-46, mqW=bw*0.5, mqH=42;
-  ctx.fillStyle='#1a1a1a'; ctx.fillRect(mqX,mqY,mqW,mqH);
-  ctx.fillStyle='#3a3a0a'; ctx.fillRect(mqX+3,mqY+3,mqW-6,mqH-6);
-  // marquee border blink lights
-  ctx.fillStyle=flash?'#ffdd00':'rgba(255,220,0,0.3)';
-  for (let i=0;i<Math.floor(mqW/8);i++) { ctx.fillRect(mqX+i*8,mqY,5,4); ctx.fillRect(mqX+i*8,mqY+mqH-4,5,4); }
-  for (let i=0;i<Math.floor(mqH/8);i++) { ctx.fillRect(mqX,mqY+i*8,4,5); ctx.fillRect(mqX+mqW-4,mqY+i*8,4,5); }
-  ctx.fillStyle='#E2A820'; ctx.font='bold 8px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MAJESTIC THEATRE',mqX+mqW/2,mqY+16);
-  ctx.fillStyle='rgba(255,200,50,0.7)'; ctx.font='5px "Press Start 2P"';
-  ctx.fillText('TONIGHT: RAT KING TRIBUTE',mqX+mqW/2,mqY+30);
-  // storefront
-  ctx.fillStyle='#1a1010'; ctx.fillRect(bx,by-storeH,bw,storeH);
-  // box office (left)
-  ctx.fillStyle='#0a1825'; ctx.fillRect(bx+10,by-storeH+6,54,storeH-6);
-  ctx.fillStyle='rgba(60,120,200,0.22)'; ctx.fillRect(bx+12,by-storeH+8,50,storeH-10);
-  ctx.fillStyle='rgba(245,240,220,0.55)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('BOX OFFICE',bx+37,by-storeH+22);
-  // main double doors (center)
-  ctx.fillStyle='#0e0808'; ctx.fillRect(bx+bw/2-20,by-storeH+4,40,storeH-4);
-  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(bx+bw/2-1,by-storeH+4,2,storeH-4);
-  ctx.fillStyle='#5a3010'; ctx.fillRect(bx+bw/2-18,by-storeH/2,4,6); ctx.fillRect(bx+bw/2+14,by-storeH/2,4,6);
-  // right window
-  ctx.fillStyle='#0a1825'; ctx.fillRect(bx+bw-64,by-storeH+6,54,storeH-6);
-  ctx.fillStyle='rgba(60,120,200,0.22)'; ctx.fillRect(bx+bw-62,by-storeH+8,50,storeH-10);
-  // Woodward Ave sign (right side, vertical)
-  ctx.fillStyle='#1a3a8a'; ctx.fillRect(bx+bw+4,by-68,14,54);
-  ctx.fillStyle='#ffffff'; ctx.save(); ctx.translate(bx+bw+11,by-42); ctx.rotate(-Math.PI/2);
-  ctx.font='5px "Press Start 2P"'; ctx.textAlign='center'; ctx.fillText('WOODWARD AVE',0,4);
+
+  // ── four tall orange panels, five polychrome piers between them ──────
+  const pierW = 13, panelW = 42, panelTop = uy + 22;
+  const pierXs = [], margin = 8;
+  let px = bx + margin;
+  for (let i = 0; i < 5; i++) {
+    pierXs.push(px); px += pierW;
+    if (i < 4) {
+      // orange terra-cotta panel
+      ctx.fillStyle = '#c85a1e';
+      ctx.fillRect(px, panelTop, panelW, by - storeH - panelTop);
+      ctx.fillStyle = 'rgba(120,50,14,0.26)';                   // block coursing
+      for (let ty = panelTop; ty < by - storeH; ty += 13) ctx.fillRect(px, ty, panelW, 1);
+      ctx.fillRect(px + panelW / 2, panelTop, 1, by - storeH - panelTop);
+      ctx.fillStyle = 'rgba(226,208,170,0.4)';                  // weathered panel head
+      ctx.fillRect(px, panelTop, panelW, 4);
+      px += panelW;
+    }
+  }
+
+  // polychrome foliate strips + stepped Deco capitals on each pier
+  pierXs.forEach(sx => {
+    const stripX = sx + 3, stripW = 7;
+    ctx.fillStyle = '#1b3f86';                                  // blue ground
+    ctx.fillRect(stripX - 1, panelTop - 2, stripW + 2, by - storeH - panelTop + 2);
+    ctx.fillStyle = '#b9302b';                                  // red inner band
+    ctx.fillRect(stripX, panelTop - 2, stripW, by - storeH - panelTop + 2);
+    ctx.fillStyle = '#e8c04a';                                  // gold foliate motif
+    for (let ty = panelTop + 2; ty < by - storeH - 3; ty += 11) {
+      ctx.fillRect(stripX + 1, ty, stripW - 2, 4);
+      ctx.fillRect(stripX + 2, ty + 4, stripW - 4, 2);
+    }
+    ctx.fillStyle = '#2f6f3a';                                  // green accents
+    for (let ty = panelTop + 8; ty < by - storeH - 3; ty += 22) ctx.fillRect(stripX + 2, ty, 2, 2);
+
+    // stepped Deco capital crowning the pier
+    const capY = uy + 4;
+    ctx.fillStyle = '#1b3f86'; ctx.fillRect(stripX - 6, capY, stripW + 12, 18);
+    ctx.fillStyle = '#b9302b'; ctx.fillRect(stripX - 4, capY + 4, stripW + 8, 12);
+    ctx.fillStyle = '#e8c04a';
+    ctx.fillRect(stripX - 3, capY + 8, stripW + 6, 3);
+    ctx.fillRect(stripX - 1, capY + 3, stripW + 2, 4);
+    ctx.fillRect(stripX + 1, capY - 4, stripW - 2, 6);          // fan finial
+    ctx.fillStyle = '#cdbf9f';                                  // cream shoulders
+    ctx.fillRect(stripX - 9, capY + 12, 3, 6); ctx.fillRect(stripX + stripW + 6, capY + 12, 3, 6);
+  });
+
+  // ── low stepped Deco parapet along the roofline ──────────────────────
+  ctx.fillStyle = '#d3c7aa'; ctx.fillRect(bx - 3, uy - 5, bw + 6, 8);
+  ctx.fillStyle = '#e5dbc2'; ctx.fillRect(bx - 1, uy - 8, bw + 2, 4);
+  // each pier steps a little higher through the coping
+  pierXs.forEach(sx => {
+    ctx.fillStyle = '#e5dbc2'; ctx.fillRect(sx - 4, uy - 12, pierW + 8, 8);
+    ctx.fillStyle = '#d3c7aa'; ctx.fillRect(sx - 1, uy - 15, pierW + 2, 4);
+  });
+  ctx.fillStyle = 'rgba(120,110,90,0.28)'; ctx.fillRect(bx - 2, uy + 3, bw + 4, 2);
+
+  // ── black marquee ────────────────────────────────────────────────────
+  const mqW = bw * 0.72, mqX = bx + (bw - mqW) / 2, mqH = 42, mqY = by - storeH - mqH - 2;
+  ctx.fillStyle = '#15130f'; ctx.fillRect(mqX - 7, mqY - 5, mqW + 14, mqH + 10);
+  ctx.fillStyle = '#201c16'; ctx.fillRect(mqX, mqY, mqW, mqH);
+  // chrome trim ribs and the sloped side returns
+  ctx.fillStyle = '#9c9482';
+  ctx.fillRect(mqX - 7, mqY - 5, mqW + 14, 2); ctx.fillRect(mqX - 7, mqY + mqH + 3, mqW + 14, 2);
+  ctx.fillStyle = '#15130f';
+  ctx.fillRect(mqX - 12, mqY + 4, 6, mqH); ctx.fillRect(mqX + mqW + 6, mqY + 4, 6, mqH);
+  // bulb runs around the fascia
+  ctx.fillStyle = flash ? '#ffe27a' : 'rgba(255,226,122,0.32)';
+  for (let i = 0; i < Math.floor((mqW + 14) / 9); i++) {
+    ctx.fillRect(mqX - 6 + i * 9, mqY - 3, 4, 3);
+    ctx.fillRect(mqX - 6 + i * 9, mqY + mqH + 2, 4, 3);
+  }
+  // gold MAJESTIC THEATRE lettering
+  if (flash) { ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(226,168,32,0.8)'; }
+  ctx.fillStyle = '#E2A820'; ctx.font = '8px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('MAJESTIC THEATRE', mqX + mqW / 2, mqY + 15);
+  ctx.shadowBlur = 0;
+  // white letterboard, two rows of changeable black letters
+  ctx.fillStyle = '#efe9dc'; ctx.fillRect(mqX + 8, mqY + 21, mqW - 16, 17);
+  ctx.fillStyle = 'rgba(120,112,96,0.3)'; ctx.fillRect(mqX + 8, mqY + 29, mqW - 16, 1);
+  ctx.fillStyle = '#1a1a1a'; ctx.font = '4px "Press Start 2P"';
+  ctx.fillText('TONIGHT RAT KING TRIBUTE', mqX + mqW / 2, mqY + 27);
+  ctx.fillText('MAGIC STICK UPSTAIRS 21+', mqX + mqW / 2, mqY + 36);
+
+  // ── banded stone base ────────────────────────────────────────────────
+  ctx.fillStyle = '#3b352c'; ctx.fillRect(bx, by - storeH, bw, storeH);
+  ctx.fillStyle = 'rgba(20,18,14,0.5)';
+  for (let ty = by - storeH; ty < by; ty += 7) ctx.fillRect(bx, ty, bw, 2);
+  // three entrance bays under the marquee, split by cream stone piers
+  const bay0 = bx + bw * 0.28;
+  [0, 1, 2].forEach(i => {
+    const dx = bay0 + i * 38;
+    ctx.fillStyle = '#0d1512'; ctx.fillRect(dx, by - storeH + 6, 30, storeH - 6);
+    ctx.fillStyle = 'rgba(70,120,110,0.22)'; ctx.fillRect(dx + 2, by - storeH + 8, 26, storeH - 12);
+    ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(dx + 14, by - storeH + 6, 2, storeH - 6);
+    ctx.fillStyle = '#8a7c58'; ctx.fillRect(dx + 11, by - 26, 3, 7); ctx.fillRect(dx + 17, by - 26, 3, 7);
+    ctx.fillStyle = '#cfc4a8'; ctx.fillRect(dx + 30, by - storeH, 8, storeH);
+  });
+  ctx.fillStyle = '#cfc4a8'; ctx.fillRect(bay0 - 8, by - storeH, 8, storeH);
+  // dark plate-glass storefronts flanking the entrance
+  ctx.fillStyle = '#0b1418'; ctx.fillRect(bx + 8, by - storeH + 8, 52, storeH - 10);
+  ctx.fillRect(bx + bw - 60, by - storeH + 8, 52, storeH - 10);
+  ctx.fillStyle = 'rgba(60,120,200,0.16)';
+  ctx.fillRect(bx + 10, by - storeH + 10, 48, storeH - 14);
+  ctx.fillRect(bx + bw - 58, by - storeH + 10, 48, storeH - 14);
+  ctx.fillStyle = 'rgba(245,240,220,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('BOX OFFICE', bx + 34, by - storeH + 24);
+  ctx.fillText('MAJESTIC CAFE', bx + bw - 34, by - storeH + 24);
+  // sidewalk shadow under the marquee
+  ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(bx, by - storeH, bw, 5);
+
+  // ── MAGIC STICK vertical blade sign on the left edge ─────────────────
+  const bsX = bx - 17, bsY = by - bh + 34, bsH = 78;
+  ctx.fillStyle = '#141014'; ctx.fillRect(bsX, bsY, 18, bsH);
+  ctx.strokeStyle = flash ? 'rgba(170,40,255,0.95)' : 'rgba(90,20,150,0.55)'; ctx.lineWidth = 2;
+  ctx.strokeRect(bsX, bsY, 18, bsH);
+  ctx.fillStyle = '#241c24'; ctx.fillRect(bsX + 18, bsY + bsH / 2 - 3, 6, 6);   // wall bracket
+  if (flash) { ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(170,40,255,0.9)'; }
+  ctx.fillStyle = flash ? '#cc55ff' : '#8a28cc';
+  ctx.save(); ctx.translate(bsX + 9, bsY + bsH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.font = '6px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText('MAGIC STICK', 0, 2);
+  ctx.restore(); ctx.shadowBlur = 0;
+
+  // ── WOODWARD AVE street sign ─────────────────────────────────────────
+  ctx.fillStyle = '#1a3a8a'; ctx.fillRect(bx + bw + 4, by - 70, 14, 56);
+  ctx.fillStyle = '#ffffff'; ctx.save(); ctx.translate(bx + bw + 11, by - 42); ctx.rotate(-Math.PI / 2);
+  ctx.font = '5px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText('WOODWARD AVE', 0, 4);
   ctx.restore();
 }
