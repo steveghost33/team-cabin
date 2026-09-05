@@ -13,10 +13,10 @@
 .music__trigger {
   font-family: var(--font-pixel);
   font-size: 0.6rem;
-  border: 3px solid var(--color-gold);
+  border: 3px solid var(--color-ink);
   padding: 14px 32px;
   cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: 4px 4px 0 var(--color-ink);
   letter-spacing: 0.06em;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   display: flex;
@@ -25,18 +25,18 @@
 }
 
 .music__trigger--closed {
-  background: var(--color-gold);
-  color: var(--color-green);
+  background: var(--color-red);
+  color: var(--color-cream);
 }
 
 .music__trigger--open {
-  background: var(--color-green-mid);
-  color: var(--color-cream);
+  background: var(--color-yellow);
+  color: var(--color-ink);
 }
 
 .music__trigger:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 #000;
+  box-shadow: 6px 6px 0 var(--color-ink);
 }
 
 .music__trigger-icon {
@@ -73,26 +73,31 @@
 }
 
 /* Per-link color comes from --link-color and --link-bg CSS custom properties
-   set inline on each element, since every platform has a unique brand color. */
+   set inline on each element, since every platform has a unique brand color.
+   The brand tint sits on a cream card so it reads against the sky backdrop. */
 .music__link {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1.2rem 1.4rem;
   text-decoration: none;
-  border: 3px solid var(--link-color);
-  background: var(--link-bg);
+  border: 3px solid var(--color-ink);
+  background:
+    linear-gradient(var(--link-bg), var(--link-bg)),
+    var(--color-cream);
+  box-shadow: 4px 4px 0 rgba(15, 13, 12, 0.35);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .music__link:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 6px 6px 0 var(--link-color);
+  box-shadow: 7px 7px 0 var(--color-ink);
 }
 
 .music__link-icon {
   font-size: 1.7rem;
   flex-shrink: 0;
+  color: var(--link-color);
 }
 
 .music__link-name {
@@ -105,7 +110,7 @@
 .music__link-label {
   font-family: var(--font-vt323);
   font-size: 1.3rem;
-  color: var(--color-cream);
+  color: var(--color-ink);
 }
 
 @media (min-width: 769px) {
@@ -113,9 +118,9 @@
     width: fit-content;
     margin: 0 auto 2rem;
     padding: 0.85rem;
-    border: 3px solid var(--color-gold);
-    box-shadow: 6px 6px 0 #000;
-    background: rgba(10, 10, 10, 0.22);
+    border: 3px solid var(--color-ink);
+    box-shadow: 6px 6px 0 var(--color-ink);
+    background: var(--color-cream);
   }
 
   .music__grid {

@@ -1,7 +1,7 @@
 .shows {
-  background: rgba(0, 0, 0, 0.45);
-  border-top: 3px solid rgba(212, 160, 23, 0.2);
-  border-bottom: 3px solid rgba(212, 160, 23, 0.2);
+  background: var(--color-sky-shade);
+  border-top: 4px solid var(--color-ink);
+  border-bottom: 4px solid var(--color-ink);
 }
 
 .shows__inner {
@@ -13,7 +13,7 @@
 .shows__tba {
   font-family: var(--font-vt323);
   font-size: 2.2rem;
-  color: var(--color-gold-light);
+  color: var(--color-red-dark);
   text-align: center;
   padding: 2rem 0;
   letter-spacing: 0.05em;
@@ -30,8 +30,9 @@
 }
 
 .shows__empty {
-  border: 3px solid rgba(212, 160, 23, 0.22);
-  background: rgba(0, 0, 0, 0.25);
+  border: 3px solid var(--color-ink);
+  background: var(--color-cream);
+  box-shadow: 5px 5px 0 var(--color-ink);
   padding: 1.4rem 1.8rem;
   text-align: center;
   margin-bottom: 2.5rem;
@@ -40,19 +41,19 @@
 .shows__empty-title {
   font-family: var(--font-pixel);
   font-size: 0.7rem;
-  color: var(--color-gold);
+  color: var(--color-red);
   margin-bottom: 0.9rem;
 }
 
 .shows__empty-copy {
   font-family: var(--font-vt323);
   font-size: 1.5rem;
-  color: var(--color-cream);
+  color: var(--color-ink);
   line-height: 1.15;
 }
 
 .shows__empty-copy a {
-  color: var(--color-gold-light);
+  color: var(--color-red);
 }
 
 .show-card {
@@ -61,20 +62,21 @@
   align-items: center;
   gap: 1.25rem;
   padding: 1.4rem 1.8rem;
-  border: 3px solid rgba(212, 160, 23, 0.22);
-  background: rgba(0, 0, 0, 0.25);
+  border: 3px solid var(--color-ink);
+  background: var(--color-cream);
+  box-shadow: 5px 5px 0 rgba(15, 13, 12, 0.35);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   cursor: default;
 }
 
 .show-card--featured {
-  border-color: var(--color-gold);
-  background: rgba(212, 160, 23, 0.07);
+  border-color: var(--color-ink);
+  background: var(--color-yellow);
 }
 
 .show-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--color-gold-dark);
+  box-shadow: 7px 7px 0 var(--color-ink);
 }
 
 .show-card__date {
@@ -84,14 +86,14 @@
 .show-card__meta {
   font-family: var(--font-pixel);
   font-size: 0.45rem;
-  color: rgba(245, 240, 220, 0.75);
+  color: var(--color-ink-soft);
   margin-bottom: 0.45rem;
 }
 
 .show-card__month {
   font-family: var(--font-pixel);
   font-size: 0.55rem;
-  color: #e74c3c;
+  color: var(--color-red);
   display: block;
   margin-bottom: 0.25rem;
 }
@@ -99,14 +101,14 @@
 .show-card__day {
   font-family: var(--font-pixel);
   font-size: 1.2rem;
-  color: var(--color-gold);
+  color: var(--color-ink);
   display: block;
 }
 
 .show-card__venue {
   font-family: var(--font-vt323);
   font-size: 2.2rem;
-  color: var(--color-cream);
+  color: var(--color-ink);
   display: block;
   line-height: 1.1;
 }
@@ -114,7 +116,7 @@
 .show-card__details {
   font-family: var(--font-vt323);
   font-size: 1.5rem;
-  color: var(--color-gold-light);
+  color: var(--color-ink-soft);
   display: block;
   margin-top: 0.2rem;
 }
@@ -129,17 +131,19 @@
 .show-card__link {
   font-family: var(--font-pixel);
   font-size: 0.45rem;
-  color: var(--color-gold-light);
+  color: var(--color-ink);
   text-decoration: none;
-  border: 2px solid rgba(212, 160, 23, 0.38);
+  border: 2px solid var(--color-ink);
+  background: var(--color-sky-light);
   padding: 0.55rem 0.7rem;
 }
 
 .show-card__link:hover,
 .show-card__link:focus-visible {
   color: var(--color-cream);
-  border-color: var(--color-gold);
-  outline: 2px solid var(--color-gold-light);
+  background: var(--color-red);
+  border-color: var(--color-ink);
+  outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 

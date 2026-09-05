@@ -3,6 +3,9 @@ import { SOCIAL_LINKS } from '../../config/constants';
 import { getSafeExternalUrl } from '../../utils/safeUrl';
 import '../../styles/components/Footer.css';
 
+// Negative space inside the pixel icons — matches the footer's red backdrop.
+const FOOTER_BG = '#D1241F';
+
 const ICONS = {
   Instagram: () => (
     <svg viewBox="0 0 16 16" width="32" height="32" style={{ imageRendering: 'pixelated' }} aria-hidden="true">
@@ -11,14 +14,14 @@ const ICONS = {
       <rect x="3" y="14" width="10" height="1" fill="currentColor" />
       <rect x="1" y="3" width="1" height="10" fill="currentColor" />
       <rect x="14" y="3" width="1" height="10" fill="currentColor" />
-      <rect x="3" y="3" width="10" height="10" fill="#030a02" />
+      <rect x="3" y="3" width="10" height="10" fill={FOOTER_BG} />
       <rect x="5" y="4" width="6" height="1" fill="currentColor" />
       <rect x="5" y="11" width="6" height="1" fill="currentColor" />
       <rect x="4" y="5" width="1" height="6" fill="currentColor" />
       <rect x="11" y="5" width="1" height="6" fill="currentColor" />
-      <rect x="5" y="5" width="6" height="6" fill="#030a02" />
+      <rect x="5" y="5" width="6" height="6" fill={FOOTER_BG} />
       <rect x="6" y="6" width="4" height="4" fill="currentColor" />
-      <rect x="7" y="7" width="2" height="2" fill="#030a02" />
+      <rect x="7" y="7" width="2" height="2" fill={FOOTER_BG} />
       <rect x="11" y="4" width="1" height="1" fill="currentColor" />
     </svg>
   ),
@@ -36,7 +39,7 @@ const ICONS = {
       <rect x="1"  y="4"  width="14" height="8" fill="currentColor" />
       <rect x="2"  y="3"  width="12" height="1" fill="currentColor" />
       <rect x="2"  y="12" width="12" height="1" fill="currentColor" />
-      <rect x="2"  y="5"  width="12" height="6" fill="#030a02" />
+      <rect x="2"  y="5"  width="12" height="6" fill={FOOTER_BG} />
       <rect x="6"  y="6"  width="1" height="4" fill="currentColor" />
       <rect x="7"  y="7"  width="1" height="2" fill="currentColor" />
       <rect x="8"  y="7"  width="1" height="2" fill="currentColor" />

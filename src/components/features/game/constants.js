@@ -17,10 +17,10 @@ export const MAX_LIVES = 3;
 export const PIZZA_TO_BOSS = 16;     // slices needed to trigger boss
 export const SONG_FILE = '/kylesong.mp3';
 export const SONG_VOLUME = 0.5;
-export const GLD = '#E2A820';
-export const GRN = '#1C3D12';
-export const GRN2 = '#2D4A1E';
-export const CREAM = '#F5F0DC';
+// Arcade chrome — matches the site theme (red sticker logo, cream, yellow).
+export const GLD = '#E9C118';
+export const MENU_BG = '#8E1512';
+export const CREAM = '#F7F4EC';
 
 // ── LEVEL CONFIGS ─────────────────────────────
 // Level order: Ypsilanti → Ferndale → Detroit

@@ -2,7 +2,7 @@
 //  game/sprites.js
 //  All canvas draw functions for the game.
 // ─────────────────────────────────────────────
-import { PW, PH, GLD, GRN } from './constants.js';
+import { PW, PH, GLD } from './constants.js';
 
 // ── PLAYER ────────────────────────────────────
 export function drawPlayer(ctx, pl, charIdx, frame) {

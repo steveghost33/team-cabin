@@ -1,6 +1,12 @@
 .game-section {
-  background: #030a02;
-  border-top: 4px solid var(--color-gold);
+  background: var(--color-ramp);
+  border-top: 4px solid var(--color-ink);
+  border-bottom: 4px solid var(--color-ink);
+}
+
+.game-section .section-title {
+  /* red would sink into the plywood orange — cream keeps it readable */
+  --section-title-color: var(--color-cream);
 }
 
 .game-section__inner {
@@ -22,16 +28,18 @@
 .game-section__description {
   font-family: var(--font-vt323);
   font-size: 1.25rem;
-  color: rgba(212, 160, 23, 0.55);
+  color: var(--color-ink);
   text-align: center;
   margin-bottom: 2rem;
   line-height: 1.5;
 }
 
 .game-section__description strong {
-  color: var(--color-gold);
+  color: var(--color-cream);
+  text-shadow: 1px 1px 0 var(--color-ink);
 }
 
 .game-section__description strong.danger {
-  color: #e74c3c;
+  color: var(--color-red);
+  text-shadow: 1px 1px 0 var(--color-ink);
 }

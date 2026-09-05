@@ -1,13 +1,13 @@
 .footer {
-  background: #030a02;
-  border-top: 3px solid rgba(212, 160, 23, 0.25);
+  background: var(--color-red);
+  border-top: 4px solid var(--color-ink);
   padding: 3rem 2rem;
   text-align: center;
 }
 
 .footer__logo {
   margin-bottom: 1.5rem;
-  filter: drop-shadow(0 0 12px var(--color-gold-dark));
+  filter: drop-shadow(4px 4px 0 rgba(15, 13, 12, 0.3));
 }
 
 .footer__social {
@@ -21,32 +21,32 @@
 .footer__copyright {
   font-family: var(--font-pixel);
   font-size: 0.35rem;
-  color: rgba(212, 160, 23, 0.28);
+  color: rgba(247, 244, 236, 0.72);
   letter-spacing: 0.08em;
 }
 
 .footer__tagline {
   font-family: var(--font-vt323);
   font-size: 1rem;
-  color: rgba(212, 160, 23, 0.28);
+  color: rgba(247, 244, 236, 0.72);
   margin-top: 0.4rem;
 }
 
 .footer__credit {
   font-family: var(--font-vt323);
   font-size: 0.85rem;
-  color: rgba(212, 160, 23, 0.28);
+  color: rgba(247, 244, 236, 0.72);
   margin-top: 1rem;
 }
 
 .footer__credit-link {
-  color: var(--color-gold-light);
+  color: var(--color-cream);
   text-decoration: none;
   transition: color var(--transition-normal);
 }
 
 .footer__credit-link:hover {
-  color: var(--color-gold);
+  color: var(--color-yellow);
   text-decoration: underline;
 }
 
@@ -55,13 +55,13 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: var(--color-gold-light);
+  color: var(--color-cream);
   text-decoration: none;
   transition: color var(--transition-normal);
 }
 
 .social-icon:hover {
-  color: var(--color-gold);
+  color: var(--color-yellow);
 }
 
 .social-icon__label {

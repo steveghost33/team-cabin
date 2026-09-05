@@ -2,9 +2,8 @@
   position: sticky;
   top: 0;
   z-index: 500;
-  background: rgba(10, 22, 6, 0.97);
-  border-bottom: 3px solid var(--color-gold);
-  backdrop-filter: blur(8px);
+  background: var(--color-red);
+  border-bottom: 4px solid var(--color-ink);
 }
 
 .nav__container {
@@ -29,7 +28,7 @@
 
 .nav__logo:focus-visible,
 .nav__link:focus-visible {
-  outline: 2px solid var(--color-gold-light);
+  outline: 2px solid var(--color-cream);
   outline-offset: 4px;
 }
 
@@ -53,7 +52,7 @@
 }
 
 .nav__link:hover {
-  color: var(--color-gold);
+  color: var(--color-yellow);
 }
 
 .nav__link-mobile {

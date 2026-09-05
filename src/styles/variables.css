@@ -1,13 +1,26 @@
 :root {
-  /* Colors */
-  --color-gold: #D4A017;
-  --color-gold-light: #E8B84B;
-  --color-gold-dark: #A07810;
-  --color-green: #2D4A1E;
-  --color-green-mid: #3D6B2A;
-  --color-green-light: #4A7A30;
-  --color-cream: #F5F0DC;
-  --color-black: #0a0a0a;
+  /* Colors — pulled from the skate-ramp band art:
+     sky blue backdrop, red sticker logo, cream letters, heavy black outlines,
+     orange plywood ramps, lavender-grey concrete, yellow tee, green wheels. */
+  --color-sky: #7AC6F2;
+  --color-sky-light: #A6DDF9;
+  --color-sky-deep: #4A9FD6;
+  --color-sky-shade: #64B4E4;
+
+  --color-red: #D1241F;
+  --color-red-light: #EE4B3F;
+  --color-red-dark: #971410;
+
+  --color-ramp: #D3922F;
+  --color-ramp-dark: #A46A18;
+
+  --color-concrete: #B3ADBE;
+  --color-yellow: #E9C118;
+  --color-grass: #1D7C2D;
+
+  --color-cream: #F7F4EC;
+  --color-ink: #0F0D0C;
+  --color-ink-soft: #3B342E;
 
   /* Typography */
   --font-pixel: 'Press Start 2P', cursive;

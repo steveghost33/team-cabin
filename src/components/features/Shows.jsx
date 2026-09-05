@@ -125,7 +125,7 @@ export default function Shows() {
 
         {pastShows.length > 0 && (
           <>
-            <SectionTitle as="h3" color="var(--color-gold-light)">RECENT SHOWS</SectionTitle>
+            <SectionTitle as="h3" color="var(--color-ink-soft)">RECENT SHOWS</SectionTitle>
             <ul className="shows__list shows__list--past" role="list">
               {pastShows.slice(0, 5).map((show) => (
                 <ShowCard key={show.id} show={show} />

@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { GameEngine } from './game/GameEngine.js';
 import { renderFrame } from './game/renderer.js';
-import { GLD, GRN, CREAM, SONG_FILE, SONG_VOLUME } from './game/constants.js';
+import { GLD, CREAM, SONG_FILE, SONG_VOLUME } from './game/constants.js';
 import { useFullscreen } from '../../hooks/useFullscreen.js';
 import { useMobile } from '../../hooks/useMobile.js';
+
+// Site-theme colors for the arcade cabinet chrome around the canvas.
+// (In-canvas art keeps its own palette from game/constants.js.)
+const UI_RED = '#D1241F';
+const UI_INK = '#0F0D0C';
+const UI_CREAM = '#F7F4EC';
 
 export default function PizzaGame() {
   const canvasRef          = useRef(null);
@@ -136,11 +142,11 @@ export default function PizzaGame() {
         ctx.save();
         ctx.fillStyle = 'rgba(0,16,2,0.92)';
         ctx.fillRect(px, 0, pw, ph);
-        ctx.strokeStyle = 'rgba(226,168,32,0.7)';
+        ctx.strokeStyle = 'rgba(233,193,24,0.7)';
         ctx.lineWidth = 2;
         ctx.beginPath(); ctx.moveTo(px + 1, 0); ctx.lineTo(px + 1, ph); ctx.stroke();
 
-        ctx.fillStyle = '#E2A820';
+        ctx.fillStyle = '#E9C118';
         ctx.font = '8px "Press Start 2P"';
         ctx.textAlign = 'center';
         ctx.fillText('TOP SCORES', px + pw / 2, 22);
@@ -154,20 +160,20 @@ export default function PizzaGame() {
           entries.slice(0, 10).forEach((entry, i) => {
             const isMe = myName && entry.playerName === myName && entry.score === myScore;
             const ry = startY + i * rowH;
-            ctx.fillStyle = isMe ? 'rgba(226,168,32,0.18)' : 'rgba(0,0,0,0.28)';
+            ctx.fillStyle = isMe ? 'rgba(233,193,24,0.18)' : 'rgba(0,0,0,0.28)';
             ctx.fillRect(px + 5, ry, pw - 10, rowH - 2);
             if (isMe) {
-              ctx.strokeStyle = '#E2A820'; ctx.lineWidth = 1;
+              ctx.strokeStyle = '#E9C118'; ctx.lineWidth = 1;
               ctx.strokeRect(px + 5, ry, pw - 10, rowH - 2);
             }
             ctx.font = '6px "Press Start 2P"';
             ctx.textAlign = 'left';
-            ctx.fillStyle = isMe ? '#E2A820' : 'rgba(226,168,32,0.55)';
+            ctx.fillStyle = isMe ? '#E9C118' : 'rgba(233,193,24,0.55)';
             ctx.fillText(`#${i + 1}`, px + 9, ry + 14);
-            ctx.fillStyle = '#FFF8E7';
+            ctx.fillStyle = '#F7F4EC';
             ctx.fillText(entry.playerName.slice(0, 3), px + 30, ry + 14);
             ctx.textAlign = 'right';
-            ctx.fillStyle = isMe ? '#E2A820' : '#FFF8E7';
+            ctx.fillStyle = isMe ? '#E9C118' : '#F7F4EC';
             ctx.fillText(entry.score.toLocaleString(), px + pw - 7, ry + 14);
           });
         }
@@ -411,8 +417,8 @@ export default function PizzaGame() {
     <button
       style={{
         position: 'absolute', bottom: 6, right: 6, zIndex: 20,
-        background: 'rgba(0,0,0,0.65)', color: GLD,
-        border: `1px solid rgba(226,168,32,0.4)`,
+        background: 'rgba(15,13,12,0.65)', color: UI_CREAM,
+        border: `1px solid rgba(247,244,236,0.45)`,
         borderRadius: 5, padding: '3px 8px',
         fontFamily: '"Press Start 2P"', fontSize: '0.65rem',
         cursor: 'pointer', lineHeight: 1,
@@ -470,7 +476,7 @@ export default function PizzaGame() {
   const KeyGroup = ({ children, label }) => (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
       {children}
-      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: GLD, letterSpacing: 1 }}>
+      <span style={{ fontFamily: '"Press Start 2P"', fontSize: '0.5rem', color: UI_CREAM, letterSpacing: 1 }}>
         {label}
       </span>
     </div>
@@ -478,8 +484,8 @@ export default function PizzaGame() {
 
   const DesktopControls = () => (
     <div style={{
-      background: GRN,
-      borderTop: `3px solid ${GLD}`,
+      background: UI_RED,
+      borderTop: `4px solid ${UI_INK}`,
       padding: '14px 28px 16px',
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
     }}>
@@ -775,7 +781,7 @@ export default function PizzaGame() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
       <div style={{
         position: 'relative',
-        border: `4px solid ${GLD}`, boxShadow: `4px 4px 0 #000`,
+        border: `4px solid ${UI_INK}`, boxShadow: `6px 6px 0 rgba(15,13,12,0.35)`,
         background: '#000', width: '100%', maxWidth: 780, alignSelf: 'center',
       }}>
         <canvas

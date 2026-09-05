@@ -49,7 +49,7 @@ Open `src/config/constants.js` and add to the `SHOWS` array:
   ticketUrl: 'https://your-ticket-link.com',
 }
 ```
-Set `feat: true` to give it the gold highlight treatment.
+Set `feat: true` to give it the yellow highlight treatment.
 
 ### Update music links
 In `src/config/constants.js`, update the `url` fields in `MUSIC_LINKS`:
@@ -67,12 +67,14 @@ In `src/config/constants.js`, update the `url` fields in `SOCIAL_LINKS`:
 In `src/config/constants.js`, edit the `bio` and `pizza` fields in `MEMBERS`.
 
 ### Change brand colors
-In `src/config/constants.js`, edit the `C` object:
+In `src/config/constants.js`, edit the `C` object (and mirror it in `src/styles/variables.css`):
 ```js
 export const C = {
-  gold:  '#D4A017',   // main gold
-  goldL: '#E8B84B',   // light gold
-  green: '#2D4A1E',   // dark green
+  sky:   '#7AC6F2',   // sky-blue backdrop
+  red:   '#D1241F',   // sticker-logo red
+  ramp:  '#D3922F',   // plywood ramp orange
+  cream: '#F7F4EC',   // letter cream
+  ink:   '#0F0D0C',   // outline black
   ...
 };
 ```

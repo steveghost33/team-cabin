@@ -1,12 +1,18 @@
-const LETTER_COLOR = '#1C3D12';
-const GOLD = '#E2A820';
+const RED = '#D1241F';
+const INK = '#0F0D0C';
+const CREAM = '#F7F4EC';
 
 export default function TCLogo({ size = 120 }) {
-  const shadowOffset = 8;
-
-  // Layout math (200×200 viewBox, circle r=94 at center 100,100):
+  // Hand-drawn sticker badge: a wobbly red blob with a heavy ink outline and
+  // chunky cream letters, matching the painted "TEAM CABIN" band logo.
+  //
+  // Layout math (200×200 viewBox):
   //   TC block = 148px wide → startX=26  (centered: (200-148)/2 = 26)
   //   Height   = 94px tall  → startY=53  (centered: (200-94)/2  = 53)
+  const blobPath = `
+    M32,30 Q100,19 171,31 Q186,44 184,100 Q186,154 169,168
+    Q100,180 31,167 Q15,153 17,99 Q15,44 32,30 Z`;
+
   const tPath = `
     M30,53 L92,53 Q96,53 96,57 L96,69 Q96,73 92,73 L78,73
     L78,143 Q78,147 74,147 L52,147 Q48,147 48,143 L48,73
@@ -27,40 +33,32 @@ export default function TCLogo({ size = 120 }) {
       aria-label="Team Cabin TC logo"
       role="img"
     >
-      <defs>
-        <pattern
-          id="tcH"
-          patternUnits="userSpaceOnUse"
-          width="7"
-          height="7"
-          patternTransform="rotate(-45 0 0)"
-        >
-          <line x1="0" y1="0" x2="0" y2="7" stroke={LETTER_COLOR} strokeWidth="2.2" />
-        </pattern>
+      {/* Scaled down slightly so the die-cut ring stays inside the viewBox. */}
+      <g transform="translate(100,100) scale(0.9) translate(-100,-100)">
+        {/* die-cut sticker edge — keeps the badge readable on the red bars */}
+        <path
+          d={blobPath}
+          fill="none"
+          stroke={CREAM}
+          strokeWidth="24"
+          strokeLinejoin="round"
+        />
 
-        <clipPath id="tSh">
-          <path transform={`translate(${shadowOffset},${shadowOffset})`} d={tPath} />
-        </clipPath>
+        {/* red sticker blob */}
+        <path
+          d={blobPath}
+          fill={RED}
+          stroke={INK}
+          strokeWidth="9"
+          strokeLinejoin="round"
+        />
 
-        <clipPath id="cSh">
-          <path transform={`translate(${shadowOffset},${shadowOffset})`} d={cPath} />
-        </clipPath>
-      </defs>
-
-      <circle cx="100" cy="100" r="94" fill={GOLD} />
-
-      <g clipPath="url(#tSh)">
-        <rect x="0" y="0" width="200" height="200" fill={GOLD} />
-        <rect x="0" y="0" width="200" height="200" fill="url(#tcH)" />
+        {/* cream letters, outlined like the painted logo */}
+        <g transform="rotate(-2 100 100)" strokeLinejoin="round">
+          <path d={tPath} fill={CREAM} stroke={INK} strokeWidth="7" />
+          <path d={cPath} fill={CREAM} stroke={INK} strokeWidth="7" />
+        </g>
       </g>
-
-      <g clipPath="url(#cSh)">
-        <rect x="0" y="0" width="200" height="200" fill={GOLD} />
-        <rect x="0" y="0" width="200" height="200" fill="url(#tcH)" />
-      </g>
-
-      <path d={tPath} fill={LETTER_COLOR} />
-      <path d={cPath} fill={LETTER_COLOR} />
     </svg>
   );
 }

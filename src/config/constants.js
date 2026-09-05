@@ -1,14 +1,19 @@
 // ── Brand Colors ──
-// Used by the canvas game renderer (JS context) and as a reference for CSS variables.
+// Skate-park palette from the band art. Mirrors src/styles/variables.css —
+// keep the two in sync, and use these in JS contexts (canvas, inline styles).
 export const C = {
-  gold:   '#D4A017',
-  goldL:  '#E8B84B',
-  goldD:  '#A07810',
-  green:  '#2D4A1E',
-  greenM: '#3D6B2A',
-  greenL: '#4A7A30',
-  cream:  '#F5F0DC',
-  black:  '#0a0a0a',
+  sky:      '#7AC6F2',
+  skyLight: '#A6DDF9',
+  skyDeep:  '#4A9FD6',
+  red:      '#D1241F',
+  redLight: '#EE4B3F',
+  redDark:  '#971410',
+  ramp:     '#D3922F',
+  rampDark: '#A46A18',
+  concrete: '#B3ADBE',
+  yellow:   '#E9C118',
+  cream:    '#F7F4EC',
+  ink:      '#0F0D0C',
 };
 
 export const SITE_URL = 'https://www.weareteamcabin.com';

@@ -3,7 +3,7 @@
 //  Pure canvas drawing — no React, no state.
 //  Called each frame by PizzaGame.jsx
 // ─────────────────────────────────────────────
-import { W, H, GROUND, PW, PH, GLD, GRN, GRN2, CREAM } from './constants.js';
+import { W, H, GROUND, PW, PH, GLD, MENU_BG, CREAM } from './constants.js';
 import { LEVELS } from './constants.js';
 import { drawPlayer, drawEnemy, drawPizza, drawHeart, drawBoss, drawCharPreview } from './sprites.js';
 
@@ -278,7 +278,7 @@ function drawHUD(ctx, engine, lvl) {
   ctx.fillStyle = GLD; ctx.font = '11px "Press Start 2P"'; ctx.textAlign = 'left';
   ctx.fillText('SCORE:' + sc, 10, 18);
   if (engine.highSc > 0) {
-    ctx.fillStyle = 'rgba(226,168,32,0.55)'; ctx.font = '8px "Press Start 2P"';
+    ctx.fillStyle = 'rgba(233,193,24,0.55)'; ctx.font = '8px "Press Start 2P"';
     ctx.fillText('BEST:' + engine.highSc, 10, 34);
   }
 
@@ -296,7 +296,7 @@ function drawHUD(ctx, engine, lvl) {
   // level name + mission
   ctx.fillStyle = CREAM; ctx.font = '7px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText(`LVL ${engine.lvlIdx+1} · ${lvl.name}`, W/2, 33);
-  ctx.fillStyle = 'rgba(245,240,220,0.5)'; ctx.font = '6px "Press Start 2P"';
+  ctx.fillStyle = 'rgba(247,244,236,0.5)'; ctx.font = '6px "Press Start 2P"';
   ctx.fillText(lvl.mission, W/2, 46);
 
   // character life icons — top-right
@@ -1910,7 +1910,7 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
 
   // skip prompt
   if (Math.floor(frame / 22) % 2 === 0) {
-    ctx.fillStyle = 'rgba(226,168,32,0.4)';
+    ctx.fillStyle = 'rgba(233,193,24,0.4)';
     ctx.font = '8px "Press Start 2P"';
     ctx.fillText('TAP TO SKIP', W / 2, H - 22);
   }
@@ -1918,10 +1918,10 @@ function drawLevelIntro(ctx, frame, lvl, introTimer) {
 
 function drawInitials(ctx, frame, engine) {
   const { initials, initialsPos } = engine;
-  ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = MENU_BG; ctx.fillRect(0,0,W,H);
   for (let i=0;i<40;i++) {
     const sx=(i*131+frame*0.3)%W, sy=(i*71)%(H*0.55);
-    ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(226,168,32,0.08)';
+    ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(233,193,24,0.08)';
     ctx.fillRect(sx,sy,2,2);
   }
   ctx.fillStyle='rgba(0,0,0,0.86)'; ctx.fillRect(W/2-260,H/2-160,520,320);
@@ -1929,7 +1929,7 @@ function drawInitials(ctx, frame, engine) {
 
   ctx.fillStyle=GLD; ctx.font='13px "Press Start 2P"'; ctx.textAlign='center';
   ctx.fillText('ENTER YOUR INITIALS',W/2,H/2-108);
-  ctx.fillStyle='rgba(245,240,220,0.45)'; ctx.font='6px "Press Start 2P"';
+  ctx.fillStyle='rgba(247,244,236,0.45)'; ctx.font='6px "Press Start 2P"';
   ctx.fillText('← → CHANGE LETTER   ENTER / A = CONFIRM',W/2,H/2-82);
 
   // 3 letter slots
@@ -1940,17 +1940,17 @@ function drawInitials(ctx, frame, engine) {
     const active = i === initialsPos;
 
     // box
-    ctx.fillStyle = active ? 'rgba(226,168,32,0.14)' : 'rgba(0,0,0,0.45)';
+    ctx.fillStyle = active ? 'rgba(233,193,24,0.14)' : 'rgba(0,0,0,0.45)';
     ctx.fillRect(cx-26, cy-46, 52, 68);
     ctx.lineWidth = active ? 3 : 1;
-    ctx.strokeStyle = active ? GLD : 'rgba(226,168,32,0.25)';
+    ctx.strokeStyle = active ? GLD : 'rgba(233,193,24,0.25)';
     if (active) { ctx.shadowBlur=14; ctx.shadowColor=GLD; }
     ctx.strokeRect(cx-26, cy-46, 52, 68);
     ctx.shadowBlur=0;
 
     // show prev/next letters dimmed for context
     const curIdx = CHARS.indexOf(initials[i]);
-    ctx.fillStyle='rgba(226,168,32,0.22)'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(233,193,24,0.22)'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
     if (active) {
       ctx.fillText(CHARS[(curIdx-1+CHARS.length)%CHARS.length], cx, cy-28);
       ctx.fillText(CHARS[(curIdx+1)%CHARS.length], cx, cy+38);
@@ -1968,16 +1968,16 @@ function drawInitials(ctx, frame, engine) {
   }
 
   if (Math.floor(frame/25)%2===0) {
-    ctx.fillStyle='#4A7A30'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
+    ctx.fillStyle='#7AC6F2'; ctx.font='9px "Press Start 2P"'; ctx.textAlign='center';
     ctx.fillText(initialsPos < 2 ? 'ENTER · NEXT' : 'ENTER TO FINISH', W/2, H/2+100);
   }
 }
 
 function drawTitle(ctx, frame, highSc, playerName) {
-  ctx.fillStyle = GRN; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = MENU_BG; ctx.fillRect(0,0,W,H);
   for (let i=0;i<40;i++) {
     const sx=(i*131+frame*0.3)%W, sy=(i*71)%(H*0.55);
-    ctx.fillStyle = Math.sin(frame*0.04+i)>0.4 ? GLD : 'rgba(226,168,32,0.08)';
+    ctx.fillStyle = Math.sin(frame*0.04+i)>0.4 ? GLD : 'rgba(233,193,24,0.08)';
     ctx.fillRect(sx,sy,2,2);
   }
   ctx.fillStyle='rgba(0,0,0,0.92)'; ctx.fillRect(W/2-270,H/2-180,540,360);
@@ -1986,11 +1986,11 @@ function drawTitle(ctx, frame, highSc, playerName) {
   // title
   ctx.fillStyle=GLD; ctx.font='22px "Press Start 2P"'; ctx.textAlign='center';
   ctx.fillText('TC PIZZA QUEST',W/2,H/2-118);
-  ctx.fillStyle='rgba(226,168,32,0.55)'; ctx.font='10px "Press Start 2P"';
+  ctx.fillStyle='rgba(233,193,24,0.55)'; ctx.font='10px "Press Start 2P"';
   ctx.fillText('— Team Cabin Edition —',W/2,H/2-90);
 
   // divider
-  ctx.strokeStyle='rgba(226,168,32,0.3)'; ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(233,193,24,0.3)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(W/2-210,H/2-70); ctx.lineTo(W/2+210,H/2-70); ctx.stroke();
 
   // how to play header
@@ -2012,12 +2012,12 @@ function drawTitle(ctx, frame, highSc, playerName) {
     ctx.fillStyle=GLD; ctx.font='14px "Press Start 2P"';
     ctx.fillText('PRESS ENTER / START',W/2,H/2+90);
   }
-  if (highSc>0){ctx.fillStyle='rgba(226,168,32,0.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+120);}
+  if (highSc>0){ctx.fillStyle='rgba(233,193,24,0.45)';ctx.font='8px "Press Start 2P"';ctx.fillText('BEST: '+highSc+(playerName&&playerName!=='AAA'?' · '+playerName:''),W/2,H/2+120);}
 }
 
 function drawCharSelect(ctx, frame, selChar) {
-  ctx.fillStyle=GRN; ctx.fillRect(0,0,W,H);
-  for(let i=0;i<35;i++){const sx=(i*137)%W,sy=(i*71)%(H*0.6);ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(226,168,32,0.07)';ctx.fillRect(sx,sy,2,2);}
+  ctx.fillStyle=MENU_BG; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<35;i++){const sx=(i*137)%W,sy=(i*71)%(H*0.6);ctx.fillStyle=Math.sin(frame*0.04+i)>0.4?GLD:'rgba(233,193,24,0.07)';ctx.fillRect(sx,sy,2,2);}
   ctx.fillStyle=GLD; ctx.font='18px "Press Start 2P"'; ctx.textAlign='center';
   ctx.fillText('CHOOSE YOUR PLAYER',W/2,50);
   const chars=[{name:'STEVE',role:'Bass & Vocals'},{name:'MIKE',role:'Drums'},{name:'KYLE',role:'Guitar & Vocals'}];
@@ -2026,15 +2026,15 @@ function drawCharSelect(ctx, frame, selChar) {
   chars.forEach((ch,i)=>{
     const cx=startX+i*(cW+gap), cy=75;
     const sel=selChar===i;
-    ctx.fillStyle=sel?'rgba(226,168,32,0.12)':'rgba(0,0,0,0.5)'; ctx.fillRect(cx,cy,cW,cH);
-    ctx.strokeStyle=sel?GLD:'rgba(226,168,32,0.2)'; ctx.lineWidth=sel?4:2; ctx.strokeRect(cx,cy,cW,cH);
+    ctx.fillStyle=sel?'rgba(233,193,24,0.12)':'rgba(0,0,0,0.5)'; ctx.fillRect(cx,cy,cW,cH);
+    ctx.strokeStyle=sel?GLD:'rgba(233,193,24,0.2)'; ctx.lineWidth=sel?4:2; ctx.strokeRect(cx,cy,cW,cH);
     if(sel){ctx.shadowBlur=14;ctx.shadowColor=GLD;ctx.strokeRect(cx,cy,cW,cH);ctx.shadowBlur=0;}
     ctx.save(); ctx.beginPath(); ctx.rect(cx+3,cy+3,cW-6,cH-6); ctx.clip();
     drawCharPreview(ctx, i, cx+cW/2, cy+cH*0.44, 3);
     ctx.restore();
     ctx.fillStyle=sel?GLD:CREAM; ctx.font=`${sel?'13':'11'}px "Press Start 2P"`; ctx.textAlign='center';
     ctx.fillText(ch.name, cx+cW/2, cy+cH-55);
-    ctx.fillStyle='rgba(226,168,32,0.6)'; ctx.font='8px "Press Start 2P"';
+    ctx.fillStyle='rgba(233,193,24,0.6)'; ctx.font='8px "Press Start 2P"';
     ctx.fillText(ch.role, cx+cW/2, cy+cH-32);
     if(sel&&Math.floor(frame/20)%2===0){ctx.fillStyle=GLD;ctx.font='16px serif';ctx.fillText('▼',cx+cW/2,cy-8);}
   });
@@ -2054,9 +2054,9 @@ function drawLevelUp(ctx, frame, lvlIdx, lvl) {
   ctx.fillText('LEVEL '+lvlIdx+' COMPLETE!',W/2,H/2-62);
   ctx.fillStyle=CREAM; ctx.font='18px "Press Start 2P"';
   ctx.fillText('→ '+lvl.name,W/2,H/2-20);
-  ctx.fillStyle='rgba(245,240,220,0.6)'; ctx.font='8px "Press Start 2P"';
+  ctx.fillStyle='rgba(247,244,236,0.6)'; ctx.font='8px "Press Start 2P"';
   ctx.fillText(lvl.mission,W/2,H/2+12);
-  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#4A7A30';ctx.font='10px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+55);}
+  if(Math.floor(frame/20)%2===0){ctx.fillStyle='#7AC6F2';ctx.font='10px "Press Start 2P"';ctx.fillText('GET READY...',W/2,H/2+55);}
 }
 
 function drawGameOver(ctx, frame, sc, highSc) {
@@ -2070,8 +2070,8 @@ function drawGameOver(ctx, frame, sc, highSc) {
 }
 
 function drawWin(ctx, frame, sc, highSc, playerName) {
-  ctx.fillStyle=GRN; ctx.fillRect(0,0,W,H);
-  for(let i=0;i<28;i++){ctx.fillStyle=[GLD,'#e74c3c','#F5F0DC','#4A7A30'][i%4];ctx.fillRect((i*137+frame*2.5)%W,(i*89+frame*1.5)%(H-60),8,8);}
+  ctx.fillStyle=MENU_BG; ctx.fillRect(0,0,W,H);
+  for(let i=0;i<28;i++){ctx.fillStyle=[GLD,'#D1241F',CREAM,'#7AC6F2'][i%4];ctx.fillRect((i*137+frame*2.5)%W,(i*89+frame*1.5)%(H-60),8,8);}
   ctx.fillStyle='rgba(0,0,0,0.85)'; ctx.fillRect(W/2-265,H/2-148,530,296);
   ctx.strokeStyle=GLD; ctx.lineWidth=4; ctx.strokeRect(W/2-265,H/2-148,530,296);
   ctx.fillStyle=GLD; ctx.font='15px "Press Start 2P"'; ctx.textAlign='center';
@@ -2241,7 +2241,7 @@ function drawPieSci(ctx, bx, frame) {
 
   // roof cap + street sign
   ctx.fillStyle = '#141414'; ctx.fillRect(bx - 3, by - bh - 4, bw + 6, 6);
-  ctx.fillStyle = 'rgba(226,168,32,0.6)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(233,193,24,0.6)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('TRUMBULL AVE', bx + bw * 0.5, by - bh - 9);
 }
 
@@ -2415,15 +2415,15 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
   // gilt sphere with sunburst rays, resting on the raised palm
   const pulse = 0.78 + Math.sin(frame * 0.05) * 0.18;
   const sx = rHd[0] + 1, sy = rHd[1] - 21;
-  ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(226,168,32,0.85)';
-  ctx.strokeStyle = `rgba(226,168,32,${pulse})`; ctx.lineWidth = 2;
+  ctx.shadowBlur = 16; ctx.shadowColor = 'rgba(233,193,24,0.85)';
+  ctx.strokeStyle = `rgba(233,193,24,${pulse})`; ctx.lineWidth = 2;
   for (let r = 0; r < 14; r++) {
     const a = (r / 14) * Math.PI * 2;
     const r0 = 12, r1 = 23 + Math.sin(frame * 0.07 + r) * 2;
     ctx.beginPath(); ctx.moveTo(sx + Math.cos(a)*r0, sy + Math.sin(a)*r0);
     ctx.lineTo(sx + Math.cos(a)*r1, sy + Math.sin(a)*r1); ctx.stroke();
   }
-  ctx.fillStyle = `rgba(226,168,32,${pulse})`;
+  ctx.fillStyle = `rgba(233,193,24,${pulse})`;
   ctx.beginPath(); ctx.arc(sx, sy, 11, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = 'rgba(255,243,178,0.7)';
   ctx.beginPath(); ctx.arc(sx - 3, sy - 3, 4, 0, Math.PI*2); ctx.fill();
@@ -2431,11 +2431,11 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
 
   // gilt family group standing on the open left palm
   const lx = lHd[0], ly = lHd[1] - 13;
-  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(226,168,32,0.7)';
-  ctx.fillStyle = `rgba(226,168,32,${0.72 + Math.sin(frame*0.04)*0.18})`;
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(233,193,24,0.7)';
+  ctx.fillStyle = `rgba(233,193,24,${0.72 + Math.sin(frame*0.04)*0.18})`;
   ctx.beginPath(); ctx.arc(lx, ly - 10, 3.5, 0, Math.PI*2); ctx.fill();   // parent head
   ctx.fillRect(lx - 3, ly - 7, 6, 11);                                    // parent body
-  ctx.strokeStyle = `rgba(226,168,32,${0.8 + Math.sin(frame*0.04)*0.15})`; ctx.lineWidth = 2;
+  ctx.strokeStyle = `rgba(233,193,24,${0.8 + Math.sin(frame*0.04)*0.15})`; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(lx - 3, ly - 4); ctx.lineTo(lx - 9, ly - 10); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(lx + 3, ly - 4); ctx.lineTo(lx + 9, ly - 10); ctx.stroke();
   ctx.fillRect(lx - 9, ly - 3, 4, 7); ctx.fillRect(lx + 5, ly - 3, 4, 7); // two children
@@ -2488,7 +2488,7 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
   }
 
   // small bronze dedication plaque cut into the face of the marble base
-  ctx.fillStyle = 'rgba(226,168,32,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(233,193,24,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('THE SPIRIT OF DETROIT', cx, by - 19);
 }
 // ── JOE LOUIS FIST — Monument to Joe Louis ───────────────────────────────────
@@ -2595,7 +2595,7 @@ function drawJoeLouisFist(ctx, bx, frame) {
 
   // plaque
   ctx.fillStyle = '#2b2f31'; ctx.fillRect(bx + bw / 2 - 56, by - 22, 112, 18);
-  ctx.fillStyle = 'rgba(226,168,32,0.75)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(233,193,24,0.75)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('MONUMENT TO JOE LOUIS', bx + bw / 2, by - 10);
   ctx.lineCap = 'butt';
 }
@@ -2693,8 +2693,8 @@ function drawMajestic(ctx, bx, frame) {
     ctx.fillRect(mqX - 6 + i * 9, mqY + mqH + 2, 4, 3);
   }
   // gold MAJESTIC THEATRE lettering
-  if (flash) { ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(226,168,32,0.8)'; }
-  ctx.fillStyle = '#E2A820'; ctx.font = '8px "Press Start 2P"'; ctx.textAlign = 'center';
+  if (flash) { ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(233,193,24,0.8)'; }
+  ctx.fillStyle = GLD; ctx.font = '8px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('MAJESTIC THEATRE', mqX + mqW / 2, mqY + 15);
   ctx.shadowBlur = 0;
   // white letterboard, two rows of changeable black letters
@@ -2725,7 +2725,7 @@ function drawMajestic(ctx, bx, frame) {
   ctx.fillStyle = 'rgba(60,120,200,0.16)';
   ctx.fillRect(bx + 10, by - storeH + 10, 48, storeH - 14);
   ctx.fillRect(bx + bw - 58, by - storeH + 10, 48, storeH - 14);
-  ctx.fillStyle = 'rgba(245,240,220,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(247,244,236,0.55)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
   ctx.fillText('BOX OFFICE', bx + 34, by - storeH + 24);
   ctx.fillText('MAJESTIC CAFE', bx + bw - 34, by - storeH + 24);
   // sidewalk shadow under the marquee

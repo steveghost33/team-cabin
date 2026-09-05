@@ -13,8 +13,8 @@ html {
 }
 
 body {
-  background: var(--color-green);
-  color: var(--color-cream);
+  background: var(--color-sky);
+  color: var(--color-ink);
   font-family: var(--font-bebas);
   overflow-x: hidden;
 }
@@ -28,8 +28,8 @@ body::after {
     0deg,
     transparent,
     transparent 3px,
-    rgba(0, 0, 0, 0.07) 3px,
-    rgba(0, 0, 0, 0.07) 4px
+    rgba(15, 13, 12, 0.05) 3px,
+    rgba(15, 13, 12, 0.05) 4px
   );
   pointer-events: none;
   z-index: 9000;
@@ -45,7 +45,7 @@ body::after {
 
 @media (max-width: 768px) {
   body {
-    background: #030a02;
+    background: var(--color-sky-light);
   }
 }
 
@@ -56,8 +56,14 @@ body::after {
 }
 
 @keyframes glow {
-  0%, 100% { text-shadow: 4px 4px 0 var(--color-green), 8px 8px 0 #000; }
-  50%       { text-shadow: 4px 4px 0 var(--color-green), 8px 8px 0 #000, 0 0 30px var(--color-gold), 0 0 60px #ffcc00; }
+  0%, 100% { text-shadow: 4px 4px 0 var(--color-ink), 8px 8px 0 var(--color-red-dark); }
+  50%       { text-shadow: 4px 4px 0 var(--color-ink), 8px 8px 0 var(--color-red), 0 0 18px rgba(233, 193, 24, 0.55); }
+}
+
+/* Same pulse, tighter offsets — for the smaller mobile title. */
+@keyframes glow-sm {
+  0%, 100% { text-shadow: 2px 2px 0 var(--color-ink), 4px 4px 0 var(--color-red-dark); }
+  50%       { text-shadow: 2px 2px 0 var(--color-ink), 4px 4px 0 var(--color-red), 0 0 12px rgba(233, 193, 24, 0.55); }
 }
 
 @keyframes blink {

@@ -7,15 +7,33 @@
   padding: 4rem 2rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #060f04 0%, #0d1f09 55%, #1e3314 100%);
+  border-bottom: 4px solid var(--color-ink);
+  /* Skate-park backdrop: open sky, a concrete floor strip, and a plywood
+     quarter pipe curving up on each side (radial gradients = concave ramps). */
+  background-image:
+    radial-gradient(circle at 100% 0%, transparent 0 170px, var(--color-ramp) 170px),
+    radial-gradient(circle at 0% 0%, transparent 0 170px, var(--color-ramp) 170px),
+    linear-gradient(var(--color-concrete), var(--color-concrete)),
+    linear-gradient(180deg, var(--color-sky-light) 0%, var(--color-sky) 58%, var(--color-sky-shade) 100%);
+  background-repeat: no-repeat;
+  background-size:
+    170px 170px,
+    170px 170px,
+    100% 72px,
+    100% 100%;
+  background-position:
+    left bottom 72px,
+    right bottom 72px,
+    left bottom,
+    center;
 }
 
 .hero__grid {
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(45, 74, 30, 0.25) 40px);
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(247, 244, 236, 0.22) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(247, 244, 236, 0.22) 40px);
   background-size: 40px 40px;
   pointer-events: none;
 }
@@ -23,13 +41,14 @@
 .hero__logo {
   animation: float 4s ease-in-out infinite;
   margin-bottom: 2rem;
-  filter: drop-shadow(0 0 28px var(--color-gold));
+  filter: drop-shadow(6px 6px 0 rgba(15, 13, 12, 0.28));
 }
 
 .hero__title {
   font-family: var(--font-pixel);
   font-size: clamp(1.4rem, 5vw, 3.2rem);
-  color: var(--color-gold);
+  color: var(--color-cream);
+  -webkit-text-stroke: 2px var(--color-ink);
   animation: glow 2.5s ease-in-out infinite;
   letter-spacing: 0.08em;
   text-align: center;
@@ -39,7 +58,7 @@
 .hero__subtitle {
   font-family: var(--font-vt323);
   font-size: clamp(1.2rem, 3vw, 2rem);
-  color: var(--color-gold-light);
+  color: var(--color-red-dark);
   letter-spacing: 0.1em;
   margin-bottom: 0.9rem;
   text-align: center;
@@ -48,7 +67,7 @@
 .hero__description {
   font-family: var(--font-vt323);
   font-size: clamp(1.15rem, 2vw, 1.6rem);
-  color: var(--color-cream);
+  color: var(--color-ink);
   max-width: 760px;
   text-align: center;
   line-height: 1.1;
@@ -64,26 +83,32 @@
 }
 
 .hero__action {
-  border: 2px solid var(--color-gold);
-  color: var(--color-gold-light);
+  border: 3px solid var(--color-ink);
+  color: var(--color-ink);
   text-decoration: none;
   font-family: var(--font-pixel);
   font-size: 0.55rem;
   padding: 0.95rem 1.15rem;
-  background: rgba(0, 0, 0, 0.24);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast);
+  background: var(--color-cream);
+  box-shadow: 4px 4px 0 var(--color-ink);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 
-.hero__action--primary,
+.hero__action--primary {
+  background: var(--color-red);
+  color: var(--color-cream);
+}
+
 .hero__action:hover,
 .hero__action:focus-visible {
-  color: var(--color-cream);
+  background: var(--color-yellow);
+  color: var(--color-ink);
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--color-gold-dark);
+  box-shadow: 6px 6px 0 var(--color-ink);
 }
 
 .hero__action:focus-visible {
-  outline: 2px solid var(--color-gold-light);
+  outline: 2px solid var(--color-ink);
   outline-offset: 3px;
 }
 
@@ -105,7 +130,7 @@
 .hero__character-name {
   font-family: var(--font-vt323);
   font-size: 0.95rem;
-  color: var(--color-gold-light);
+  color: var(--color-ink);
   letter-spacing: 0.1em;
   text-align: center;
 }
@@ -113,12 +138,26 @@
 .hero__scroll-hint {
   font-family: var(--font-pixel);
   font-size: 0.5rem;
-  color: var(--color-gold);
+  color: var(--color-red);
+  text-shadow: 2px 2px 0 var(--color-ink);
   animation: blink 1s step-end infinite;
   letter-spacing: 0.1em;
 }
 
 @media (max-width: 768px) {
+  .hero {
+    background-size:
+      110px 110px,
+      110px 110px,
+      100% 52px,
+      100% 100%;
+    background-position:
+      left bottom 52px,
+      right bottom 52px,
+      left bottom,
+      center;
+  }
+
   .hero__description {
     font-size: 1.2rem;
   }
