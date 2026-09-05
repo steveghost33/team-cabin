@@ -53,6 +53,15 @@ export const SHOWS = [
     details: 'w/ Shindig Machine & Slug Love',
     featured: true,
   },
+  {
+    id: '2026-09-24-a2-funhouse',
+    date: '2026-09-24T21:00:00-04:00',
+    venue: 'A2 Funhouse',
+    city: 'Ann Arbor',
+    state: 'MI',
+    details: 'w/ Catzap!, FinalBossFight! & Tequila Mockingbird — $5 PWYC, 21+, doors @ 8:00',
+    featured: true,
+  },
 ];
 
 // ── Music Streaming Links ──
