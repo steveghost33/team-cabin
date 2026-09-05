@@ -187,20 +187,51 @@ function drawSky(ctx, lvl, frame, scrollX) {
 }
 
 // ── GROUND ─────────────────────────────────────
-function drawGround(ctx, lvl, scrollX) {
-  ctx.fillStyle = lvl.groundTop;
-  ctx.fillRect(0, GROUND, W, 5);
-  ctx.fillStyle = lvl.groundColor;
-  ctx.fillRect(0, GROUND+5, W, H-GROUND-5);
-  ctx.fillStyle = lvl.groundColor;
-  ctx.fillRect(0, GROUND+6, W, H-GROUND-6);
+// Shift a hex color toward black (amt < 0) or white (amt > 0).
+function shadeHex(hex, amt) {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  const mix = (c) => Math.max(0, Math.min(255, Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt)));
+  return `rgb(${mix((n >> 16) & 255)},${mix((n >> 8) & 255)},${mix(n & 255)})`;
+}
 
-  // lane dashes
-  ctx.fillStyle = lvl.laneColor;
-  const lY = GROUND + (H-GROUND)/2 - 2;
-  for (let i = 0; i < W; i += 56) {
-    const dx = ((i - scrollX*0.5) % 56 + 56) % 56;
-    ctx.fillRect(dx, lY, 36, 3);
+function drawGround(ctx, lvl, scrollX) {
+  const walkH = 20;                                  // sidewalk depth below the curb
+
+  // curb edge the player walks on, with a shadow line beneath it
+  ctx.fillStyle = lvl.groundTop;
+  ctx.fillRect(0, GROUND, W, 4);
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.fillRect(0, GROUND + 4, W, 2);
+
+  // sidewalk band
+  ctx.fillStyle = lvl.sidewalkColor || shadeHex(lvl.groundColor, 0.14);
+  ctx.fillRect(0, GROUND + 6, W, walkH);
+  // paving joints, scrolling with the level
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';
+  for (let i = 0; i < W / 48 + 2; i++) {
+    const jx = ((i * 48 - scrollX * 0.5) % (W + 48) + W + 48) % (W + 48) - 48;
+    ctx.fillRect(jx, GROUND + 6, 1, walkH);
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.fillRect(0, GROUND + 6 + walkH, W, 2);
+
+  // roadway below the sidewalk, falling off toward the bottom of the screen
+  const roadY = GROUND + 8 + walkH;
+  const road = lvl.roadColor || lvl.groundColor;
+  const rg = ctx.createLinearGradient(0, roadY, 0, H);
+  rg.addColorStop(0, road);
+  rg.addColorStop(1, shadeHex(road, -0.45));
+  ctx.fillStyle = rg;
+  ctx.fillRect(0, roadY, W, H - roadY);
+
+  // grit on the roadway so the surface reads as ground, not a flat block
+  for (let i = 0; i < 70; i++) {
+    const gx = ((i * 53 - scrollX * 0.5) % (W + 60) + W + 60) % (W + 60) - 30;
+    const gy = roadY + 4 + ((i * 37) % Math.max(1, H - roadY - 8));
+    ctx.fillStyle = i % 3 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.16)';
+    ctx.fillRect(gx, gy, 2 + (i % 3), 2);
   }
 }
 
