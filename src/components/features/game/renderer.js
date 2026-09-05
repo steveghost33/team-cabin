@@ -2161,31 +2161,31 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
   const by = GROUND;
   const cx = bx + bw / 2; // statue center x
 
-  // ── marble arch / backing panel ──
+  // ── marble backing wall (flat rectangular slab, per the real memorial) ──
   ctx.fillStyle = '#d4cfc8';
-  ctx.beginPath();
-  ctx.moveTo(bx + 10, by - 14);
-  ctx.lineTo(bx + 10, by - 200);
-  ctx.quadraticCurveTo(cx, by - 240, bx + bw - 10, by - 200);
-  ctx.lineTo(bx + bw - 10, by - 14);
-  ctx.fill();
+  ctx.fillRect(bx + 10, by - 236, bw - 20, 222);
+  // marble tile seams
+  ctx.strokeStyle = 'rgba(160,155,148,0.5)'; ctx.lineWidth = 1;
+  for (let ty = by - 236; ty < by - 14; ty += 36) {
+    ctx.beginPath(); ctx.moveTo(bx+10, ty); ctx.lineTo(bx+bw-10, ty); ctx.stroke();
+  }
   // marble veining lines
   ctx.strokeStyle = 'rgba(180,175,168,0.6)'; ctx.lineWidth = 1;
   [[bx+30,by-30,bx+60,by-180],[bx+80,by-20,bx+100,by-220],[bx+140,by-25,bx+160,by-210]].forEach(([x1,y1,x2,y2])=>{
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
   });
-  // MICHIGAN medallion circle at top of arch
+  // MICHIGAN state seal medallion at top of wall
   ctx.strokeStyle='#a89e8e'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.arc(cx, by-220, 18, 0, Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#c8c2ba'; ctx.beginPath(); ctx.arc(cx, by-220, 16, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, by-222, 18, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#c8c2ba'; ctx.beginPath(); ctx.arc(cx, by-222, 16, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle='#8a7e70'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('MICHIGAN', cx, by-218);
+  ctx.fillText('MICHIGAN', cx, by-220);
 
-  // inscription text on marble
+  // inscription — 2 Corinthians 3:17, carved into the marble below the seal
   const glow = 0.6 + Math.sin(frame * 0.04) * 0.2;
   ctx.fillStyle='rgba(120,105,80,0.8)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.fillText('"NOW THE SPIRIT"', cx, by-172);
-  ctx.fillText('OF THE LORD', cx, by-163);
+  ctx.fillText('"NOW THE LORD"', cx, by-192);
+  ctx.fillText('IS THAT SPIRIT"', cx, by-183);
 
   // ── pedestal (tiered, granite) ──
   // bottom slab
@@ -2319,28 +2319,28 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
   ctx.beginPath(); ctx.moveTo(lx+3, ly-1); ctx.lineTo(lx+7, ly-6); ctx.stroke();
   ctx.shadowBlur=0;
 
-  // ── head ──
+  // ── head — bowed slightly forward, eyes downcast in quiet contemplation ──
   ctx.fillStyle=V1;
-  ctx.beginPath(); ctx.arc(cx-2, fy-62, 13, 0, Math.PI*2); ctx.fill();
-  // face — slight left-turn
-  ctx.fillStyle=Vd;
-  // eyes
-  ctx.beginPath(); ctx.arc(cx-7, fy-65, 2, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(cx+1, fy-65, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx-2, fy-63, 15, 0, Math.PI*2); ctx.fill();
+  // face
+  ctx.strokeStyle=Vd; ctx.lineWidth=1.5;
+  // closed / downcast eyes (lids, not open circles — the statue looks down)
+  ctx.beginPath(); ctx.moveTo(cx-11,fy-64); ctx.quadraticCurveTo(cx-7,fy-62,cx-3,fy-64); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+0,fy-64); ctx.quadraticCurveTo(cx+4,fy-62,cx+8,fy-64); ctx.stroke();
   // brow ridge
-  ctx.strokeStyle=Vd; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.moveTo(cx-10,fy-68); ctx.lineTo(cx-4,fy-67); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx-2,fy-67); ctx.lineTo(cx+4,fy-68); ctx.stroke();
+  ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(cx-12,fy-69); ctx.lineTo(cx-4,fy-68); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx-2,fy-68); ctx.lineTo(cx+6,fy-69); ctx.stroke();
   // nose
-  ctx.beginPath(); ctx.moveTo(cx-4,fy-64); ctx.lineTo(cx-3,fy-60); ctx.stroke();
-  // mouth
-  ctx.beginPath(); ctx.moveTo(cx-6,fy-58); ctx.quadraticCurveTo(cx-2,fy-56,cx+2,fy-58); ctx.stroke();
-  // hair waves
-  ctx.strokeStyle=V2; ctx.lineWidth=2;
-  for (let w=0;w<4;w++){
+  ctx.beginPath(); ctx.moveTo(cx-3,fy-63); ctx.lineTo(cx-2,fy-58); ctx.stroke();
+  // solemn, closed mouth
+  ctx.beginPath(); ctx.moveTo(cx-6,fy-55); ctx.lineTo(cx+2,fy-55); ctx.stroke();
+  // hair — swept back off the brow in heavy waves
+  ctx.strokeStyle=V2; ctx.lineWidth=2.5;
+  for (let w=0;w<5;w++){
     ctx.beginPath();
-    ctx.moveTo(cx-10+w*4, fy-73);
-    ctx.quadraticCurveTo(cx-8+w*4, fy-78, cx-6+w*4, fy-73);
+    ctx.moveTo(cx-13+w*5, fy-75);
+    ctx.quadraticCurveTo(cx-9+w*5, fy-81, cx-5+w*5, fy-75);
     ctx.stroke();
   }
 
@@ -2351,58 +2351,64 @@ function drawSpiritOfDetroit(ctx, bx, frame) {
 
 // ── JOE LOUIS FIST — Monument to Joe Louis ───────────────────────────────────
 function drawJoeLouisFist(ctx, bx, frame) {
-  const bw=122, bh=168;
+  const bw=150, bh=180;
   const by=GROUND;
-  // pylon frame (steel dark)
-  ctx.strokeStyle='#2a2a2a'; ctx.lineWidth=7;
+  // pylon frame (black steel A-frame)
+  ctx.strokeStyle='#1c1c1c'; ctx.lineWidth=8;
   // left leg
-  ctx.beginPath(); ctx.moveTo(bx+18,by); ctx.lineTo(bx+bw/2,by-bh*0.6); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx+16,by); ctx.lineTo(bx+bw/2,by-bh*0.62); ctx.stroke();
   // right leg
-  ctx.beginPath(); ctx.moveTo(bx+bw-18,by); ctx.lineTo(bx+bw/2,by-bh*0.6); ctx.stroke();
-  // top crossbar
-  ctx.beginPath(); ctx.moveTo(bx+18,by-bh*0.3); ctx.lineTo(bx+bw-18,by-bh*0.3); ctx.stroke();
-  ctx.strokeStyle='#333'; ctx.lineWidth=5;
-  ctx.beginPath(); ctx.moveTo(bx+bw/2,by-bh*0.6); ctx.lineTo(bx+bw/2,by-bh+20); ctx.stroke();
-  // bolt details
-  ctx.fillStyle='#222'; [bx+bw/2-4,bx+bw/2+4].forEach(px=>{ ctx.beginPath(); ctx.arc(px,by-bh*0.6+4,3,0,Math.PI*2); ctx.fill(); });
-  // suspension chains (sway animation)
+  ctx.beginPath(); ctx.moveTo(bx+bw-16,by); ctx.lineTo(bx+bw/2,by-bh*0.62); ctx.stroke();
+  // bracing crossbar
+  ctx.lineWidth=6;
+  ctx.beginPath(); ctx.moveTo(bx+bw*0.22,by-bh*0.34); ctx.lineTo(bx+bw*0.78,by-bh*0.34); ctx.stroke();
+  ctx.strokeStyle='#262626'; ctx.lineWidth=5;
+  ctx.beginPath(); ctx.moveTo(bx+bw/2,by-bh*0.62); ctx.lineTo(bx+bw/2,by-bh+16); ctx.stroke();
+  // gusset bolts at the apex
+  ctx.fillStyle='#111'; [bx+bw/2-5,bx+bw/2+5].forEach(px=>{ ctx.beginPath(); ctx.arc(px,by-bh*0.62+5,3,0,Math.PI*2); ctx.fill(); });
+
+  // suspension cables (sway animation) — the arm hangs from the apex
   const sway=Math.sin(frame*0.025)*2;
-  ctx.strokeStyle='#3a3a3a'; ctx.lineWidth=2;
-  const chainSteps=8;
-  for (let s=0;s<chainSteps;s++) {
-    const t=s/chainSteps, t1=(s+1)/chainSteps;
-    const cx0=bx+bw*0.28+sway*t, cy0=by-bh*0.56+s*(bh*0.3/chainSteps);
-    const cx1=bx+bw*0.28+sway*t1, cy1=by-bh*0.56+(s+1)*(bh*0.3/chainSteps);
-    ctx.beginPath(); ctx.moveTo(cx0,cy0); ctx.lineTo(cx1,cy1); ctx.stroke();
-  }
-  for (let s=0;s<chainSteps;s++) {
-    const t=s/chainSteps, t1=(s+1)/chainSteps;
-    const cx0=bx+bw*0.72+sway*t, cy0=by-bh*0.56+s*(bh*0.3/chainSteps);
-    const cx1=bx+bw*0.72+sway*t1, cy1=by-bh*0.56+(s+1)*(bh*0.3/chainSteps);
-    ctx.beginPath(); ctx.moveTo(cx0,cy0); ctx.lineTo(cx1,cy1); ctx.stroke();
-  }
-  // forearm (angled, bronze-brown)
-  const armY=by-bh*0.28+sway;
-  ctx.fillStyle='#5a3010'; ctx.save(); ctx.translate(bx+bw*0.5,armY); ctx.rotate(-0.2);
-  ctx.fillRect(-10,-14,20,50); ctx.restore();
-  // fist (large, dark bronze)
-  const fistY=armY-34+sway;
-  ctx.fillStyle='#5a3010';
-  ctx.fillRect(bx+bw*0.3,fistY,bw*0.4,bh*0.18);
-  // knuckle ridge
-  ctx.fillStyle='#3e2008'; ctx.fillRect(bx+bw*0.3,fistY,bw*0.4,8);
-  // individual knuckles
-  ctx.fillStyle='#6a3a14';
-  [0.34,0.44,0.54,0.64].forEach(kx=>{ ctx.beginPath(); ctx.arc(bx+bw*kx,fistY+4,5,Math.PI,Math.PI*2); ctx.fill(); });
-  // thumb
-  ctx.fillStyle='#5a3010'; ctx.beginPath(); ctx.arc(bx+bw*0.3-6,fistY+14,8,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#333'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(bx+bw/2-3,by-bh*0.6); ctx.lineTo(bx+bw*0.36+sway,by-bh*0.42); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx+bw/2+3,by-bh*0.6); ctx.lineTo(bx+bw*0.64+sway,by-bh*0.42); ctx.stroke();
+
+  // ── forearm — thick bronze-black, angled down toward the fist ──
+  const armY=by-bh*0.42+sway;
+  const BR1='#211307', BR2='#140b04', BR3='#3a220f';
+  ctx.fillStyle=BR1; ctx.save(); ctx.translate(bx+bw*0.5,armY); ctx.rotate(-0.16);
+  ctx.fillRect(-13,-8,26,64);
+  // forearm shading seam
+  ctx.strokeStyle=BR2; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(-13,-4); ctx.lineTo(13,54); ctx.stroke();
+  ctx.restore();
+
+  // ── fist — one large rounded bronze-black mass, knuckles forward ──
+  const fcx=bx+bw*0.5+sway*0.6, fcy=armY+58;
+  const fw=bw*0.42, fh=bh*0.2;
+  ctx.fillStyle=BR1;
+  ctx.beginPath();
+  ctx.moveTo(fcx-fw/2, fcy+fh*0.3);
+  ctx.quadraticCurveTo(fcx-fw/2-4, fcy-fh*0.6, fcx-fw*0.2, fcy-fh*0.7);
+  ctx.quadraticCurveTo(fcx+fw*0.3, fcy-fh*0.8, fcx+fw/2, fcy-fh*0.3);
+  ctx.quadraticCurveTo(fcx+fw/2+4, fcy+fh*0.5, fcx+fw*0.3, fcy+fh*0.75);
+  ctx.quadraticCurveTo(fcx-fw*0.1, fcy+fh*0.9, fcx-fw/2, fcy+fh*0.3);
+  ctx.fill();
+  // knuckle ridge along the top
+  ctx.fillStyle=BR3;
+  [-0.32,-0.12,0.08,0.28].forEach(kx=>{ ctx.beginPath(); ctx.arc(fcx+fw*kx, fcy-fh*0.55, fw*0.12, Math.PI, Math.PI*2); ctx.fill(); });
   // finger divisions
-  ctx.strokeStyle='#3e2008'; ctx.lineWidth=1;
-  [0.44,0.54,0.64].forEach(kx=>{ ctx.beginPath(); ctx.moveTo(bx+bw*kx,fistY+6); ctx.lineTo(bx+bw*kx,fistY+bh*0.18-2); ctx.stroke(); });
-  // patina overlay
-  ctx.fillStyle='rgba(80,160,100,0.12)'; ctx.fillRect(bx+bw*0.28,fistY-36,bw*0.44,bh*0.24);
+  ctx.strokeStyle=BR2; ctx.lineWidth=1.5;
+  [-0.22,-0.02,0.18].forEach(kx=>{ ctx.beginPath(); ctx.moveTo(fcx+fw*kx,fcy-fh*0.45); ctx.lineTo(fcx+fw*kx,fcy+fh*0.65); ctx.stroke(); });
+  // thumb wrapped along the near side
+  ctx.fillStyle=BR1;
+  ctx.beginPath(); ctx.ellipse(fcx-fw*0.42, fcy+fh*0.15, fw*0.14, fh*0.42, 0.3, 0, Math.PI*2); ctx.fill();
+  // verdigris patina sheen
+  ctx.fillStyle='rgba(70,150,120,0.14)';
+  ctx.beginPath(); ctx.ellipse(fcx-fw*0.05, fcy-fh*0.35, fw*0.35, fh*0.3, -0.2, 0, Math.PI*2); ctx.fill();
+
   // plaque
-  ctx.fillStyle='#3a2008'; ctx.fillRect(bx+10,by-24,bw-20,20);
+  ctx.fillStyle='#241a10'; ctx.fillRect(bx+10,by-24,bw-20,20);
   ctx.fillStyle='rgba(226,168,32,0.7)'; ctx.font='4px "Press Start 2P"'; ctx.textAlign='center';
   ctx.fillText('MONUMENT TO JOE LOUIS',bx+bw/2,by-11);
 }
