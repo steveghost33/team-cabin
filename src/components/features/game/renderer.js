@@ -22,6 +22,9 @@ const _liongraf = new Image(); _liongraf.src = '/liongraf.png';
 const _tigergraf = new Image(); _tigergraf.src = '/tigergraf.png';
 const _wondergraf = new Image(); _wondergraf.src = '/wondergraf.png';
 
+// Preload the Pie Sci logo mark for its storefront sign
+const _piesciLogo = new Image(); _piesciLogo.src = '/piesci-logo.png';
+
 export function renderFrame(ctx, engine, frame) {
   const gs = engine.gState;
 
@@ -1560,73 +1563,100 @@ function drawPugFest(ctx, bx) {
 }
 
 // ── COMO'S PIZZA (Ferndale ~50%) ───────────────────────────────
+// ── COMO'S — Nine Mile & Woodward, Ferndale ─────────────────────────────────
+// Reference: the real corner restaurant — low tan building under a flat
+// parapet, deep red awnings over the storefront glass, a wall script sign and
+// the rooftop pylon: red "Como's" on white with a gold star over it.
 function drawComos(ctx, bx) {
-  const bw = 225, bh = 120, storeH = 42;
+  const bw = 225, bh = 124, storeH = 50, awnH = 22;
   const by = GROUND;
   const upperH = bh - storeH;
 
-  // orange-red brick upper wall
-  ctx.fillStyle = '#c04418';
+  // ── upper wall — warm tan siding under a flat parapet ────────────────
+  ctx.fillStyle = '#8a7350';
   ctx.fillRect(bx, by - bh, bw, upperH);
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  for (let y = 8; y < upperH; y += 9) ctx.fillRect(bx, by - bh + y, bw, 1);
-  for (let row = 0; row < Math.floor(upperH / 9); row++) {
-    const xOff = (row % 2) * 16;
-    for (let x = xOff; x < bw; x += 32) ctx.fillRect(bx + x, by - bh + row * 9, 1, 9);
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';                     // siding courses
+  for (let y = 7; y < upperH; y += 7) ctx.fillRect(bx, by - bh + y, bw, 1);
+  ctx.fillStyle = 'rgba(255,220,170,0.06)';               // light wash off the sign
+  ctx.fillRect(bx, by - bh, bw, 16);
+
+  // wall-mounted script sign over the awning
+  ctx.fillStyle = '#b3202a';
+  ctx.font = '13px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(220,40,50,0.7)';
+  ctx.fillText("Como's", bx + bw * 0.5, by - storeH - awnH - 12);
+  ctx.shadowBlur = 0;
+
+  // ── rooftop pylon sign ───────────────────────────────────────────────
+  const sW = 104, sH = 40;
+  const sX = bx + bw * 0.5 - sW / 2, sY = by - bh - sH - 10;
+  ctx.fillStyle = '#3a3a3a';                              // support legs
+  ctx.fillRect(sX + 16, sY + sH, 5, 12); ctx.fillRect(sX + sW - 21, sY + sH, 5, 12);
+  ctx.fillStyle = '#141414'; ctx.fillRect(sX - 3, sY - 3, sW + 6, sH + 6);
+  ctx.fillStyle = '#f2ece0'; ctx.fillRect(sX, sY, sW, sH);
+  ctx.strokeStyle = '#b3202a'; ctx.lineWidth = 2; ctx.strokeRect(sX + 3, sY + 3, sW - 6, sH - 6);
+  // gold star riding on top of the box
+  const stx = bx + bw * 0.5, sty = sY - 9;
+  ctx.fillStyle = '#e8b81c';
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const r = i % 2 === 0 ? 9 : 4;
+    const px = stx + Math.cos(a) * r, py = sty + Math.sin(a) * r;
+    i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
   }
-  // "COMOS" raised letter effect (big embossed letters on brick)
-  ctx.fillStyle = 'rgba(0,0,0,0.22)';
-  ctx.font = 'bold 22px "Press Start 2P"'; ctx.textAlign = 'center';
-  ctx.fillText('COMOS', bx + bw / 2, by - storeH - 12);
-  ctx.fillStyle = 'rgba(255,255,255,0.08)';
-  ctx.fillText('COMOS', bx + bw / 2 - 1, by - storeH - 13);
+  ctx.closePath(); ctx.fill();
+  // red script name + restaurant band
+  ctx.fillStyle = '#b3202a'; ctx.font = '12px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText("Como's", stx, sY + 20);
+  ctx.fillStyle = '#b3202a'; ctx.fillRect(sX + 6, sY + 25, sW - 12, 10);
+  ctx.fillStyle = '#f2ece0'; ctx.font = '5px "Press Start 2P"';
+  ctx.fillText('RESTAURANT', stx, sY + 33);
 
-  // neon sign on a pole — "Como's" in a yellow box with red star
-  const signX = bx + bw / 2 - 55, signY = by - bh - 52;
-  // pole
-  ctx.fillStyle = '#555';
-  ctx.fillRect(bx + bw / 2 - 2, signY + 10, 4, bh + 52);
-  // sign frame — yellow
-  ctx.fillStyle = '#d4a800';
-  ctx.fillRect(signX, signY, 110, 52);
-  ctx.fillStyle = '#f0c000';
-  ctx.fillRect(signX + 2, signY + 2, 106, 48);
-  // red star at top
-  ctx.fillStyle = '#cc1111';
-  ctx.fillRect(signX + 47, signY - 10, 16, 14);
-  ctx.fillRect(signX + 43, signY - 6, 24, 6);
-  // "Como's" script-ish text
-  ctx.fillStyle = '#cc2244';
-  ctx.font = '11px "Press Start 2P"'; ctx.textAlign = 'center';
-  ctx.fillText("Como's", signX + 55, signY + 24);
-  ctx.fillStyle = '#1a1a88';
-  ctx.font = '6px "Press Start 2P"';
-  ctx.fillText('Restaurant', signX + 55, signY + 36);
-  // yellow sign border lines
-  ctx.strokeStyle = '#888800'; ctx.lineWidth = 1;
-  ctx.strokeRect(signX + 4, signY + 4, 102, 44);
+  // ── deep red awning across the storefront ────────────────────────────
+  const awnY = by - storeH - awnH;
+  ctx.fillStyle = '#8e1c22';
+  ctx.fillRect(bx + 4, awnY, bw - 8, awnH);
+  ctx.fillStyle = '#6d1319';                              // shaded underside
+  ctx.fillRect(bx + 4, awnY + awnH - 4, bw - 8, 4);
+  ctx.fillStyle = '#a52830';                              // valance highlight
+  ctx.fillRect(bx + 4, awnY, bw - 8, 3);
+  ctx.fillStyle = '#8e1c22';                              // scalloped hem
+  for (let i = 0; i < Math.floor((bw - 8) / 16); i++) {
+    ctx.beginPath(); ctx.arc(bx + 12 + i * 16, awnY + awnH, 8, 0, Math.PI); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';                     // seam per awning panel
+  for (let i = 0; i < Math.floor((bw - 8) / 32); i++) ctx.fillRect(bx + 20 + i * 32, awnY, 1, awnH);
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';                     // shadow the awning casts
+  ctx.fillRect(bx + 4, awnY + awnH + 7, bw - 8, 4);
 
-  // lower storefront — warm tan/wood
-  ctx.fillStyle = '#8b5a20';
-  ctx.fillRect(bx, by - storeH, bw, storeH);
-  // wood panel texture
-  ctx.fillStyle = 'rgba(0,0,0,0.12)';
-  for (let y = 10; y < storeH; y += 10) ctx.fillRect(bx, by - storeH + y, bw, 1);
-
-  // three windows + center door (ground level)
-  [8, 76, 152].forEach((wx, i) => {
-    const iw = i === 1 ? 32 : 56;
-    ctx.fillStyle = i === 1 ? '#3a2010' : '#0a1820';
-    ctx.fillRect(bx + wx, by - storeH + 4, iw, storeH - 4);
-    ctx.fillStyle = i === 1 ? 'rgba(180,100,30,0.3)' : 'rgba(80,140,200,0.2)';
-    ctx.fillRect(bx + wx + 2, by - storeH + 6, iw - 4, storeH - 8);
-    ctx.strokeStyle = '#5a3a10'; ctx.lineWidth = 1;
-    ctx.strokeRect(bx + wx, by - storeH + 4, iw, storeH - 4);
+  // ── storefront under the awning ──────────────────────────────────────
+  ctx.fillStyle = '#2b2016'; ctx.fillRect(bx, by - storeH, bw, storeH);
+  [[bx + 10, 66], [bx + 149, 66]].forEach(([wx, ww]) => {
+    ctx.fillStyle = '#160f0a'; ctx.fillRect(wx, by - storeH + 6, ww, storeH - 14);
+    ctx.fillStyle = 'rgba(240,185,100,0.3)';              // warm light inside
+    ctx.fillRect(wx + 3, by - storeH + 9, ww - 6, storeH - 20);
+    ctx.fillStyle = 'rgba(255,215,150,0.16)';             // pooled light near the glass
+    ctx.fillRect(wx + 3, by - storeH + 9, ww - 6, 7);
+    ctx.fillStyle = '#4a3520'; ctx.fillRect(wx + ww / 2 - 1, by - storeH + 6, 2, storeH - 14);
+    ctx.strokeStyle = '#5a4426'; ctx.lineWidth = 1;
+    ctx.strokeRect(wx, by - storeH + 6, ww, storeH - 14);
   });
+  // door
+  const dX = bx + bw * 0.5 - 16;
+  ctx.fillStyle = '#1c1208'; ctx.fillRect(dX, by - storeH + 5, 32, storeH - 5);
+  ctx.fillStyle = 'rgba(240,190,110,0.18)'; ctx.fillRect(dX + 3, by - storeH + 8, 26, storeH - 14);
+  ctx.strokeStyle = '#4a3520'; ctx.lineWidth = 1; ctx.strokeRect(dX, by - storeH + 5, 32, storeH - 5);
+  ctx.fillStyle = '#c9a24a'; ctx.fillRect(dX + 25, by - 26, 3, 8);
+  // stone base course
+  ctx.fillStyle = '#3a2f24'; ctx.fillRect(bx, by - 8, bw, 8);
 
-  // roof cap
-  ctx.fillStyle = '#1a1a1a';
-  ctx.fillRect(bx - 2, by - bh - 4, bw + 4, 5);
+  // string lights along the right end of the awning
+  ctx.fillStyle = 'rgba(255,214,140,0.85)';
+  for (let i = 0; i < 7; i++) ctx.fillRect(bx + bw - 62 + i * 9, awnY - 4 + (i % 2), 2, 2);
+
+  // parapet cap
+  ctx.fillStyle = '#141414'; ctx.fillRect(bx - 3, by - bh - 5, bw + 6, 6);
 }
 
 // ── DANNY'S IRISH PUB (Ferndale ~75%) ──────────────────────────
@@ -2148,41 +2178,71 @@ function drawDetroitMural(ctx, bx, by, bw, bh, type, _frame) {
 
 // ── PIE SCI PIZZA — Trumbull Ave ─────────────────────────────────────────────
 function drawPieSci(ctx, bx, frame) {
-  const bw=150, bh=96, storeH=38;
-  const by=GROUND;
-  // upper mural panel (teal)
-  ctx.fillStyle='#006066'; ctx.fillRect(bx,by-bh,bw,bh-storeH);
-  // pizza slice icon
-  ctx.fillStyle='#E2A820'; ctx.beginPath(); ctx.moveTo(bx+bw*0.28,by-bh+18); ctx.lineTo(bx+bw*0.12,by-bh+52); ctx.lineTo(bx+bw*0.44,by-bh+52); ctx.closePath(); ctx.fill();
-  ctx.fillStyle='#c02010'; ctx.beginPath(); ctx.arc(bx+bw*0.22,by-bh+38,5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(bx+bw*0.32,by-bh+46,4,0,Math.PI*2); ctx.fill();
-  // atom rings (neon, pulsing)
-  const atomPulse=0.8+Math.sin(frame*0.06)*0.2;
-  ctx.strokeStyle=`rgba(0,220,220,${atomPulse})`; ctx.lineWidth=1.5;
-  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,220,220,0.8)';
-  ctx.beginPath(); ctx.ellipse(bx+bw*0.68,by-bh+34,22,10,0,0,Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(bx+bw*0.68,by-bh+34,22,10,Math.PI/3,0,Math.PI*2); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(bx+bw*0.68,by-bh+34,22,10,-Math.PI/3,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle=`rgba(0,220,220,${atomPulse})`; ctx.beginPath(); ctx.arc(bx+bw*0.68,by-bh+34,4,0,Math.PI*2); ctx.fill();
-  ctx.shadowBlur=0;
-  // PIE SCI neon sign
-  ctx.fillStyle='rgba(0,220,220,0.95)'; ctx.font='bold 9px "Press Start 2P"'; ctx.textAlign='center';
-  ctx.shadowBlur=12; ctx.shadowColor='rgba(0,220,220,0.9)';
-  ctx.fillText('PIE SCI',bx+bw*0.68,by-bh+52); ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(245,240,220,0.7)'; ctx.font='5px "Press Start 2P"'; ctx.fillText('PIZZA',bx+bw*0.68,by-bh+64);
-  // storefront
-  ctx.fillStyle='#0a3030'; ctx.fillRect(bx,by-storeH,bw,storeH);
-  ctx.fillStyle='rgba(0,200,200,0.15)'; ctx.fillRect(bx+8,by-storeH+5,bw-16,storeH-10);
+  const bw = 178, bh = 200, storeH = 46;
+  const by = GROUND;
+  const upperH = bh - storeH;
+
+  // ── facade — dark teal panels ────────────────────────────────────────
+  ctx.fillStyle = '#0a4a4e';
+  ctx.fillRect(bx, by - bh, bw, upperH);
+  ctx.fillStyle = 'rgba(0,0,0,0.16)';
+  for (let y = 10; y < upperH; y += 12) ctx.fillRect(bx, by - bh + y, bw, 1);
+  for (let x = 22; x < bw; x += 44) ctx.fillRect(bx + x, by - bh, 1, upperH);
+
+  // ── illuminated sign board carrying the Pie Sci logo ─────────────────
+  const sW = 118, sH = upperH - 22;
+  const sX = bx + (bw - sW) / 2, sY = by - bh + 10;
+  const glow = 0.75 + Math.sin(frame * 0.05) * 0.15;
+  ctx.fillStyle = '#12100f'; ctx.fillRect(sX - 4, sY - 4, sW + 8, sH + 8);
+  ctx.fillStyle = '#f4efe2'; ctx.fillRect(sX, sY, sW, sH);
+  ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2; ctx.strokeRect(sX, sY, sW, sH);
+  // bulbs around the sign box
+  ctx.fillStyle = `rgba(255,226,140,${glow})`;
+  for (let i = 0; i < Math.floor(sW / 12); i++) {
+    ctx.fillRect(sX + 4 + i * 12, sY - 3, 3, 3);
+    ctx.fillRect(sX + 4 + i * 12, sY + sH, 3, 3);
+  }
+
+  // the logo mark itself, fitted inside the board
+  const logo = _piesciLogo;
+  if (logo && logo.complete && logo.naturalWidth > 0) {
+    const pad = 8;
+    const k = Math.min((sW - pad * 2) / logo.naturalWidth, (sH - pad * 2) / logo.naturalHeight);
+    const lw = logo.naturalWidth * k, lh = logo.naturalHeight * k;
+    ctx.drawImage(logo, sX + (sW - lw) / 2, sY + (sH - lh) / 2, lw, lh);
+  } else {
+    // fallback wordmark until the logo finishes loading
+    ctx.fillStyle = '#c8102e'; ctx.font = 'bold 11px "Press Start 2P"'; ctx.textAlign = 'center';
+    ctx.fillText('PIE SCI', sX + sW / 2, sY + sH / 2);
+  }
+
+  // ── storefront ───────────────────────────────────────────────────────
+  ctx.fillStyle = '#08383a'; ctx.fillRect(bx, by - storeH, bw, storeH);
+  ctx.fillStyle = '#061e20'; ctx.fillRect(bx, by - storeH, bw, 4);
+  // plate glass either side of the door, warm light inside
+  [[bx + 8, 58], [bx + bw - 66, 58]].forEach(([wx, ww]) => {
+    ctx.fillStyle = '#0a2426'; ctx.fillRect(wx, by - storeH + 8, ww, storeH - 12);
+    ctx.fillStyle = 'rgba(0,200,200,0.16)'; ctx.fillRect(wx + 2, by - storeH + 10, ww - 4, storeH - 16);
+  });
+  // neon flask in the left window — the sign that hangs in the real one
+  const fx = bx + 30, fy = by - storeH + 26;
+  ctx.strokeStyle = `rgba(255,90,90,${glow})`; ctx.lineWidth = 1.5;
+  ctx.shadowBlur = 7; ctx.shadowColor = 'rgba(255,90,90,0.85)';
+  ctx.beginPath(); ctx.moveTo(fx - 3, fy - 11); ctx.lineTo(fx - 3, fy - 5);
+  ctx.lineTo(fx - 10, fy + 8); ctx.lineTo(fx + 10, fy + 8); ctx.lineTo(fx + 3, fy - 5);
+  ctx.lineTo(fx + 3, fy - 11); ctx.closePath(); ctx.stroke();
+  ctx.shadowBlur = 0;
   // door
-  ctx.fillStyle='#084040'; ctx.fillRect(bx+bw*0.42,by-storeH+5,24,storeH-5);
-  ctx.strokeStyle='rgba(0,200,200,0.6)'; ctx.lineWidth=1; ctx.strokeRect(bx+bw*0.42,by-storeH+5,24,storeH-5);
-  // window sign
-  ctx.fillStyle='rgba(0,220,220,0.55)'; ctx.font='4px "Press Start 2P"'; ctx.fillText('OPEN LATE',bx+bw*0.2,by-storeH+18);
-  ctx.fillStyle='rgba(245,240,220,0.4)'; ctx.fillText('NY STYLE $3/SLICE',bx+bw*0.78,by-storeH+18);
-  // roof cap
-  ctx.fillStyle='#1a1a1a'; ctx.fillRect(bx-2,by-bh-3,bw+4,5);
-  // TRUMBULL AVE sign
-  ctx.fillStyle='rgba(226,168,32,0.6)'; ctx.font='4px "Press Start 2P"';
-  ctx.fillText('TRUMBULL AVE',bx+bw*0.5,by-bh-8);
+  ctx.fillStyle = '#05292b'; ctx.fillRect(bx + bw / 2 - 15, by - storeH + 6, 30, storeH - 6);
+  ctx.strokeStyle = 'rgba(0,200,200,0.5)'; ctx.lineWidth = 1;
+  ctx.strokeRect(bx + bw / 2 - 15, by - storeH + 6, 30, storeH - 6);
+  ctx.fillStyle = 'rgba(0,220,220,0.5)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('OPEN LATE', bx + bw / 2, by - storeH + 3);
+
+  // roof cap + street sign
+  ctx.fillStyle = '#141414'; ctx.fillRect(bx - 3, by - bh - 4, bw + 6, 6);
+  ctx.fillStyle = 'rgba(226,168,32,0.6)'; ctx.font = '4px "Press Start 2P"'; ctx.textAlign = 'center';
+  ctx.fillText('TRUMBULL AVE', bx + bw * 0.5, by - bh - 9);
 }
 
 // ── SPIRIT OF DETROIT STATUE ──────────────────────────────────────────────────
