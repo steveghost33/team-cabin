@@ -65,8 +65,6 @@ function ShowCard({ show }) {
 
 export default function Shows() {
   const upcomingShows = SHOWS.filter((show) => isUpcomingShow(show.date));
-  const pastShows = SHOWS.filter((show) => !isUpcomingShow(show.date))
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
   const upcomingShowSchemas = upcomingShows.map((show) => ({
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -121,17 +119,6 @@ export default function Shows() {
               for booking, venue, or press inquiries.
             </p>
           </div>
-        )}
-
-        {pastShows.length > 0 && (
-          <>
-            <SectionTitle as="h3" color="var(--color-ink-soft)">RECENT SHOWS</SectionTitle>
-            <ul className="shows__list shows__list--past" role="list">
-              {pastShows.slice(0, 5).map((show) => (
-                <ShowCard key={show.id} show={show} />
-              ))}
-            </ul>
-          </>
         )}
       </div>
 
