@@ -62,6 +62,15 @@ export const SHOWS = [
     details: 'w/ Catzap!, FinalBossFight! & Tequila Mockingbird — $5 PWYC, 21+, doors @ 8:00',
     featured: true,
   },
+  {
+    id: '2026-10-03-ypsi-alehouse',
+    date: '2026-10-03T20:00:00-04:00',
+    venue: 'Ypsi Alehouse',
+    city: 'Ypsilanti',
+    state: 'MI',
+    details: 'w/ Cult Therapy, Playground! & Shindig Machine',
+    featured: true,
+  },
 ];
 
 // ── Music Streaming Links ──
