@@ -71,6 +71,15 @@ export const SHOWS = [
     details: 'w/ Cult Therapy, Playground! & Shindig Machine',
     featured: true,
   },
+  {
+    id: '2026-11-27-the-lexington',
+    date: '2026-11-27T20:00:00-05:00',
+    venue: 'The Lexington',
+    city: 'Detroit',
+    state: 'MI',
+    details: 'w/ Ryan Allen & the Full Court Press & lyloc',
+    featured: true,
+  },
 ];
 
 // ── Music Streaming Links ──
