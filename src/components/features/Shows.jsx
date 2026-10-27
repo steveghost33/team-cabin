@@ -3,13 +3,17 @@ import { BOOKING_EMAIL, SHOWS } from '../../config/constants';
 import { getSafeExternalUrl } from '../../utils/safeUrl';
 import '../../styles/components/Shows.css';
 
+// Shows are in Michigan, so always display dates in Eastern time
+const SHOW_TIME_ZONE = 'America/New_York';
+
 function formatShowDate(value) {
   const date = new Date(value);
 
   return {
-    month: date.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
-    day: String(date.getDate()).padStart(2, '0'),
+    month: date.toLocaleString('en-US', { month: 'short', timeZone: SHOW_TIME_ZONE }).toUpperCase(),
+    day: date.toLocaleString('en-US', { day: '2-digit', timeZone: SHOW_TIME_ZONE }),
     full: date.toLocaleDateString('en-US', {
+      timeZone: SHOW_TIME_ZONE,
       weekday: 'short',
       month: 'short',
       day: 'numeric',
