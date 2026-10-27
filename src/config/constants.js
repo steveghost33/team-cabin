@@ -77,7 +77,7 @@ export const SHOWS = [
     venue: 'The Lexington',
     city: 'Detroit',
     state: 'MI',
-    details: 'w/ Ryan Allen & the Full Court Press & lyloc',
+    details: 'w/ Ryan Allen & the Full Court Press & lyloc — 5063 Trumbull Ave., Free/PWYC, 21+, doors @ 8:00',
     featured: true,
   },
 ];
