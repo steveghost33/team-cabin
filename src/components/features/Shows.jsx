@@ -36,7 +36,7 @@ function ShowCard({ show }) {
 
   return (
     <li
-      className={`show-card ${show.featured ? 'show-card--featured' : ''}`}
+      className={`show-card ${show.featured ? 'show-card--featured' : ''} ${show.flyer ? 'show-card--flyer' : ''}`}
       aria-label={`${full} at ${show.venue}`}
     >
       <div className="show-card__date">
@@ -59,6 +59,11 @@ function ShowCard({ show }) {
           </div>
         )}
       </div>
+      {show.flyer && (
+        <a href={show.flyer} target="_blank" rel="noopener noreferrer" className="show-card__flyer">
+          <img src={show.flyer} alt={`Flyer for ${full} at ${show.venue}`} loading="lazy" width="800" height="1000" />
+        </a>
+      )}
     </li>
   );
 }
@@ -95,6 +100,7 @@ export default function Shows() {
       : undefined,
     url: show.eventUrl || show.ticketUrl,
     description: show.details,
+    image: show.flyer ? new URL(show.flyer, window.location.origin).href : undefined,
   }));
 
   return (

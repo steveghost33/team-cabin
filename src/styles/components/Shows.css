@@ -75,6 +75,27 @@
   box-shadow: 7px 7px 0 var(--color-ink);
 }
 
+.show-card--flyer {
+  grid-template-columns: 76px 1fr 140px;
+}
+
+.show-card__flyer {
+  display: block;
+  border: 3px solid var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-ink);
+  line-height: 0;
+}
+
+.show-card__flyer img {
+  width: 100%;
+  height: auto;
+}
+
+.show-card__flyer:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
 .show-card__date {
   text-align: center;
 }
@@ -148,6 +169,13 @@
     grid-template-columns: 62px 1fr;
     gap: 0.9rem;
     padding: 1.1rem 1rem;
+  }
+
+  .show-card__flyer {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    max-width: 260px;
   }
 
   .shows__empty-title {

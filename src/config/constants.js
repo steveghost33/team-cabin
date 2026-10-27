@@ -43,6 +43,7 @@ export const NAV_LINKS = [
 
 // ── Upcoming Shows ──
 // feat: true → gold highlight border
+// flyer: optional path to a poster image in /public
 export const SHOWS = [
   {
     id: '2026-08-29-a2-funhouse',
@@ -78,6 +79,7 @@ export const SHOWS = [
     city: 'Detroit',
     state: 'MI',
     details: 'w/ Ryan Allen & the Full Court Press & lyloc — 5063 Trumbull Ave., Free/PWYC, 21+, doors @ 8:00',
+    flyer: '/flyers/2026-11-27-the-lexington.jpg',
     featured: true,
   },
 ];
