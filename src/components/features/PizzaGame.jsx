@@ -759,6 +759,104 @@ export default function PizzaGame() {
 
   const Controls = isMobile ? MobileControls : DesktopControls;
 
+  // ── TOP SCORES SECTION ───────────────────────
+  const TopScores = () => (
+    <div style={{
+      marginTop: 24,
+      border: `3px solid ${UI_INK}`,
+      boxShadow: `4px 4px 0 rgba(15,13,12,0.3)`,
+      background: 'rgba(0,16,2,0.92)',
+      width: '100%',
+      maxWidth: 780,
+      alignSelf: 'center',
+    }}>
+      {/* Header */}
+      <div style={{
+        background: UI_INK,
+        padding: '10px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <span style={{
+          fontFamily: '"Press Start 2P"',
+          fontSize: '0.75rem',
+          color: '#E9C118',
+          letterSpacing: 2,
+        }}>🏆 TOP SCORES</span>
+        {leaderboard.length > 0 && (
+          <span style={{
+            fontFamily: '"Press Start 2P"',
+            fontSize: '0.45rem',
+            color: 'rgba(247,244,236,0.4)',
+          }}>PLAY TO ENTER</span>
+        )}
+      </div>
+
+      {/* Scores table */}
+      <div style={{ padding: '12px 16px 16px' }}>
+        {leaderboard.length === 0 ? (
+          <p style={{
+            fontFamily: '"Press Start 2P"',
+            fontSize: '0.55rem',
+            color: 'rgba(255,240,200,0.4)',
+            textAlign: 'center',
+            margin: '16px 0',
+            lineHeight: 2,
+          }}>
+            NO SCORES YET<br />
+            <span style={{ fontSize: '0.45rem', opacity: 0.6 }}>BE THE FIRST TO PLAY!</span>
+          </p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {leaderboard.slice(0, 10).map((entry, i) => {
+              const isTop3 = i < 3;
+              const rankColors = ['#E9C118', '#B0B0B0', '#CD7F32'];
+              const rankColor  = isTop3 ? rankColors[i] : 'rgba(233,193,24,0.45)';
+              return (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '7px 10px',
+                  background: isTop3 ? 'rgba(233,193,24,0.08)' : 'rgba(0,0,0,0.25)',
+                  border: `1px solid ${isTop3 ? 'rgba(233,193,24,0.25)' : 'transparent'}`,
+                  borderRadius: 2,
+                }}>
+                  {/* Rank */}
+                  <span style={{
+                    fontFamily: '"Press Start 2P"',
+                    fontSize: '0.55rem',
+                    color: rankColor,
+                    minWidth: 28,
+                    textAlign: 'right',
+                  }}>#{i + 1}</span>
+
+                  {/* Name */}
+                  <span style={{
+                    fontFamily: '"Press Start 2P"',
+                    fontSize: '0.65rem',
+                    color: '#F7F4EC',
+                    flex: 1,
+                    letterSpacing: 3,
+                  }}>{entry.playerName.slice(0, 3).toUpperCase()}</span>
+
+                  {/* Score */}
+                  <span style={{
+                    fontFamily: '"Press Start 2P"',
+                    fontSize: '0.65rem',
+                    color: isTop3 ? rankColor : '#F7F4EC',
+                    letterSpacing: 1,
+                  }}>{entry.score.toLocaleString()}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   // ── FULLSCREEN LAYOUT ───────────────────────
   if (isExpanded) {
     return (
@@ -792,6 +890,7 @@ export default function PizzaGame() {
         <FsBtn />
       </div>
       <Controls />
+      <TopScores />
     </div>
   );
 }

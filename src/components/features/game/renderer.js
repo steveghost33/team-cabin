@@ -201,35 +201,15 @@ function shadeHex(hex, amt) {
 
 function drawGround(ctx, lvl, scrollX) {
   if (lvl.smb2Ground) {
-    // SMB2-style wavy grass ground
+    // Ground fill
     ctx.fillStyle = lvl.groundColor;
     ctx.fillRect(0, GROUND, W, H - GROUND);
-    // wavy grass top edge
-    const bump = 8;
-    const period = 32;
+    // Clean flat grass cap
     ctx.fillStyle = lvl.groundTop;
-    ctx.beginPath();
-    ctx.moveTo(0, H);
-    ctx.lineTo(0, GROUND + bump);
-    for (let x = 0; x <= W + period; x += period) {
-      const ox = ((x - scrollX * 0.3) % (period * 2) + period * 2) % (period * 2);
-      ctx.quadraticCurveTo(ox - period * 0.5, GROUND - bump, ox, GROUND + bump);
-    }
-    ctx.lineTo(W, H);
-    ctx.closePath();
-    ctx.fill();
-    // bright grass highlight strip
+    ctx.fillRect(0, GROUND - 4, W, 8);
+    // Bright top highlight edge
     ctx.fillStyle = lvl.laneColor;
-    ctx.beginPath();
-    ctx.moveTo(0, GROUND + bump + 2);
-    for (let x = 0; x <= W + period; x += period) {
-      const ox = ((x - scrollX * 0.3) % (period * 2) + period * 2) % (period * 2);
-      ctx.quadraticCurveTo(ox - period * 0.5, GROUND - bump + 2, ox, GROUND + bump + 2);
-    }
-    ctx.lineTo(W, GROUND + bump + 5);
-    ctx.lineTo(0, GROUND + bump + 5);
-    ctx.closePath();
-    ctx.fill();
+    ctx.fillRect(0, GROUND - 4, W, 4);
   } else {
     // Urban ground: curb, sidewalk, roadway
     const walkH = 20;

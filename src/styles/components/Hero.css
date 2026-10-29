@@ -28,15 +28,6 @@
     center;
 }
 
-.hero__grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(247, 244, 236, 0.22) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(247, 244, 236, 0.22) 40px);
-  background-size: 40px 40px;
-  pointer-events: none;
-}
 
 .hero__logo {
   animation: float 4s ease-in-out infinite;
