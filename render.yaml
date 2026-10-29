@@ -1,9 +1,30 @@
 services:
   - type: web
+    name: team-cabin-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DB_PATH
+        value: /data/leaderboard.db
+      - key: ALLOWED_ORIGINS
+        value: https://team-cabin.onrender.com
+    disk:
+      name: leaderboard-data
+      mountPath: /data
+      sizeGB: 1
+
+  - type: web
     name: team-cabin
     runtime: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./build
+    envVars:
+      - key: VITE_API_URL
+        value: https://team-cabin-api.onrender.com
     routes:
       - type: rewrite
         source: /*
@@ -11,7 +32,7 @@ services:
     headers:
       - path: /*
         name: Content-Security-Policy
-        value: "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; media-src 'self'; connect-src 'self'; frame-src https://bandcamp.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+        value: "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; media-src 'self'; connect-src 'self' https://team-cabin-api.onrender.com; frame-src https://bandcamp.com; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin

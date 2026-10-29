@@ -5,7 +5,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+
+_allowed_origins = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:5174,http://localhost:4173"
+).split(",")
+CORS(app, origins=_allowed_origins)
 
 # Reject oversized request bodies outright (a single score submission is
 # only ever a few dozen bytes of JSON).
