@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import TCLogo from '../common/TCLogo';
 import { getSafeExternalUrl } from '../../utils/safeUrl';
-import { CHARS } from '../features/Characters';
+import { GameChar } from '../features/GameChar';
 import { BAND_INFO, BOOKING_EMAIL, MEMBERS, SOCIAL_LINKS } from '../../config/constants';
 import Music from '../features/Music';
 import Shows from '../features/Shows';
@@ -70,15 +70,12 @@ export default function MobileApp() {
           </p>
         )}
         <div className="m-hub-chars">
-          {MEMBERS.map((member, i) => {
-            const Char = CHARS[member.charId];
-            return (
-              <div key={member.name} className="m-hub-char">
-                <Char size={56} animate delay={`${i * 0.25}s`} />
-                <span className="m-hub-char-name">{member.name}</span>
-              </div>
-            );
-          })}
+          {MEMBERS.map((member, i) => (
+            <div key={member.name} className="m-hub-char">
+              <GameChar charIdx={member.charId} size={64} animate delay={`${i * 0.25}s`} />
+              <span className="m-hub-char-name">{member.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 

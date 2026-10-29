@@ -1,11 +1,10 @@
 /* ═══════════════════════════════════════════════
-   MOBILE HUB — full-screen, no-scroll landing
+   MOBILE HUB — full-screen landing (scrolls if content overflows)
    ═══════════════════════════════════════════════ */
 
 .m-hub {
-  height: 100dvh;
-  min-height: -webkit-fill-available;
-  overflow: hidden;
+  min-height: 100dvh;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -208,7 +207,7 @@
 /* ── Footer: social links + copyright ── */
 
 .m-hub-footer {
-  padding: 0.5rem 1.5rem 1rem;
+  padding: 0.5rem 1.5rem calc(1rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
