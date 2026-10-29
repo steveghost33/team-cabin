@@ -219,11 +219,11 @@ const BOSS_HEADS = {
   ],
 };
 const RAT_KING = [
-  '......##...##...##......', '......#g#.#gg#.#g#......', '......#gg#gggg#gg#......',
-  '......#gggggggggg#......', '......#grggbgggrg#......', '......############......',
+  '......#g...#g...#g......', '......#gg.#ggg.#gg......', '......#ggggggggggg#.....',
+  '...##.#ggggggggggg#.##..', '...#ss##ttttttttt##ss#..', '......############......',
   '...##################...', '..#ssss#tttttttt#ssss#..', '..#srrss########ssrrs#..',
   '..#srsssttttttttssrs#...', '...##tttllllllllttt##...',
-  '....#ttll##ll##lltt#....', '....#tlllw#llw#lllt#....', '....#tllllllllllllt#....',
+  '..ww#ttll##ll##lltt#ww..', '..ww#tlllw#llw#lllt#ww..', '....#tllllllllllllt#....',
   '...##tllsssrrsssllt##...', '..#ww#lssssssssssl#ww#..', '...##llss######ssll##...',
   '....#lll#wwwwww#lll#....', '.....###wwwwwwww###.....',
   '...###gg########gg###...', '..#tt#ggccccccccgg#tt#..', '.#tlt#gccllllllccg#tlt#.',
@@ -244,10 +244,33 @@ export function drawBossArt(ctx, type, x, y, angry, frame) {
   const bob = Math.floor(frame / 24) % 2;
   drawPixels(ctx, SUIT_BODY, palette, x, y + 22 - bob, 3);
   drawPixels(ctx, BOSS_HEADS[type] || BOSS_HEADS.landlord, palette, x, y - 14 - bob, 3);
-  const paperX = type === 'landlord' ? x + 57 : x - 9;
-  drawPixels(ctx, ['#######', '#wwwww#', '#wrrrw#', '#wwwww#', '#wtttw#', '#wwwww#', '#wtttw#', '#wwwww#', '#######'], palette, paperX, y + 42, 3);
+  if (type === 'landlord') {
+    // contract to sign — gold header, text lines, red X signature mark
+    drawPixels(ctx, [
+      '#########',
+      '#ggggggg#',
+      '#ttttttt#',
+      '#ttttttt#',
+      '#wwwwwww#',
+      '#ttttttt#',
+      '#wwwwwww#',
+      '#rwwrwww#',
+      '#ttttttt#',
+      '#########',
+    ], palette, x + 57, y + 36 - bob, 3);
+  }
   if (type === 'recordexec') {
-    drawPixels(ctx, ['.ggg.', 'g...g', 'g...g', '.g.g.', '..g..'], palette, x + 24, y + 29, 2);
-    drawPixels(ctx, ['##', '#g', '#g', '#g', '#g', '##'], palette, x + 57, y + 42, 3);
+    // Creed "Human Clay" vinyl record held aloft — dark vinyl, pink-magenta label
+    drawPixels(ctx, [
+      '..######..',
+      '.#tttttt#.',
+      '#tt####tt#',
+      '#t##ll##t#',
+      '#t#lcll#t#',
+      '#t##ll##t#',
+      '#tt####tt#',
+      '.#tttttt#.',
+      '..######..',
+    ], palette, x - 21, y + 12 - bob, 3);
   }
 }

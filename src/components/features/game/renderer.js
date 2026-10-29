@@ -112,6 +112,7 @@ export function renderFrame(ctx, engine, frame) {
 
   // ── BOSS ─────────────────────────────────────
   if (engine.boss) drawBoss(ctx, engine.boss, scrollX, frame);
+  if (engine.bossProjs) engine.bossProjs.forEach(p => drawBossProj(ctx, p, scrollX));
 
   // ── PARTICLES ────────────────────────────────
   engine.parts.forEach(p => {
@@ -2751,5 +2752,30 @@ function drawMajestic(ctx, bx, frame) {
   ctx.fillStyle = '#1a3a8a'; ctx.fillRect(bx + bw + 4, by - 70, 14, 56);
   ctx.fillStyle = '#ffffff'; ctx.save(); ctx.translate(bx + bw + 11, by - 42); ctx.rotate(-Math.PI / 2);
   ctx.font = '5px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText('WOODWARD AVE', 0, 4);
+  ctx.restore();
+}
+
+// ── BOSS PROJECTILES ──────────────────────────────────────────────────────────
+function drawBossProj(ctx, p, scrollX) {
+  const px = Math.round(p.x - scrollX), py = Math.round(p.y);
+  if (px > 900 || px + p.w < -20) return;
+  ctx.save();
+  if (p.bossType === 'recordexec') {
+    // vinyl record — dark disc with label hole
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath(); ctx.ellipse(px + 7, py + 5, 7, 5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#8833cc';
+    ctx.beginPath(); ctx.ellipse(px + 7, py + 5, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f0e0ff';
+    ctx.beginPath(); ctx.ellipse(px + 7, py + 5, 1, 1, 0, 0, Math.PI * 2); ctx.fill();
+  } else {
+    // rat king projectile — flying rat chunk
+    ctx.fillStyle = '#5a3010';
+    ctx.fillRect(px, py + 2, 10, 7);
+    ctx.fillStyle = '#7a4820';
+    ctx.fillRect(px + 1, py, 5, 3);  // head
+    ctx.fillStyle = '#ff9999';
+    ctx.fillRect(px + 10, py + 3, 4, 2);  // tail
+  }
   ctx.restore();
 }

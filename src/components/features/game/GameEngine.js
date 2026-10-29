@@ -106,7 +106,7 @@ export class GameEngine {
     pl.dying = false; pl.dyingTimer = 0; pl.dyingLaunched = false;
     this.obs = []; this.pizzas = []; this.hearts = [];
     this.parts = []; this.blds = []; this.cars = []; this.carT = 0;
-    this.boss = null;
+    this.boss = null; this.bossProjs = [];
     this.groveX = 0; this.walkingIn = false;
     this.halesBarks = []; this.halesBarkT = 0;
     this.scrollX = 0; this.spT = 0; this.piT = 0; this.hpT = 0; this.pc = 0;
@@ -131,7 +131,7 @@ export class GameEngine {
     if (pl.og && !pl.dying) { pl.vy = JUMP_POWER; pl.og = false; }
   }
 
-  _spawnEnemy() {
+  _spawnEnemy(speedOverride) {
     if (this.boss) return;
     const lvl = this.lvl;
     const types = lvl.enemyTypes;
@@ -140,14 +140,19 @@ export class GameEngine {
       cone: { w: 18, h: 26 }, metermaid: { w: 22, h: 38 },
       muscledude: { w: 28, h: 40 }, rat: { w: 20, h: 16 }, biker: { w: 26, h: 40 },
     }[type];
-    const speed = lvl.enemySpeed + Math.random() * 0.8;
+    const baseSpeed = speedOverride ?? lvl.enemySpeed;
+    const speed = baseSpeed + Math.random() * 0.8;
+    // tough enemies need 2 stomps in later levels
+    const hp = (this.lvlIdx >= 1 && type === 'muscledude') ? 2
+             : (this.lvlIdx >= 2 && type === 'biker')      ? 2
+             : 1;
     this.obs.push({
       id: this.eid++, type,
       x: this.scrollX + W + 80,
       y: GROUND - geo.h, w: geo.w, h: geo.h,
       vx: -(speed), at: 0,
       dead: false, deadTimer: 0,
-      hp: 1,
+      hp, inv: 0, hitFlash: 0,
     });
   }
 
@@ -179,9 +184,9 @@ export class GameEngine {
   _triggerBoss() {
     this.obs = []; this.pizzas = []; this.hearts = [];
     const bossDefs = {
-      landlord: { w: 60, h: 82, maxHp: 200, label: 'LANDLORD', speed: 1.8 },
-      ratking:  { w: 62, h: 92, maxHp: 280, label: 'RAT KING', speed: 2.2 },
-      recordexec: { w: 60, h: 82, maxHp: 340, label: 'RECORD EXEC', speed: 2.8 },
+      landlord:   { w: 60, h: 82, maxHp: 200, label: 'LANDLORD',    speed: 1.8 },
+      recordexec: { w: 60, h: 82, maxHp: 260, label: 'RECORD EXEC', speed: 2.3 },
+      ratking:    { w: 62, h: 92, maxHp: 340, label: 'RAT KING',    speed: 2.7 },
     };
     const def = bossDefs[this.lvl.boss];
     this.boss = {
@@ -189,7 +194,7 @@ export class GameEngine {
       x: this.scrollX + W + 80, y: GROUND - def.h,
       vx: -def.speed, hp: def.maxHp,
       inv: 0, hitFlash: 0,
-      dead: false,
+      dead: false, projT: 90,
     };
     this.sync();
   }
@@ -295,8 +300,12 @@ export class GameEngine {
 
     // ── SPAWNING ──────────────────────────────
     if (!this.boss) {
+      // within-level difficulty ramp: as pizza count grows, enemies spawn faster and move faster
+      const prog = Math.min(1, this.pc / PIZZA_TO_BOSS);
+      const effSpawnRate  = lvl.spawnRate  * (1 - 0.38 * prog);
+      const effEnemySpeed = lvl.enemySpeed * (1 + 0.35 * prog);
       this.spT += dt;
-      if (this.spT >= lvl.spawnRate) { this._spawnEnemy(); this.spT = 0; }
+      if (this.spT >= effSpawnRate) { this._spawnEnemy(effEnemySpeed); this.spT = 0; }
       this.piT += dt;
       if (this.piT >= lvl.pizzaRate) { this._spawnPizza(); this.piT = 0; }
       this.hpT += dt;
@@ -324,6 +333,21 @@ export class GameEngine {
       // bounce — keep boss away from screen edges so player isn't cornered
       if (bOx < 140)          b.vx =  Math.abs(b.vx);
       if (bOx > W - b.w - 140) b.vx = -Math.abs(b.vx);
+
+      // projectile attacks (level 2 Record Exec + level 3 Rat King)
+      if (this.lvlIdx >= 1) {
+        b.projT -= dt;
+        if (b.projT <= 0) {
+          const phase2 = b.hp < b.maxHp * 0.5;
+          b.projT = this.lvlIdx === 1 ? (phase2 ? 62 : 98) : (phase2 ? 46 : 76);
+          const dir = pl.x > bOx + b.w / 2 ? 1 : -1;
+          const spd = this.lvlIdx === 1 ? 3.8 : 4.5;
+          this.bossProjs.push({ x: b.x + (dir > 0 ? b.w : 0), y: b.y + b.h * 0.45, vx: dir * spd, vy: 0, w: 14, h: 10, bossType: this.lvl.boss });
+          if (phase2 && this.lvlIdx === 2) {
+            this.bossProjs.push({ x: b.x + (dir > 0 ? b.w : 0), y: b.y + b.h * 0.3, vx: dir * spd * 0.75, vy: -2.4, w: 14, h: 10, bossType: this.lvl.boss });
+          }
+        }
+      }
 
       // stomp boss
       const pb = pl.y + PH;
@@ -391,6 +415,8 @@ export class GameEngine {
       if (o.dead) { o.deadTimer -= dt; return o.deadTimer > 0; }
       o.x  += o.vx * dt;
       o.at += dt;
+      if (o.inv      > 0) o.inv      = Math.max(0, o.inv      - dt);
+      if (o.hitFlash > 0) o.hitFlash = Math.max(0, o.hitFlash - dt);
 
       // stomp — use half enemy height as window so taller enemies in later levels register correctly
       if (!pl.og && pl.vy > 0) {
@@ -409,11 +435,18 @@ export class GameEngine {
             pl.vy = -8;   // bounce off, keep horizontal momentum
             return true;
           }
+          if (o.inv > 0) { pl.vy = -8; return true; }  // mid-stun — can't double-stomp immediately
           o.hp--;
           if (o.hp <= 0) {
             o.dead = true; o.deadTimer = 30;
             this.sc += 200;
             this._addParts(ox + o.w/2, o.y, GLD, 10);
+            this.sync();
+          } else {
+            // multi-hp hit — stun briefly, flash orange
+            o.hitFlash = 25; o.inv = 35;
+            this.sc += 75;
+            this._addParts(ox + o.w/2, o.y, '#FF8800', 8);
             this.sync();
           }
           pl.vy = -10;  // bounce impulse only — keep horizontal momentum
@@ -451,6 +484,30 @@ export class GameEngine {
       }
       return true;
     });
+
+    // ── BOSS PROJECTILES ─────────────────────────
+    if (this.boss && !this.boss.dead) {
+      this.bossProjs = this.bossProjs.filter(p => {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 0.14 * dt;
+        const px = p.x - this.scrollX;
+        if (px < -90 || px > W + 90 || p.y > GROUND) return false;
+        if (pl.inv <= 0 &&
+            px + p.w > pl.x && px < pl.x + PW &&
+            p.y + p.h > pl.y && p.y < pl.y + PH) {
+          pl.hp -= 16;
+          pl.inv = 80;
+          this._addParts(pl.x + PW/2, pl.y + PH/2, '#e74c3c', 10);
+          if (pl.hp <= 0) this._die();
+          this.sync();
+          return false;
+        }
+        return true;
+      });
+    } else {
+      this.bossProjs = [];
+    }
 
     // ── PIZZAS ────────────────────────────────
     this.pizzas = this.pizzas.filter(pz => {

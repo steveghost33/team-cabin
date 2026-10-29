@@ -40,6 +40,11 @@ export function drawEnemy(ctx, o, scrollX, frame) {
   ctx.save();
   if (o.dead) ctx.globalAlpha = Math.max(0, Math.min(1, o.deadTimer / 30));
   drawEnemyArt(ctx, o.type, x, y, frame, o.dead);
+  if (o.hitFlash > 0 && !o.dead) {
+    ctx.globalAlpha = 0.55 * (o.hitFlash / 25);
+    ctx.fillStyle = '#ff7700';
+    ctx.fillRect(x - 1, y - 1, o.w + 2, o.h + 2);
+  }
   ctx.restore();
 }
 
