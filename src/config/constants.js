@@ -103,7 +103,7 @@ export const SOCIAL_LINKS = [
 ];
 
 // ── Band Members ──
-// charId maps to CHARS index in Characters.jsx: 0=Steve, 1=Mike, 2=Kyle
+// charId maps to the hero index in game/pixelArt.js: 0=Steve, 1=Mike, 2=Kyle
 export const MEMBERS = [
   {
     charId: 0,

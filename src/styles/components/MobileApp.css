@@ -5,7 +5,9 @@
 .m-hub {
   height: 100dvh;
   min-height: -webkit-fill-available;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -208,7 +210,7 @@
 /* ── Footer: social links + copyright ── */
 
 .m-hub-footer {
-  padding: 0.5rem 1.5rem 1rem;
+  padding: 0.5rem 1.5rem calc(1rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
