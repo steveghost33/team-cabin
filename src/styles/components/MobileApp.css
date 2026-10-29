@@ -262,11 +262,10 @@
 }
 
 .m-hub-credit {
-  font-family: var(--font-pixel);
-  font-size: 0.28rem;
+  font-family: var(--font-vt323);
+  font-size: 0.85rem;
   color: var(--color-ink-soft);
   text-align: center;
-  letter-spacing: 0.05em;
   margin-top: 0.2rem;
 }
 
