@@ -43,9 +43,9 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
   const lL = Math.round(walkOsc * 3);
   const lR = -lL;
 
-  if      (charIdx === 0) _mario(ctx, px, py, lL, lR);
-  else if (charIdx === 1) _luigi(ctx, px, py, lL, lR);
-  else                    _peach(ctx, px, py, lL, lR);
+  if      (charIdx === 0) _steve(ctx, px, py, lL, lR);
+  else if (charIdx === 1) _mike(ctx, px, py, lL, lR);
+  else                    _kyle(ctx, px, py, lL, lR);
 
   if (pl.dying) {
     ctx.fillStyle = '#ff2020';
@@ -58,137 +58,42 @@ export function drawPlayer(ctx, pl, charIdx, frame) {
   ctx.restore();
 }
 
-function _mario(ctx, px, py, lL, lR) {
-  // brown shoes
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px-2, py+26+lL, 12, 4);
-  ctx.fillRect(px+13, py+26+lR, 12, 4);
-  // red overalls legs
-  ctx.fillStyle = RED;
-  ctx.fillRect(px+1, py+16+lL, 8, 11);
-  ctx.fillRect(px+15, py+16+lR, 8, 11);
-  // blue shirt body
-  ctx.fillStyle = BLUE;
-  ctx.fillRect(px-1, py+5, 26, 12);
-  // red overalls bib
-  ctx.fillStyle = RED;
-  ctx.fillRect(px+6, py+5, 12, 9);
-  ctx.fillStyle = DK_RED;
-  ctx.fillRect(px+14, py+5, 4, 9);
-  // yellow overall buttons
-  ctx.fillStyle = GOLD;
-  ctx.fillRect(px+7, py+13, 2, 2);
-  ctx.fillRect(px+15, py+13, 2, 2);
-  // blue arms
-  ctx.fillStyle = BLUE;
-  ctx.fillRect(px-5, py+5, 5, 11);
-  ctx.fillRect(px+24, py+5, 5, 11);
-  // skin hands
-  ctx.fillStyle = SKIN;
-  ctx.fillRect(px-5, py+14, 5, 4);
-  ctx.fillRect(px+24, py+14, 5, 4);
-  // head
-  ctx.fillStyle = SKIN;
-  ctx.fillRect(px+3, py-8, 18, 14);
-  // red cap
-  ctx.fillStyle = RED;
-  ctx.fillRect(px+2, py-12, 20, 5);
-  ctx.fillRect(px-1, py-8, 26, 2);
-  ctx.fillStyle = DK_RED;
-  ctx.fillRect(px-1, py-7, 26, 1);
-  // brown hair/sideburns
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px+3, py-8, 5, 4);
-  ctx.fillRect(px+16, py-8, 4, 4);
-  // eyes
-  ctx.fillStyle = '#000066';
-  ctx.fillRect(px+6, py-4, 4, 3);
-  ctx.fillRect(px+13, py-4, 4, 3);
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(px+7, py-4, 2, 2);
-  ctx.fillRect(px+14, py-4, 2, 2);
-  // brown mustache
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px+5, py+2, 14, 3);
-  ctx.fillRect(px+7, py, 10, 3);
-}
-
-function _luigi(ctx, px, py, lL, lR) {
-  // brown shoes
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px-2, py+26+lL, 12, 4);
-  ctx.fillRect(px+13, py+26+lR, 12, 4);
-  // green overalls legs
-  ctx.fillStyle = GREEN;
-  ctx.fillRect(px+1, py+16+lL, 8, 11);
-  ctx.fillRect(px+15, py+16+lR, 8, 11);
-  // blue shirt body
-  ctx.fillStyle = BLUE;
-  ctx.fillRect(px-1, py+5, 26, 12);
-  // green overalls bib
-  ctx.fillStyle = GREEN;
-  ctx.fillRect(px+6, py+5, 12, 9);
-  ctx.fillStyle = DK_GRN;
-  ctx.fillRect(px+14, py+5, 4, 9);
-  // yellow overall buttons
-  ctx.fillStyle = GOLD;
-  ctx.fillRect(px+7, py+13, 2, 2);
-  ctx.fillRect(px+15, py+13, 2, 2);
-  // blue arms
-  ctx.fillStyle = BLUE;
-  ctx.fillRect(px-5, py+5, 5, 11);
-  ctx.fillRect(px+24, py+5, 5, 11);
-  // skin hands
-  ctx.fillStyle = SKIN;
-  ctx.fillRect(px-5, py+14, 5, 4);
-  ctx.fillRect(px+24, py+14, 5, 4);
-  // head
-  ctx.fillStyle = SKIN;
-  ctx.fillRect(px+3, py-8, 18, 14);
-  // green cap
-  ctx.fillStyle = GREEN;
-  ctx.fillRect(px+2, py-12, 20, 5);
-  ctx.fillRect(px-1, py-8, 26, 2);
-  ctx.fillStyle = DK_GRN;
-  ctx.fillRect(px-1, py-7, 26, 1);
-  // brown hair/sideburns
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px+3, py-8, 5, 4);
-  ctx.fillRect(px+16, py-8, 4, 4);
-  // eyes
-  ctx.fillStyle = '#000066';
-  ctx.fillRect(px+6, py-4, 4, 3);
-  ctx.fillRect(px+13, py-4, 4, 3);
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(px+7, py-4, 2, 2);
-  ctx.fillRect(px+14, py-4, 2, 2);
-  // mustache
-  ctx.fillStyle = BROWN;
-  ctx.fillRect(px+5, py+2, 14, 3);
-  ctx.fillRect(px+7, py, 10, 3);
-}
-
-function _peach(ctx, px, py, lL, lR) {
-  // white shoes
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(px-1, py+26+lL, 11, 4);
-  ctx.fillRect(px+13, py+26+lR, 11, 4);
-  // pink dress lower legs
-  ctx.fillStyle = PINK;
-  ctx.fillRect(px-2, py+16+lL, 12, 11);
-  ctx.fillRect(px+13, py+16+lR, 12, 11);
-  // pink dress body
-  ctx.fillStyle = PINK;
-  ctx.fillRect(px-2, py+5, 28, 12);
-  ctx.fillStyle = DK_PNK;
-  ctx.fillRect(px+20, py+5, 6, 12);
-  // white collar
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(px+5, py+5, 14, 6);
-  // white glove arms
-  ctx.fillStyle = WHITE;
+// Steve — plaid flannel shirt, jeans, boots, brown hair & beard
+function _steve(ctx, px, py, lL, lR) {
+  // dark brown boots
+  ctx.fillStyle = '#5C3010';
+  ctx.fillRect(px-2, py+26+lL, 12, 5);
+  ctx.fillRect(px+13, py+26+lR, 12, 5);
+  // blue jeans legs
+  ctx.fillStyle = '#2244AA';
+  ctx.fillRect(px+1, py+16+lL, 9, 12);
+  ctx.fillRect(px+14, py+16+lR, 9, 12);
+  ctx.fillStyle = '#1A3488';
+  ctx.fillRect(px+8, py+16+lL, 3, 12);
+  ctx.fillRect(px+21, py+16+lR, 3, 12);
+  // plaid flannel body (red base)
+  ctx.fillStyle = '#BB2222';
+  ctx.fillRect(px-1, py+5, 26, 13);
+  // plaid dark stripes vertical
+  ctx.fillStyle = '#881111';
+  ctx.fillRect(px+5,  py+5, 3, 13);
+  ctx.fillRect(px+14, py+5, 3, 13);
+  ctx.fillRect(px+21, py+5, 4, 13);
+  // plaid horizontal stripes
+  ctx.fillStyle = '#771111';
+  ctx.fillRect(px-1, py+8,  26, 2);
+  ctx.fillRect(px-1, py+14, 26, 2);
+  // blue plaid accent lines
+  ctx.fillStyle = '#4466CC';
+  ctx.fillRect(px-1, py+10, 26, 1);
+  ctx.fillRect(px-1, py+16, 26, 1);
+  // flannel arms
+  ctx.fillStyle = '#BB2222';
   ctx.fillRect(px-5, py+5, 5, 12);
   ctx.fillRect(px+24, py+5, 5, 12);
+  ctx.fillStyle = '#881111';
+  ctx.fillRect(px-5, py+9, 5, 2);
+  ctx.fillRect(px+24, py+9, 5, 2);
   // skin hands
   ctx.fillStyle = SKIN;
   ctx.fillRect(px-5, py+15, 5, 4);
@@ -196,38 +101,167 @@ function _peach(ctx, px, py, lL, lR) {
   // head
   ctx.fillStyle = SKIN;
   ctx.fillRect(px+3, py-8, 18, 14);
-  // blonde hair
-  ctx.fillStyle = GOLD;
-  ctx.fillRect(px+1, py-12, 22, 6);
-  ctx.fillRect(px-1, py-6, 5, 10);
-  ctx.fillRect(px+20, py-6, 5, 10);
-  ctx.fillStyle = DKGLD;
-  ctx.fillRect(px+1, py-12, 22, 2);
-  // crown
-  ctx.fillStyle = GOLD;
-  ctx.fillRect(px+5, py-16, 14, 5);
-  ctx.fillRect(px+6, py-20, 3, 5);
-  ctx.fillRect(px+11, py-22, 3, 7);
-  ctx.fillRect(px+16, py-20, 3, 5);
-  ctx.fillStyle = DKGLD;
-  ctx.fillRect(px+5, py-12, 14, 1);
-  // crown gem
-  ctx.fillStyle = '#FF0066';
-  ctx.fillRect(px+12, py-17, 2, 2);
-  ctx.fillStyle = WHITE;
-  ctx.fillRect(px+12, py-17, 1, 1);
+  // brown hair (messy/short)
+  ctx.fillStyle = BROWN;
+  ctx.fillRect(px+2, py-12, 20, 6);
+  ctx.fillRect(px+3, py-8, 5, 3);
+  ctx.fillRect(px+16, py-8, 4, 3);
+  ctx.fillStyle = '#5C3010';
+  ctx.fillRect(px+4, py-13, 3, 3);
+  ctx.fillRect(px+10, py-14, 4, 3);
+  ctx.fillRect(px+17, py-13, 3, 3);
   // eyes
-  ctx.fillStyle = '#000066';
-  ctx.fillRect(px+7, py-4, 3, 4);
-  ctx.fillRect(px+14, py-4, 3, 4);
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px+6, py-4, 4, 3);
+  ctx.fillRect(px+13, py-4, 4, 3);
   ctx.fillStyle = WHITE;
-  ctx.fillRect(px+7, py-4, 1, 2);
-  ctx.fillRect(px+14, py-4, 1, 2);
-  // lips
-  ctx.fillStyle = '#CC2266';
-  ctx.fillRect(px+9, py+2, 6, 3);
-  ctx.fillStyle = '#FF4488';
-  ctx.fillRect(px+10, py+2, 4, 1);
+  ctx.fillRect(px+7, py-4, 2, 2);
+  ctx.fillRect(px+14, py-4, 2, 2);
+  // beard stubble (dark chin)
+  ctx.fillStyle = BROWN;
+  ctx.fillRect(px+4, py+1, 16, 4);
+  ctx.fillRect(px+3, py+3, 18, 3);
+  ctx.fillStyle = '#5C3010';
+  ctx.fillRect(px+5, py+2, 14, 2);
+}
+
+// Mike — grey hoodie, mustard cap, beard
+function _mike(ctx, px, py, lL, lR) {
+  // black sneakers
+  ctx.fillStyle = '#222';
+  ctx.fillRect(px-2, py+26+lL, 12, 5);
+  ctx.fillRect(px+13, py+26+lR, 12, 5);
+  ctx.fillStyle = '#555';
+  ctx.fillRect(px-2, py+26+lL, 12, 2);
+  ctx.fillRect(px+13, py+26+lR, 12, 2);
+  // dark jeans legs
+  ctx.fillStyle = '#334466';
+  ctx.fillRect(px+1, py+16+lL, 9, 12);
+  ctx.fillRect(px+14, py+16+lR, 9, 12);
+  ctx.fillStyle = '#223355';
+  ctx.fillRect(px+8, py+16+lL, 3, 12);
+  ctx.fillRect(px+21, py+16+lR, 3, 12);
+  // grey hoodie body
+  ctx.fillStyle = '#888898';
+  ctx.fillRect(px-1, py+5, 26, 13);
+  ctx.fillStyle = '#696978';
+  ctx.fillRect(px+20, py+5, 5, 13);
+  // hoodie pocket
+  ctx.fillStyle = '#696978';
+  ctx.fillRect(px+5, py+13, 14, 5);
+  ctx.fillStyle = '#888898';
+  ctx.fillRect(px+7, py+14, 10, 3);
+  // hoodie drawstrings
+  ctx.fillStyle = '#AAAAAA';
+  ctx.fillRect(px+9, py+5, 2, 7);
+  ctx.fillRect(px+13, py+5, 2, 7);
+  // grey hoodie arms
+  ctx.fillStyle = '#888898';
+  ctx.fillRect(px-5, py+5, 5, 13);
+  ctx.fillRect(px+24, py+5, 5, 13);
+  ctx.fillStyle = '#696978';
+  ctx.fillRect(px-5, py+16, 5, 3);
+  ctx.fillRect(px+24, py+16, 5, 3);
+  // skin hands
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px-5, py+17, 5, 4);
+  ctx.fillRect(px+24, py+17, 5, 4);
+  // head
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px+3, py-8, 18, 14);
+  // mustard yellow ball cap
+  ctx.fillStyle = '#CC9900';
+  ctx.fillRect(px+2, py-12, 20, 6);
+  ctx.fillRect(px-3, py-8, 29, 3);  // cap brim
+  ctx.fillStyle = '#AA7700';
+  ctx.fillRect(px+2, py-12, 20, 2);
+  ctx.fillRect(px-3, py-6, 29, 1);
+  // beard (full, medium brown)
+  ctx.fillStyle = '#7A5030';
+  ctx.fillRect(px+3, py-8, 4, 5);
+  ctx.fillRect(px+17, py-8, 4, 5);
+  ctx.fillStyle = BROWN;
+  ctx.fillRect(px+3, py+0, 18, 5);
+  ctx.fillRect(px+2, py+2, 20, 4);
+  ctx.fillStyle = '#9A6040';
+  ctx.fillRect(px+5, py+1, 3, 2);
+  ctx.fillRect(px+15, py+1, 3, 2);
+  // eyes
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px+6, py-5, 4, 3);
+  ctx.fillRect(px+13, py-5, 4, 3);
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(px+7, py-5, 2, 2);
+  ctx.fillRect(px+14, py-5, 2, 2);
+}
+
+// Kyle — green fleece jacket, glasses, brown hair
+function _kyle(ctx, px, py, lL, lR) {
+  // brown boots
+  ctx.fillStyle = '#6A3A18';
+  ctx.fillRect(px-2, py+26+lL, 12, 5);
+  ctx.fillRect(px+13, py+26+lR, 12, 5);
+  // dark jeans legs
+  ctx.fillStyle = '#2A3A66';
+  ctx.fillRect(px+1, py+16+lL, 9, 12);
+  ctx.fillRect(px+14, py+16+lR, 9, 12);
+  ctx.fillStyle = '#1E2E54';
+  ctx.fillRect(px+8, py+16+lL, 3, 12);
+  ctx.fillRect(px+21, py+16+lR, 3, 12);
+  // green fleece body
+  ctx.fillStyle = '#3A7A3A';
+  ctx.fillRect(px-1, py+5, 26, 13);
+  ctx.fillStyle = '#286028';
+  ctx.fillRect(px+20, py+5, 5, 13);
+  // fleece zip front
+  ctx.fillStyle = '#286028';
+  ctx.fillRect(px+11, py+5, 3, 13);
+  ctx.fillStyle = '#AAAAAA';
+  ctx.fillRect(px+12, py+6, 1, 10);  // zipper
+  // fleece collar
+  ctx.fillStyle = '#286028';
+  ctx.fillRect(px+6, py+5, 12, 5);
+  ctx.fillStyle = '#3A7A3A';
+  ctx.fillRect(px+8, py+5, 8, 3);
+  // green fleece arms
+  ctx.fillStyle = '#3A7A3A';
+  ctx.fillRect(px-5, py+5, 5, 13);
+  ctx.fillRect(px+24, py+5, 5, 13);
+  ctx.fillStyle = '#286028';
+  ctx.fillRect(px-5, py+16, 5, 3);
+  ctx.fillRect(px+24, py+16, 5, 3);
+  // skin hands
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px-5, py+17, 5, 4);
+  ctx.fillRect(px+24, py+17, 5, 4);
+  // head
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px+3, py-8, 18, 14);
+  // brown hair
+  ctx.fillStyle = '#8B5E3C';
+  ctx.fillRect(px+2, py-12, 20, 6);
+  ctx.fillRect(px+3, py-8,  5, 4);
+  ctx.fillRect(px+16, py-8, 4, 4);
+  ctx.fillStyle = '#6B4020';
+  ctx.fillRect(px+3, py-13, 18, 3);
+  // eyes
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px+6, py-4, 4, 3);
+  ctx.fillRect(px+13, py-4, 4, 3);
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(px+7, py-4, 2, 2);
+  ctx.fillRect(px+14, py-4, 2, 2);
+  // glasses frames (two rectangles + bridge)
+  ctx.fillStyle = '#333';
+  ctx.fillRect(px+5,  py-6, 7, 6);
+  ctx.fillRect(px+12, py-6, 7, 6);
+  ctx.fillRect(px+11, py-4, 2, 2);   // bridge
+  ctx.fillRect(px+4,  py-5, 2, 4);   // left arm
+  ctx.fillRect(px+18, py-5, 2, 4);   // right arm
+  // glass lenses (tinted)
+  ctx.fillStyle = 'rgba(180,220,255,0.35)';
+  ctx.fillRect(px+6,  py-5, 5, 4);
+  ctx.fillRect(px+13, py-5, 5, 4);
 }
 
 // ── CHAR PREVIEW (scaled) ─────────────────────
@@ -236,9 +270,9 @@ export function drawCharPreview(ctx, idx, cx, cy, scale) {
   ctx.translate(cx - 12*scale, cy - 6*scale);
   ctx.scale(scale, scale);
   const px=0, py=0;
-  if      (idx === 0) _mario(ctx, px, py, 0, 0);
-  else if (idx === 1) _luigi(ctx, px, py, 0, 0);
-  else                _peach(ctx, px, py, 0, 0);
+  if      (idx === 0) _steve(ctx, px, py, 0, 0);
+  else if (idx === 1) _mike(ctx, px, py, 0, 0);
+  else                _kyle(ctx, px, py, 0, 0);
   ctx.restore();
 }
 
