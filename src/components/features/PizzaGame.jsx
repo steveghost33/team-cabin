@@ -553,7 +553,7 @@ export default function PizzaGame() {
   };
 
   // horizontal arms (left / right) — wide rectangles
-  const dpadH = { ...dpadArm, width: 58, height: 38, borderRadius: 8 };
+  const dpadH = { ...dpadArm, width: 80, height: 52, borderRadius: 10 };
 
   const DPad = () => (
     <div
@@ -718,13 +718,13 @@ export default function PizzaGame() {
       style={{
         background: 'linear-gradient(180deg, #1a1c28 0%, #13141e 100%)',
         borderTop: `2px solid #2a2d40`,
-        paddingTop: 6,
-        paddingBottom: 'max(10px, env(safe-area-inset-bottom, 10px))',
-        paddingLeft: 12,
-        paddingRight: 12,
+        paddingTop: 10,
+        paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))',
+        paddingLeft: 16,
+        paddingRight: 16,
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
+        gap: 10,
         userSelect: 'none',
         WebkitUserSelect: 'none',
         WebkitTouchCallout: 'none',
@@ -750,7 +750,7 @@ export default function PizzaGame() {
 
         {/* Right — A (JUMP) face button */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-          <ActBtn k="jump" btnColor='#d63031' shadowColor='#6b0f0f' size={68} />
+          <ActBtn k="jump" btnColor='#d63031' shadowColor='#6b0f0f' size={90} />
         </div>
 
       </div>

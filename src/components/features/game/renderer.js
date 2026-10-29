@@ -200,41 +200,65 @@ function shadeHex(hex, amt) {
 }
 
 function drawGround(ctx, lvl, scrollX) {
-  const walkH = 20;                                  // sidewalk depth below the curb
-
-  // curb edge the player walks on, with a shadow line beneath it
-  ctx.fillStyle = lvl.groundTop;
-  ctx.fillRect(0, GROUND, W, 4);
-  ctx.fillStyle = 'rgba(0,0,0,0.3)';
-  ctx.fillRect(0, GROUND + 4, W, 2);
-
-  // sidewalk band
-  ctx.fillStyle = lvl.sidewalkColor || shadeHex(lvl.groundColor, 0.14);
-  ctx.fillRect(0, GROUND + 6, W, walkH);
-  // paving joints, scrolling with the level
-  ctx.fillStyle = 'rgba(0,0,0,0.22)';
-  for (let i = 0; i < W / 48 + 2; i++) {
-    const jx = ((i * 48 - scrollX * 0.5) % (W + 48) + W + 48) % (W + 48) - 48;
-    ctx.fillRect(jx, GROUND + 6, 1, walkH);
-  }
-  ctx.fillStyle = 'rgba(0,0,0,0.35)';
-  ctx.fillRect(0, GROUND + 6 + walkH, W, 2);
-
-  // roadway below the sidewalk, falling off toward the bottom of the screen
-  const roadY = GROUND + 8 + walkH;
-  const road = lvl.roadColor || lvl.groundColor;
-  const rg = ctx.createLinearGradient(0, roadY, 0, H);
-  rg.addColorStop(0, road);
-  rg.addColorStop(1, shadeHex(road, -0.45));
-  ctx.fillStyle = rg;
-  ctx.fillRect(0, roadY, W, H - roadY);
-
-  // grit on the roadway so the surface reads as ground, not a flat block
-  for (let i = 0; i < 70; i++) {
-    const gx = ((i * 53 - scrollX * 0.5) % (W + 60) + W + 60) % (W + 60) - 30;
-    const gy = roadY + 4 + ((i * 37) % Math.max(1, H - roadY - 8));
-    ctx.fillStyle = i % 3 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.16)';
-    ctx.fillRect(gx, gy, 2 + (i % 3), 2);
+  if (lvl.smb2Ground) {
+    // SMB2-style wavy grass ground
+    ctx.fillStyle = lvl.groundColor;
+    ctx.fillRect(0, GROUND, W, H - GROUND);
+    // wavy grass top edge
+    const bump = 8;
+    const period = 32;
+    ctx.fillStyle = lvl.groundTop;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, GROUND + bump);
+    for (let x = 0; x <= W + period; x += period) {
+      const ox = ((x - scrollX * 0.3) % (period * 2) + period * 2) % (period * 2);
+      ctx.quadraticCurveTo(ox - period * 0.5, GROUND - bump, ox, GROUND + bump);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+    // bright grass highlight strip
+    ctx.fillStyle = lvl.laneColor;
+    ctx.beginPath();
+    ctx.moveTo(0, GROUND + bump + 2);
+    for (let x = 0; x <= W + period; x += period) {
+      const ox = ((x - scrollX * 0.3) % (period * 2) + period * 2) % (period * 2);
+      ctx.quadraticCurveTo(ox - period * 0.5, GROUND - bump + 2, ox, GROUND + bump + 2);
+    }
+    ctx.lineTo(W, GROUND + bump + 5);
+    ctx.lineTo(0, GROUND + bump + 5);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    // Urban ground: curb, sidewalk, roadway
+    const walkH = 20;
+    ctx.fillStyle = lvl.groundTop;
+    ctx.fillRect(0, GROUND, W, 4);
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, GROUND + 4, W, 2);
+    ctx.fillStyle = lvl.sidewalkColor || shadeHex(lvl.groundColor, 0.14);
+    ctx.fillRect(0, GROUND + 6, W, walkH);
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    for (let i = 0; i < W / 48 + 2; i++) {
+      const jx = ((i * 48 - scrollX * 0.5) % (W + 48) + W + 48) % (W + 48) - 48;
+      ctx.fillRect(jx, GROUND + 6, 1, walkH);
+    }
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(0, GROUND + 6 + walkH, W, 2);
+    const roadY = GROUND + 8 + walkH;
+    const road = lvl.roadColor || lvl.groundColor;
+    const rg = ctx.createLinearGradient(0, roadY, 0, H);
+    rg.addColorStop(0, road);
+    rg.addColorStop(1, shadeHex(road, -0.45));
+    ctx.fillStyle = rg;
+    ctx.fillRect(0, roadY, W, H - roadY);
+    for (let i = 0; i < 70; i++) {
+      const gx = ((i * 53 - scrollX * 0.5) % (W + 60) + W + 60) % (W + 60) - 30;
+      const gy = roadY + 4 + ((i * 37) % Math.max(1, H - roadY - 8));
+      ctx.fillStyle = i % 3 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.16)';
+      ctx.fillRect(gx, gy, 2 + (i % 3), 2);
+    }
   }
 }
 
