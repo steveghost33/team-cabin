@@ -51,8 +51,21 @@ function ShowCard({ show }) {
         <p className="show-card__meta">{full}</p>
         <span className="show-card__venue">{show.venue}</span>
         <span className="show-card__details">
-          {show.city}, {show.state}{show.details ? ` — ${show.details}` : ''}
+          {show.city}, {show.state}{!show.bands && show.details ? ` — ${show.details}` : ''}
         </span>
+        {show.bands && (
+          <ul className="show-card__bands" aria-label="Also performing">
+            {show.bands.map((band, i) => (
+              <li key={band}>
+                {i === 0 ? <span className="show-card__bands-with">w/</span> : null}
+                {band}
+              </li>
+            ))}
+          </ul>
+        )}
+        {show.bands && show.details && (
+          <span className="show-card__logistics">{show.details}</span>
+        )}
         {links.length > 0 && (
           <div className="show-card__links">
             {links.map((link) => (

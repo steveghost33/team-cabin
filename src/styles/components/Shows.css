@@ -76,14 +76,20 @@
 }
 
 .show-card--flyer {
-  grid-template-columns: 76px 1fr 140px;
+  grid-template-columns: 76px 1fr 200px;
 }
 
 .show-card__flyer {
   display: block;
   border: 3px solid var(--color-ink);
-  box-shadow: 4px 4px 0 var(--color-ink);
+  box-shadow: 5px 5px 0 var(--color-ink);
   line-height: 0;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.show-card__flyer:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 var(--color-ink);
 }
 
 .show-card__flyer img {
@@ -136,6 +142,35 @@
   color: var(--color-ink-soft);
   display: block;
   margin-top: 0.2rem;
+}
+
+.show-card__bands {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  font-family: var(--font-vt323);
+  font-size: 1.5rem;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+
+.show-card__bands-with {
+  display: inline-block;
+  margin-right: 0.4em;
+  color: var(--color-ink-soft);
+  font-size: 1.1rem;
+}
+
+.show-card__bands li:not(:first-child) {
+  padding-left: 1.8em;
+}
+
+.show-card__logistics {
+  font-family: var(--font-vt323);
+  font-size: 1.3rem;
+  color: var(--color-ink-soft);
+  display: block;
+  margin-top: 0.3rem;
 }
 
 .show-card__links {
