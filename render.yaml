@@ -9,13 +9,9 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
       - key: DB_PATH
-        value: /data/leaderboard.db
+        value: leaderboard.db
       - key: ALLOWED_ORIGINS
         value: https://team-cabin.onrender.com
-    disk:
-      name: leaderboard-data
-      mountPath: /data
-      sizeGB: 1
 
   - type: web
     name: team-cabin
